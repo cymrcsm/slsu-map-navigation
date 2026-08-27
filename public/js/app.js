@@ -442,8 +442,8 @@ function getCategoryColor(categoryName) {
 // 6. LEAFLET MAP INITIALIZATION
 // ==========================================
 
-const MAP_WIDTH = 7852;
-const MAP_HEIGHT = 12060;
+const MAP_WIDTH = 320;
+const MAP_HEIGHT = 421;
 const bounds = [[0, 0], [MAP_HEIGHT, MAP_WIDTH]];
 
 const map = L.map('map', {
@@ -457,7 +457,7 @@ const map = L.map('map', {
   attributionControl: false
 });
 
-L.imageOverlay('assets/groundFloor_layer.png', bounds).addTo(map);
+L.imageOverlay('assets/groundFloor_layer.svg', bounds).addTo(map);
 
 function autoCenterCampus(animate = true) {
   map.fitBounds(bounds, { animate: animate });
