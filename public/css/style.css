@@ -1,22 +1,40 @@
 :root {
-  /* SLSU SIS Theme Tokens */
-  --bg-color: #F2EFE9;
-  --text-color: #334e68;
-  --text-dark: #1e293b;
-  --text-muted: #627d98;
-  --primary-color: #2563eb;
-  --secondary-color: #1e3a8a;
-  --accent-color: #3b82f6;
+  /* --- Palette lifted directly from assets/groundFloor_layer.svg --- */
+  --map-ground:     #778E81; /* campus grass, the map's base fill */
+  --map-stone:      #D9D0C9; /* building & pavement fill (dominant colour) */
+  --map-stone-deep: #BAA994; /* stone shadow / hairlines */
+  --map-paper:      #FEFDF9; /* label paper white */
+  --map-ink:        #333333; /* map linework and lettering */
+  --map-water:      #AAD3DF; /* water & glazing */
+  --map-water-mid:  #88AABE;
+  --map-water-deep: #65879A;
+  --map-clay:       #E3A358; /* roof tile orange */
+  --map-leaf:       #91C57E; /* tree canopy */
+  --map-sand:       #F4E7A5;
+  --map-taupe:      #A08F7C;
+
+  /* --- Semantic tokens --- */
+  --bg-color: var(--map-ground);
+  --text-color: #4A554E;
+  --text-dark: var(--map-ink);
+  --text-muted: #7C6F60;
+  --primary-color: var(--map-water-deep);
+  --primary-strong: #4E6B7C;  /* darkened enough for white text (AA) */
+  --secondary-color: #55707F;
+  --accent-color: var(--map-clay);
+  --accent-strong: #C97F3A;
+  --danger-color: #C2503A;    /* terracotta, warm sibling of the clay roofs */
 
   /* Surface, Shadow & Border Tokens */
-  --surface-sidebar: #f8fafc;
-  --surface-box: #ffffff;
-  --surface-input: #ffffff;
-  --surface-card: #ffffff;
-  --border-subtle: #e2e8f0;
-  --border-focus: #3b82f6;
-  --card-shadow: 0 4px 14px rgba(50, 70, 100, 0.08);
-  --card-shadow-hover: 0 6px 20px rgba(50, 70, 100, 0.12);
+  --surface-sidebar: var(--map-stone);
+  --surface-box: var(--map-paper);
+  --surface-input: var(--map-paper);
+  --surface-card: var(--map-paper);
+  --surface-hover: #F1EBE3;
+  --border-subtle: #C9BDB0;
+  --border-focus: var(--map-water-deep);
+  --card-shadow: 0 4px 14px rgba(70, 58, 46, 0.10);
+  --card-shadow-hover: 0 6px 20px rgba(70, 58, 46, 0.16);
 }
 
 * {
@@ -48,7 +66,7 @@ body, html {
   min-width: 380px;
   height: 100vh;
   background: var(--surface-sidebar);
-  border-right: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--map-stone-deep);
   display: flex;
   flex-direction: column;
   z-index: 10;
@@ -70,13 +88,13 @@ body, html {
   border-radius: 10px;
   padding: 0 12px;
   height: 42px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(70, 58, 46, 0.08);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .search-input-wrapper:focus-within {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 0 3px rgba(101, 135, 154, 0.22);
 }
 
 .search-icon {
@@ -120,7 +138,7 @@ body, html {
   font-weight: 500;
   outline: none;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(70, 58, 46, 0.08);
   transition: border-color 0.2s ease;
 }
 
@@ -129,7 +147,7 @@ body, html {
 }
 
 .dropdown-wrapper select option {
-  background: #ffffff;
+  background: var(--map-paper);
   color: var(--text-dark);
 }
 
@@ -144,7 +162,7 @@ body, html {
   overflow-y: auto;
   box-shadow: var(--card-shadow);
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: var(--map-stone-deep) transparent;
 }
 
 .info-box-container::-webkit-scrollbar {
@@ -152,7 +170,7 @@ body, html {
 }
 
 .info-box-container::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--map-stone-deep);
   border-radius: 4px;
 }
 
@@ -163,7 +181,8 @@ body, html {
 /* 1. Tutorial / Quick Guide View */
 .tutorial-tag {
   display: inline-block;
-  color: var(--primary-color);
+  color: var(--primary-strong);
+  background: rgba(101, 135, 154, 0.12);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -193,7 +212,7 @@ body, html {
   gap: 10px;
 }
 
-/* SIS-Style Floating Cards */
+/* Floating Guide Cards */
 .step-card {
   display: flex;
   align-items: flex-start;
@@ -202,7 +221,7 @@ body, html {
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   padding: 12px 14px;
-  box-shadow: 0 2px 6px rgba(50, 70, 100, 0.04);
+  box-shadow: 0 2px 6px rgba(70, 58, 46, 0.06);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -215,8 +234,8 @@ body, html {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--primary-color);
+  background: rgba(101, 135, 154, 0.15);
+  color: var(--primary-strong);
   font-size: 12px;
   font-weight: 700;
   display: flex;
@@ -225,7 +244,9 @@ body, html {
   flex-shrink: 0;
 }
 
-.step-content strong {
+/* Only the card's own heading is a block; a <strong> used inline inside the body
+   copy must stay inline, or every emphasised phrase breaks onto its own line. */
+.step-content > strong {
   display: block;
   font-size: 13px;
   color: var(--text-dark);
@@ -239,7 +260,7 @@ body, html {
 }
 
 .step-content em {
-  color: var(--primary-color);
+  color: var(--primary-strong);
   font-style: normal;
   font-weight: 600;
 }
@@ -248,7 +269,7 @@ body, html {
 .back-btn {
   background: transparent;
   border: none;
-  color: var(--primary-color);
+  color: var(--primary-strong);
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
@@ -266,8 +287,8 @@ body, html {
 .detail-badge {
   display: inline-block;
   padding: 4px 10px;
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--primary-color);
+  background: rgba(101, 135, 154, 0.12);
+  color: var(--primary-strong);
   border-radius: 6px;
   font-size: 11px;
   font-weight: 700;
@@ -344,26 +365,27 @@ body, html {
   transform: scale(0.98);
 }
 
+/* Clay orange, matching the route line it draws */
 .directions-btn {
-  background: var(--primary-color);
-  color: #ffffff;
+  background: var(--accent-color);
+  color: var(--map-ink);
   border: none;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 4px 12px rgba(201, 127, 58, 0.30);
 }
 
 .directions-btn:hover {
-  background: #1d4ed8;
+  background: var(--accent-strong);
 }
 
 .secondary-btn {
-  background: #ffffff;
+  background: var(--surface-card);
   color: var(--text-dark);
   border: 1px solid var(--border-subtle);
 }
 
 .secondary-btn:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
+  background: var(--surface-hover);
+  border-color: var(--map-stone-deep);
 }
 
 /* --- RIGHT COLUMN: MAP & CONTROLS --- */
@@ -380,11 +402,13 @@ body, html {
   background-color: var(--bg-color) !important;
 }
 
+/* Matches the map's own ground fill, so the area around the campus reads as
+   part of the drawing rather than as empty canvas. */
 .leaflet-container {
   background-color: var(--bg-color) !important;
 }
 
-/* SIS Floating Controls Bar (Bottom Right) */
+/* Floating Controls Bar (Bottom Right) */
 .horizontal-controls-bar {
   position: absolute;
   bottom: 24px;
@@ -399,7 +423,7 @@ body, html {
 .ctrl-group {
   display: flex;
   flex-direction: row;
-  background: #ffffff;
+  background: var(--map-paper);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: var(--card-shadow-hover);
@@ -422,18 +446,18 @@ body, html {
 }
 
 .ctrl-btn:hover {
-  background: #f1f5f9;
+  background: var(--surface-hover);
 }
 
 .floor-btn.active {
-  background: var(--primary-color);
-  color: #ffffff;
+  background: var(--primary-strong);
+  color: var(--map-paper);
 }
 
 /* Set Kiosk Placement State */
 #set-kiosk-btn.active-placement {
-  background: #ef4444 !important;
-  color: #ffffff !important;
+  background: var(--danger-color) !important;
+  color: var(--map-paper) !important;
   animation: pulse-kiosk-btn 0.9s infinite alternate;
 }
 
@@ -442,15 +466,27 @@ body, html {
   to { transform: scale(1.06); }
 }
 
+/* Location Pins (inline SVG, coloured per category by app.js) */
+.location-pin-icon {
+  background: transparent;
+  border: none;
+  filter: drop-shadow(0 2px 3px rgba(51, 51, 51, 0.35));
+  transition: transform 0.12s ease;
+}
+
+.location-pin-icon:hover {
+  transform: translateY(-2px);
+}
+
 /* Kiosk Custom Pulsing Marker */
 .kiosk-pulsing-marker {
   position: relative;
   width: 20px;
   height: 20px;
-  background: var(--primary-color);
-  border: 3px solid #ffffff;
+  background: var(--primary-strong);
+  border: 3px solid var(--map-paper);
   border-radius: 50%;
-  box-shadow: 0 0 10px rgba(37, 99, 235, 0.7);
+  box-shadow: 0 0 10px rgba(78, 107, 124, 0.75);
 }
 
 .kiosk-pulsing-marker::after {
@@ -461,7 +497,7 @@ body, html {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: rgba(37, 99, 235, 0.35);
+  background: rgba(78, 107, 124, 0.35);
   animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
 
@@ -470,10 +506,11 @@ body, html {
   100% { transform: scale(1.8); opacity: 0; }
 }
 
-/* Route Line Animation */
+/* Route Line Animation — clay orange reads clearly over the sage/stone map */
 .leaflet-interactive.route-line {
-  stroke: var(--primary-color);
+  stroke: var(--accent-color);
   stroke-dasharray: 10, 10;
+  paint-order: stroke;
   animation: dash 1s linear infinite;
 }
 
@@ -481,9 +518,9 @@ body, html {
   to { stroke-dashoffset: -20; }
 }
 
-/* Custom Tooltip Light Styling */
+/* Custom Tooltip Styling */
 .leaflet-tooltip {
-  background: #ffffff !important;
+  background: var(--map-paper) !important;
   border: 1px solid var(--border-subtle) !important;
   color: var(--text-dark) !important;
   font-size: 12px !important;
@@ -494,7 +531,7 @@ body, html {
 }
 
 .leaflet-tooltip-top:before {
-  border-top-color: #ffffff !important;
+  border-top-color: var(--map-paper) !important;
 }
 
 /* Coordinate Inspector */
@@ -502,7 +539,7 @@ body, html {
   position: absolute;
   bottom: 14px;
   left: 16px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(254, 253, 249, 0.92);
   color: var(--text-muted);
   padding: 6px 12px;
   border-radius: 6px;
@@ -510,5 +547,5 @@ body, html {
   font-size: 11px;
   z-index: 999;
   border: 1px solid var(--border-subtle);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(70, 58, 46, 0.10);
 }

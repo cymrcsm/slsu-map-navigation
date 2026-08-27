@@ -1,12 +1,24 @@
 // ==========================================
+// 0. MAP GEOMETRY
+// ==========================================
+// groundFloor_layer.svg is a 320 x 421 vector campus map. Every coordinate in
+// this file is expressed in that SVG user-space ([x, y], origin top-left) and is
+// converted to Leaflet's [lat, lng] ordering by toLeafletCoords().
+
+const MAP_WIDTH = 320;
+const MAP_HEIGHT = 421;
+
+// ==========================================
 // 1. CATEGORY & LOCATION DATA REGISTRY
 // ==========================================
+// Category colours are pulled from the groundFloor_layer.svg palette so the
+// pins, badges and route line read as part of the same map.
 
 const CATEGORIES = [
   { id: "ALL", name: "All Categories" },
-  { id: "Executive", name: "Executive & Administrative Offices", color: "#4b8df2" },
-  { id: "Archives", name: "Archives & Records", color: "#ab6a30" },
-  { id: "Auxiliary", name: "Auxiliary & Institutional Services", color: "#0891b2" }
+  { id: "Executive", name: "Executive & Administrative Offices", color: "#4E6B7C" },
+  { id: "Archives", name: "Archives & Records", color: "#8A6A45" },
+  { id: "Auxiliary", name: "Auxiliary & Institutional Services", color: "#4F7A5E" }
 ];
 
 const LOCATIONS = [
@@ -18,7 +30,7 @@ const LOCATIONS = [
     category: "Auxiliary",
     floor: "Ground Floor",
     hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [4770, 2810],
+    coords: [196.0, 312.8],
     doorNode: "c_north_bargo",
     description: "Handles university auxiliary ventures, institutional income generation, and business facility rentals."
   },
@@ -30,7 +42,7 @@ const LOCATIONS = [
     category: "Executive",
     floor: "Ground Floor",
     hours: "8:00 AM - 4:00 PM (Mon - Fri)",
-    coords: [5459, 2811],
+    coords: [211.1, 312.7],
     doorNode: "c_north_cashier",
     description: "Handles university fee assessments, student tuition payments, cashiering transactions, and financial clearances."
   },
@@ -42,7 +54,7 @@ const LOCATIONS = [
     category: "Executive",
     floor: "Ground Floor",
     hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [5853, 2623],
+    coords: [217.8, 313.2],
     doorNode: "c_mid_east",
     description: "Handles student admissions, registration, enrollment records, transcripts, and scholastic verifications."
   },
@@ -54,7 +66,7 @@ const LOCATIONS = [
     category: "Executive",
     floor: "Ground Floor",
     hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [5457, 2205],
+    coords: [221.0, 328.6],
     doorNode: "c_door_op",
     description: "The primary executive office for university governance and administrative leadership."
   },
@@ -66,7 +78,7 @@ const LOCATIONS = [
     category: "Archives",
     floor: "Ground Floor",
     hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [5465, 2031],
+    coords: [212.0, 328.7],
     doorNode: "c_door_sra",
     description: "Central repository for student academic transcripts, permanent records, and enrollment archives."
   },
@@ -78,7 +90,7 @@ const LOCATIONS = [
     category: "Executive",
     floor: "Ground Floor",
     hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [4873, 2172],
+    coords: [196.2, 324.6],
     doorNode: "c_cross_ovpaa",
     description: "Executive offices coordinating university curriculum, academic policies, operational administration, and fiscal management."
   },
@@ -90,7 +102,7 @@ const LOCATIONS = [
     category: "Executive",
     floor: "Ground Floor",
     hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [4609, 2216],
+    coords: [188.9, 324.8],
     doorNode: "c_cross_hrmo",
     description: "Oversees personnel management, employee relations, recruitment, and faculty benefits."
   },
@@ -102,7 +114,7 @@ const LOCATIONS = [
     category: "Archives",
     floor: "Ground Floor",
     hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [4586, 1745],
+    coords: [183.7, 337.5],
     doorNode: "door_archives",
     description: "Institutional repository preserving historical records, university publications, and institutional artifacts."
   },
@@ -114,7 +126,7 @@ const LOCATIONS = [
     category: "Executive",
     floor: "Ground Floor",
     hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [4706, 1559],
+    coords: [192.0, 342.5],
     doorNode: "door_coa",
     description: "Government auditing office reviewing university financial accounts, fiscal accountability, and compliance."
   },
@@ -126,7 +138,7 @@ const LOCATIONS = [
     category: "Executive",
     floor: "Ground Floor",
     hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [4878, 1573],
+    coords: [196.8, 342.5],
     doorNode: "door_odqa",
     description: "Leads institutional accreditation, quality management systems, and academic standard compliance."
   },
@@ -138,105 +150,66 @@ const LOCATIONS = [
     category: "Auxiliary",
     floor: "Ground Floor",
     hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [5109, 1572],
+    coords: [201.6, 342.5],
     doorNode: "door_gad",
     description: "Promotes gender-responsive programs, advocacy initiatives, and campus-wide inclusivity support."
   }
 ];
 
 // ==========================================
-// 2. PERFECTED WALL BARRIERS REGISTRY 
+// 2. CORRIDOR NETWORK
 // ==========================================
-
-const USER_WALLS = [
-  // North Building Rooms
-  [[5009, 2440], [4535, 2440], [4535, 2784], [5010, 2783], [5009, 2440]],
-  [[5247, 2442], [5247, 2782], [5662, 2443], [5823, 2442], [5823, 2781], [5247, 2782]],
-  [[4535, 2440], [510, 2783]],
-  [[5719, 2331], [5248, 2331], [5248, 2189]],
-  [[5248, 2107], [5248, 2080], [5662, 2080], [5662, 2331], [5248, 2331]],
-  [[5247, 2047], [5248, 2073], [5662, 2073], [5662, 1992], [5247, 1992], [5247, 2011]],
-  [[4905, 2332], [5010, 2332], [5010, 1992], [4747, 1992], [4747, 2332], [4836, 2332]],
-  [[4686, 2331], [4739, 2331], [4739, 1991], [4482, 1991], [4482, 2331], [4626, 2331]],
-  [[5662, 1992], [5823, 1992], [5823, 2331], [5662, 2331]],
-
-  // South Wing Inner Rooms
-  [[4634, 1725], [4634, 1456], [4496, 1456], [4496, 1858], [4633, 1858], [4633, 1784]], 
-  [[4719, 1613], [4760, 1613], [4760, 1456], [4642, 1456], [4642, 1613], [4683, 1613]], 
-  [[4903, 1613], [4988, 1613], [4988, 1456], [4768, 1456], [4768, 1613], [4859, 1613]], 
-  [[5131, 1613], [5211, 1613], [5211, 1457], [4995, 1457], [4995, 1613], [5090, 1613]], 
-  
-  // South Wing Outer Boundaries and Partition Gaps
-  [[4770, 1865], [4490, 1866], [4489, 1449], [5218, 1449], [5218, 1613]],
-  [[4633, 1865], [4633, 1774]],
-  [[4633, 1724], [4633, 1449]],
-  [[4633, 1613], [4688, 1613]],
-  [[4731, 1613], [4856, 1613]],
-  [[4903, 1613], [5082, 1613]],
-  [[5137, 1613], [5219, 1613]],
-  [[4991, 1613], [4991, 1449]],
-  [[4770, 1659], [4770, 1449]]
-];
-
-const WALL_BARRIERS = [];
-USER_WALLS.forEach(chain => {
-  for (let i = 0; i < chain.length - 1; i++) {
-    WALL_BARRIERS.push([chain[i], chain[i + 1]]);
-  }
-});
-
-// ==========================================
-// 3. STRICT ORTHOGONAL CORRIDOR NETWORK
-// ==========================================
+// Walkable node graph through the Administration Building, in
+// groundFloor_layer.svg coordinates. To re-pick any node, click the map and read
+// the coordinate inspector in the bottom-left corner.
 
 const CORRIDOR_NODES = {
   // North Hallway Corridors
-  "c_north_west":     [4440, 2840],
-  "c_north_bargo":    [4770, 2840],
-  "c_north_mid":      [5125, 2840],
-  "c_north_cashier":  [5459, 2840],
-  "c_north_east":     [5900, 2840],
-  "c_mid_west":       [4440, 2600],
-  "c_mid_spine":      [5125, 2600],
-  "c_mid_east":       [5900, 2623],
-  "c_cross_west":     [4440, 2385],
-  "c_cross_hrmo":     [4655, 2385],
-  "c_cross_ovpaa":    [4873, 2385],
-  "c_cross_spine":    [5125, 2385],
-  "c_cross_east":     [5900, 2385],
-  "c_spine_op":       [5125, 2150],
-  "c_door_op":        [5230, 2150],
-  "c_spine_sra":      [5125, 2030],
-  "c_door_sra":       [5230, 2030],
-  "c_spine_lobby":    [5125, 1880],
-  "c_lobby_center":   [4873, 1880],
+  "c_north_west":        [184.92, 310.99],
+  "c_north_bargo":       [193.85, 310.78],
+  "c_north_mid":         [203.46, 310.55],
+  "c_north_cashier":     [212.50, 310.34],
+  "c_north_east":        [224.44, 310.05],
+  "c_mid_west":          [184.78, 316.87],
+  "c_mid_spine":         [203.33, 316.43],
+  "c_mid_east":          [224.32, 315.37],
+  "c_cross_west":        [184.66, 322.13],
+  "c_cross_hrmo":        [190.48, 321.99],
+  "c_cross_ovpaa":       [196.38, 321.85],
+  "c_cross_spine":       [203.21, 321.69],
+  "c_cross_east":        [224.19, 321.19],
+  "c_spine_op":          [203.07, 327.44],
+  "c_door_op":           [205.92, 327.37],
+  "c_spine_sra":         [203.01, 330.38],
+  "c_door_sra":          [205.85, 330.31],
+  "c_spine_lobby":       [202.92, 334.05],
+  "c_lobby_center":      [196.10, 334.21],
 
-  // NEW: Approach from Lobby to the EAST SIDE ENTRANCE
-  "lobby_to_entrance": [4873, 1750], 
-  "entrance_outside":  [4800, 1750], // Node outside the physical gap
-  "entrance_inside":   [4700, 1750], // Node successfully passed through gap
-  
-  // South Wing Interior Paths
-  "hall_archives_front": [4660, 1750],
-  "hall_main_vert":      [4700, 1680],
-  "hall_coa":            [4701, 1680],
-  "hall_odqa":           [4881, 1680],
-  "hall_gad":            [5110, 1680],
+  // Approach from the Lobby to the east side entrance
+  "lobby_to_entrance":   [196.02, 337.39],
+  "entrance_outside":    [194.05, 337.44],
+  "entrance_inside":     [191.34, 337.51],
 
-  // Exact Door Openings based precisely on your wall gap centers
-  "door_archives": [4633, 1750],
-  "door_coa":      [4701, 1613],
-  "door_odqa":     [4881, 1613],
-  "door_gad":      [5110, 1613],
+  // South Wing interior paths
+  "hall_archives_front": [190.26, 337.53],
+  "hall_main_vert":      [191.30, 339.22],
+  "hall_coa":            [191.33, 339.22],
+  "hall_odqa":           [196.20, 339.10],
+  "hall_gad":            [202.40, 338.96],
 
-  // Outdoor Bypass Perimeter
-  "out_bot_m": [4873, 1380], 
-  "out_bot_e": [5300, 1380], 
-  "out_mid_e": [5300, 1750], // Connects back to East Entrance
-  "out_top_e": [5300, 1880],
-  
-  "out_bot_w": [4400, 1380], 
-  "out_mid_w": [4400, 1880]
+  // Door openings
+  "door_archives":       [189.53, 337.55],
+  "door_coa":            [191.29, 340.86],
+  "door_odqa":           [196.16, 340.74],
+  "door_gad":            [202.36, 340.60],
+
+  // Outdoor bypass perimeter
+  "out_bot_m":           [195.82, 346.45],
+  "out_bot_e":           [207.38, 346.18],
+  "out_mid_e":           [207.59, 337.12],
+  "out_top_e":           [207.66, 333.94],
+  "out_bot_w":           [183.01, 346.75],
+  "out_mid_w":           [183.29, 334.52]
 };
 
 const CORRIDOR_EDGES = [
@@ -264,11 +237,11 @@ const CORRIDOR_EDGES = [
   ["c_spine_lobby", "out_top_e"],
   ["c_lobby_center", "out_mid_w"],
 
-  // Connecting to the True Entrance at Y=1750
+  // Connecting to the east entrance
   ["c_lobby_center", "lobby_to_entrance"],
   ["lobby_to_entrance", "entrance_outside"],
-  ["entrance_outside", "entrance_inside"], // Physically passes through wall gap
-  
+  ["entrance_outside", "entrance_inside"],
+
   ["entrance_inside", "hall_archives_front"],
   ["hall_archives_front", "door_archives"],
 
@@ -282,67 +255,34 @@ const CORRIDOR_EDGES = [
   ["hall_odqa", "hall_gad"],
   ["hall_gad", "door_gad"],
 
-  // Outdoor Bypass Paths
+  // Outdoor bypass paths
   ["out_bot_m", "out_bot_e"],
   ["out_bot_m", "out_bot_w"],
   ["out_bot_w", "out_mid_w"],
   ["out_bot_e", "out_mid_e"],
   ["out_mid_e", "out_top_e"],
 
-  // Sweeping connection from right-side outdoor path into entrance
+  // Sweeping connection from the right-side outdoor path into the entrance
   ["out_mid_e", "lobby_to_entrance"]
 ];
 
 // ==========================================
-// 4. COLLISION DETECTION & PATHFINDING (A*)
+// 3. PATHFINDING (A*)
 // ==========================================
 
 function getDistance(p1, p2) {
   return Math.hypot(p1[0] - p2[0], p1[1] - p2[1]);
 }
 
-function segmentsIntersect(a, b, c, d) {
-  function ccw(p, q, r) {
-    return (r[1] - p[1]) * (q[0] - p[0]) > (q[1] - p[1]) * (r[0] - p[0]);
-  }
-  return (ccw(a, c, d) !== ccw(b, c, d)) && (ccw(a, b, c) !== ccw(a, b, d));
-}
-
-function pathCrossesWall(p1, p2) {
-  const dx = p2[0] - p1[0];
-  const dy = p2[1] - p1[1];
-  const len = Math.hypot(dx, dy);
-  if (len === 0) return false;
-
-  const eps = 2.0 / len;
-  if (eps >= 0.5) return false;
-
-  const a = [p1[0] + dx * eps, p1[1] + dy * eps];
-  const b = [p2[0] - dx * eps, p2[1] - dy * eps];
-
-  return WALL_BARRIERS.some(([w1, w2]) => segmentsIntersect(a, b, w1, w2));
-}
-
-function findNearestAccessibleCorridorNode(coords) {
+function findNearestCorridorNode(coords) {
   let closestNode = null;
   let minDistance = Infinity;
 
   for (const [nodeId, nodeCoords] of Object.entries(CORRIDOR_NODES)) {
     const dist = getDistance(coords, nodeCoords);
-    if (!pathCrossesWall(coords, nodeCoords) && dist < minDistance) {
+    if (dist < minDistance) {
       minDistance = dist;
       closestNode = nodeId;
-    }
-  }
-
-  // Absolute closest fallback if placed in a corner
-  if (!closestNode) {
-    for (const [nodeId, nodeCoords] of Object.entries(CORRIDOR_NODES)) {
-      const dist = getDistance(coords, nodeCoords);
-      if (dist < minDistance) {
-        minDistance = dist;
-        closestNode = nodeId;
-      }
     }
   }
   return closestNode;
@@ -351,20 +291,12 @@ function findNearestAccessibleCorridorNode(coords) {
 function buildGraph() {
   const graph = {};
   for (const nodeId in CORRIDOR_NODES) graph[nodeId] = [];
-  
+
   CORRIDOR_EDGES.forEach(([u, v]) => {
     if (graph[u] && graph[v]) {
-      const p1 = CORRIDOR_NODES[u];
-      const p2 = CORRIDOR_NODES[v];
-
-      // ABSOLUTE STRICT COLLISION CHECK - NO OVERRIDES.
-      if (!pathCrossesWall(p1, p2)) {
-        const dist = getDistance(p1, p2);
-        graph[u].push({ node: v, cost: dist });
-        graph[v].push({ node: u, cost: dist });
-      } else {
-        console.warn(`Path blocked by wall between ${u} and ${v}`);
-      }
+      const dist = getDistance(CORRIDOR_NODES[u], CORRIDOR_NODES[v]);
+      graph[u].push({ node: v, cost: dist });
+      graph[v].push({ node: u, cost: dist });
     }
   });
   return graph;
@@ -426,31 +358,47 @@ function computeCorridorPath(startNodeId, endNodeId) {
 }
 
 // ==========================================
-// 5. HELPER FUNCTIONS
+// 4. HELPER FUNCTIONS
 // ==========================================
 
+// L.CRS.Simple counts latitude upwards, while the SVG counts y downwards, and
+// the image overlay pins svg-y 0 to the top of the bounds. Flip y so a stored
+// [x, y] lands on the same spot it occupies in groundFloor_layer.svg.
 function toLeafletCoords(xyCoords) {
-  return [xyCoords[1], xyCoords[0]];
+  return [MAP_HEIGHT - xyCoords[1], xyCoords[0]];
+}
+
+function fromLeafletCoords(latlng) {
+  return [latlng.lng, MAP_HEIGHT - latlng.lat];
 }
 
 function getCategoryColor(categoryName) {
   const cat = CATEGORIES.find(c => c.id === categoryName);
-  return cat ? cat.color : '#4b8df2';
+  return cat ? cat.color : '#4E6B7C';
 }
 
 // ==========================================
-// 6. LEAFLET MAP INITIALIZATION
+// 5. LEAFLET MAP INITIALIZATION
 // ==========================================
 
-const MAP_WIDTH = 320;
-const MAP_HEIGHT = 421;
 const bounds = [[0, 0], [MAP_HEIGHT, MAP_WIDTH]];
+
+// Zoom range for the 320x421 vector map. At zoom 0 one map unit is one screen
+// pixel, so the whole campus would be a 320px thumbnail; fitting it into the
+// kiosk map panel lands around zoom 1.25. Room-level detail sits well above
+// that, so the usable range is positive rather than the old negative range.
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 5;
+const ROOM_ZOOM = 4;      // flyTo level when a location is selected
+const ROUTE_MAX_ZOOM = 4; // ceiling used when fitting a drawn route
 
 const map = L.map('map', {
   crs: L.CRS.Simple,
-  minZoom: -4,
-  maxZoom: 1,
-  zoomSnap: 0.25,
+  minZoom: MIN_ZOOM,
+  maxZoom: MAX_ZOOM,
+  zoomSnap: 0,      // continuous, so fitBounds fills the panel exactly
+  zoomDelta: 0.5,   // but the +/- buttons still move in readable steps
+  wheelPxPerZoomLevel: 120,
   maxBounds: bounds,
   maxBoundsViscosity: 1.0,
   zoomControl: false,
@@ -460,15 +408,17 @@ const map = L.map('map', {
 L.imageOverlay('assets/groundFloor_layer.svg', bounds).addTo(map);
 
 function autoCenterCampus(animate = true) {
-  map.fitBounds(bounds, { animate: animate });
-  map.panBy([-180, 0], { animate: animate });
+  map.fitBounds(bounds, { animate: animate, padding: [16, 16] });
 }
 autoCenterCampus(false);
 
-setTimeout(() => map.invalidateSize(), 200);
+setTimeout(() => {
+  map.invalidateSize();
+  autoCenterCampus(false);
+}, 200);
 
 // ==========================================
-// 7. UI ELEMENT REFERENCES
+// 6. UI ELEMENT REFERENCES
 // ==========================================
 
 const searchInput = document.getElementById('search-input');
@@ -495,11 +445,27 @@ let activeRouteLayer = null;
 const markerLayer = L.layerGroup().addTo(map);
 
 // ==========================================
-// 8. KIOSK POSITIONING (PERSISTENT STATE)
+// 7. KIOSK POSITIONING (PERSISTENT STATE)
 // ==========================================
 
-const DEFAULT_KIOSK_COORDS = [4873, 1800];
-let kioskCoords = JSON.parse(localStorage.getItem('kiosk_coords')) || DEFAULT_KIOSK_COORDS;
+const DEFAULT_KIOSK_COORDS = [196.1, 334.2]; // Administration Building lobby
+
+// A kiosk position saved against the previous, much larger floor plan falls
+// outside the new 320x421 map, so discard anything that no longer fits.
+function readStoredKioskCoords() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('kiosk_coords'));
+    if (!Array.isArray(saved) || saved.length !== 2) return null;
+    const [x, y] = saved;
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+    if (x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT) return null;
+    return [x, y];
+  } catch (err) {
+    return null;
+  }
+}
+
+let kioskCoords = readStoredKioskCoords() || DEFAULT_KIOSK_COORDS;
 let isSettingKioskLocation = false;
 let kioskMarker = null;
 
@@ -522,7 +488,7 @@ function renderKioskMarker() {
 renderKioskMarker();
 
 // ==========================================
-// 9. POPULATE DROPDOWN & RENDER PINS
+// 8. POPULATE DROPDOWN & RENDER PINS
 // ==========================================
 
 categoryDropdown.innerHTML = '';
@@ -533,11 +499,27 @@ CATEGORIES.forEach(cat => {
   categoryDropdown.appendChild(opt);
 });
 
-const locationMarkerIcon = L.icon({
-  iconUrl: 'assets/location.svg',
-  iconSize: [36, 36],
-  iconAnchor: [18, 36],
-  popupAnchor: [0, -36]
+// Pins are drawn inline so each one can carry its category colour from the
+// groundFloor_layer.svg palette, instead of the flat white assets/location.svg
+// that disappeared against the light building fills.
+function buildPinIcon(color) {
+  return L.divIcon({
+    className: 'location-pin-icon',
+    html: `
+      <svg viewBox="0 0 24 32" width="26" height="34" aria-hidden="true">
+        <path d="M12 0.9C5.9 0.9 1 5.8 1 11.9c0 7.8 9.4 18.1 10.1 18.9a1.2 1.2 0 0 0 1.8 0C13.6 30 23 19.7 23 11.9 23 5.8 18.1 0.9 12 0.9Z"
+              fill="${color}" stroke="#FEFDF9" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="12" cy="11.9" r="4.1" fill="#FEFDF9"/>
+      </svg>`,
+    iconSize: [26, 34],
+    iconAnchor: [13, 32],
+    popupAnchor: [0, -32]
+  });
+}
+
+const PIN_ICONS = {};
+CATEGORIES.forEach(cat => {
+  if (cat.color) PIN_ICONS[cat.id] = buildPinIcon(cat.color);
 });
 
 function renderMarkers(selectedCategory = "ALL", searchQuery = "") {
@@ -546,16 +528,17 @@ function renderMarkers(selectedCategory = "ALL", searchQuery = "") {
 
   const filtered = LOCATIONS.filter(loc => {
     const matchesCat = selectedCategory === "ALL" || loc.category === selectedCategory;
-    const matchesSearch = !q || 
-      loc.name.toLowerCase().includes(q) || 
-      loc.acronym.toLowerCase().includes(q) || 
+    const matchesSearch = !q ||
+      loc.name.toLowerCase().includes(q) ||
+      loc.acronym.toLowerCase().includes(q) ||
       loc.building.toLowerCase().includes(q);
     return matchesCat && matchesSearch;
   });
 
   filtered.forEach(loc => {
     const leafletPosition = toLeafletCoords(loc.coords);
-    const marker = L.marker(leafletPosition, { icon: locationMarkerIcon });
+    const icon = PIN_ICONS[loc.category] || buildPinIcon(getCategoryColor(loc.category));
+    const marker = L.marker(leafletPosition, { icon: icon, title: loc.acronym });
 
     marker.on('click', () => showLocationDetails(loc));
     markerLayer.addLayer(marker);
@@ -581,7 +564,7 @@ function showLocationDetails(loc) {
   detailView.classList.remove('hidden');
 
   const leafletPosition = toLeafletCoords(loc.coords);
-  map.flyTo(leafletPosition, -0.5, { animate: true, duration: 0.8 });
+  map.flyTo(leafletPosition, ROOM_ZOOM, { animate: true, duration: 0.8 });
 }
 
 function showTutorialView() {
@@ -592,7 +575,7 @@ function showTutorialView() {
 }
 
 // ==========================================
-// 10. ROUTING / ASK FOR DIRECTIONS
+// 9. ROUTING / ASK FOR DIRECTIONS
 // ==========================================
 
 function clearActiveRoute() {
@@ -606,16 +589,15 @@ function drawRoute(destination) {
   clearActiveRoute();
 
   const targetNodeId = destination.doorNode;
-  const startCorridorId = findNearestAccessibleCorridorNode(kioskCoords);
+  const startCorridorId = findNearestCorridorNode(kioskCoords);
 
   if (!startCorridorId) return;
 
   const corridorPathNodes = computeCorridorPath(startCorridorId, targetNodeId);
 
-  // Fallback Check
   if (corridorPathNodes.length === 0 && startCorridorId !== targetNodeId) {
-    alert("Route is physically blocked by wall barriers.");
-    console.warn("Pathfinder blocked.");
+    inspector.innerText = "⚠ No corridor route found to that destination.";
+    console.warn(`No path in corridor graph: ${startCorridorId} -> ${targetNodeId}`);
     return;
   }
 
@@ -634,8 +616,7 @@ function drawRoute(destination) {
   const leafletWaypoints = finalWaypoints.map(pt => toLeafletCoords(pt));
 
   activeRouteLayer = L.polyline(leafletWaypoints, {
-    color: '#38bdf8',
-    weight: 6,
+    weight: 5,
     opacity: 0.95,
     className: 'route-line',
     lineCap: 'round',
@@ -643,14 +624,15 @@ function drawRoute(destination) {
   }).addTo(map);
 
   map.fitBounds(activeRouteLayer.getBounds(), {
-    padding: [80, 80],
+    padding: [70, 70],
+    maxZoom: ROUTE_MAX_ZOOM,
     animate: true,
     duration: 1
   });
 }
 
 // ==========================================
-// 11. EVENT LISTENERS
+// 10. EVENT LISTENERS
 // ==========================================
 
 backToTutorialBtn.addEventListener('click', showTutorialView);
@@ -658,7 +640,7 @@ backToTutorialBtn.addEventListener('click', showTutorialView);
 recenterRoomBtn.addEventListener('click', () => {
   if (activeSelectedLocation) {
     const leafletPosition = toLeafletCoords(activeSelectedLocation.coords);
-    map.flyTo(leafletPosition, 0, { animate: true });
+    map.flyTo(leafletPosition, MAX_ZOOM - 0.5, { animate: true });
   }
 });
 
@@ -680,8 +662,11 @@ setKioskBtn.addEventListener('click', () => {
 });
 
 map.on('click', (e) => {
-  const y = Math.round(e.latlng.lat);
-  const x = Math.round(e.latlng.lng);
+  // One decimal place: the map is only 320 units wide, so whole numbers are too
+  // coarse to place a pin or a corridor node accurately.
+  const [rawX, rawY] = fromLeafletCoords(e.latlng);
+  const x = Math.round(rawX * 10) / 10;
+  const y = Math.round(rawY * 10) / 10;
 
   if (isSettingKioskLocation) {
     kioskCoords = [x, y];
