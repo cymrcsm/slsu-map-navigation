@@ -1,8 +1,9 @@
 // GENERATED FILE - do not edit by hand.
 // Built from public/assets/groundFloor_layer.svg: every named room, office and
 // facility label on the ground floor layer, minus the ramps and stairs.
-// coords = the label position (where the pin sits).
-// entry  = nearest point on the campus walkable network, used as the routing target.
+//   coords  the pin position on the map
+//   textH   height of the label lettering in map units, used to pick a zoom
+//           level at which that particular label is actually readable
 
 const CATEGORIES = [
   {
@@ -61,13 +62,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   107.4,
-   328.4
+   107.5,
+   327
   ],
-  "entry": [
-   108,
-   328
-  ],
+  "textH": 0.68,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -79,13 +77,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   183.7,
-   337.5
+   188,
+   340.4
   ],
-  "entry": [
-   183.5,
-   335.5
-  ],
+  "textH": 0.75,
   "description": "Records, storage and supply area maintained by the university."
  },
  {
@@ -97,13 +92,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   103.1,
-   343.5
+   103.4,
+   342.6
   ],
-  "entry": [
-   99.5,
-   343.5
-  ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -116,12 +108,9 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    115.5,
-   343.6
+   342.6
   ],
-  "entry": [
-   115.5,
-   349
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -133,13 +122,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   115.4,
-   338.5
-  ],
-  "entry": [
    115.5,
-   335
+   340
   ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -152,12 +138,9 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    121.4,
-   343.5
+   342.6
   ],
-  "entry": [
-   121.5,
-   349
-  ],
+  "textH": 0.74,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -169,13 +152,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   133.9,
-   227
+   134.3,
+   228.9
   ],
-  "entry": [
-   134,
-   227
-  ],
+  "textH": 0.58,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -187,13 +167,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   188.5,
-   241.3
+   189,
+   245
   ],
-  "entry": [
-   188.5,
-   241.5
-  ],
+  "textH": 0.7,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -205,13 +182,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   196.5,
-   241.3
+   196,
+   245
   ],
-  "entry": [
-   196.5,
-   241.5
-  ],
+  "textH": 0.7,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -223,13 +197,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   203.5,
-   241.3
+   204,
+   245
   ],
-  "entry": [
-   203.5,
-   241.5
-  ],
+  "textH": 0.7,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -241,13 +212,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   211.5,
-   241.3
+   211.4,
+   245
   ],
-  "entry": [
-   211.5,
-   241.5
-  ],
+  "textH": 0.7,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -259,13 +227,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   211.7,
-   286.4
+   211.4,
+   283.4
   ],
-  "entry": [
-   211.5,
-   287
-  ],
+  "textH": 0.7,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -277,13 +242,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   205.1,
-   286.4
+   205,
+   283.4
   ],
-  "entry": [
-   204.5,
-   286.5
-  ],
+  "textH": 0.7,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -295,13 +257,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   194.1,
-   286.4
-  ],
-  "entry": [
    194,
-   287
+   283.4
   ],
+  "textH": 0.7,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -313,31 +272,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   188.1,
-   286.4
-  ],
-  "entry": [
    188,
-   287
+   283.4
   ],
+  "textH": 0.7,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
   "id": "assessment-area",
   "name": "Assessment Area",
   "acronym": "AA",
-  "building": "Barracks",
+  "building": "SLSU Main Campus",
   "category": "Admin",
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   91.2,
-   121.8
+   87,
+   121
   ],
-  "entry": [
-   93,
-   133
-  ],
+  "textH": 1.16,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -349,13 +302,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   137.6,
-   240.4
+   138.7,
+   239
   ],
-  "entry": [
-   137.5,
-   240
-  ],
+  "textH": 0.73,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -367,31 +317,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   105.5,
-   105.5
+   61,
+   158.5
   ],
-  "entry": [
-   105.5,
-   105.5
-  ],
+  "textH": 0.71,
   "description": "Student support and welfare service point."
  },
  {
   "id": "basketball-court",
   "name": "Basketball Court",
   "acronym": "BC",
-  "building": "Hotel De SLSU",
+  "building": "Physical Education Building",
   "category": "Sports",
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   144.5,
-   161
+   144.4,
+   157.8
   ],
-  "entry": [
-   144.5,
-   142
-  ],
+  "textH": 0.76,
   "description": "Sports and recreation facility open to students and staff."
  },
  {
@@ -403,13 +347,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   112.7,
-   156.5
+   115.8,
+   153.6
   ],
-  "entry": [
-   112.5,
-   139.5
-  ],
+  "textH": 1.05,
   "description": "Sports and recreation facility open to students and staff."
  },
  {
@@ -421,31 +362,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   196,
-   312.8
+   199.2,
+   307.4
   ],
-  "entry": [
-   195.5,
-   312.5
-  ],
+  "textH": 0.85,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "campus-oval",
   "name": "Campus Oval",
   "acronym": "CO",
-  "building": "Hotel De SLSU",
+  "building": "SLSU Main Campus",
   "category": "Sports",
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   162.9,
-   161.6
+   148.8,
+   185.5
   ],
-  "entry": [
-   163,
-   142.5
-  ],
+  "textH": 3.74,
   "description": "Sports and recreation facility open to students and staff."
  },
  {
@@ -457,13 +392,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   211.2,
-   312.7
+   210.9,
+   308.6
   ],
-  "entry": [
-   211,
-   312
-  ],
+  "textH": 0.62,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -475,13 +407,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   54.6,
-   211.7
-  ],
-  "entry": [
-   64.5,
+   57.5,
    211.5
   ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -493,13 +422,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   54.6,
-   207.7
-  ],
-  "entry": [
-   64.5,
+   57.5,
    207.5
   ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -511,13 +437,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   54.6,
-   203.7
-  ],
-  "entry": [
-   64.5,
+   57.5,
    203.5
   ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -529,13 +452,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   54.6,
-   199.6
-  ],
-  "entry": [
-   64.5,
+   57.5,
    199.5
   ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -547,13 +467,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   128.1,
-   386.7
+   128.5,
+   379.8
   ],
-  "entry": [
-   132,
-   383.5
-  ],
+  "textH": 1.06,
   "description": "Campus building and landmark."
  },
  {
@@ -565,13 +482,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   85,
-   270.1
-  ],
-  "entry": [
-   81,
+   88.6,
    270
   ],
+  "textH": 0.93,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -583,13 +497,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   55.6,
-   184.2
+   55.5,
+   182
   ],
-  "entry": [
-   65,
-   186
-  ],
+  "textH": 0.83,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -601,13 +512,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   137.3,
-   226.6
+   135.8,
+   228.9
   ],
-  "entry": [
-   137.5,
-   226.5
-  ],
+  "textH": 0.7,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -619,31 +527,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   126,
-   125.6
+   134,
+   122
   ],
-  "entry": [
-   127.5,
-   131
-  ],
+  "textH": 1.18,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
   "id": "comfort-room-2",
   "name": "Comfort Room",
   "acronym": "CR",
-  "building": "Student Dormitory 1",
+  "building": "SLSU Main Campus",
   "category": "Facilities",
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   110.8,
-   110.4
+   133.8,
+   86
   ],
-  "entry": [
-   111,
-   110.5
-  ],
+  "textH": 1.18,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -655,13 +557,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   54.2,
-   195.1
+   56.8,
+   195.5
   ],
-  "entry": [
-   64.5,
-   195
-  ],
+  "textH": 0.95,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -673,13 +572,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   53.3,
-   218.2
+   54.5,
+   220
   ],
-  "entry": [
-   64.5,
-   218
-  ],
+  "textH": 0.95,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -691,13 +587,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   236.1,
-   190.4
+   234,
+   188.3
   ],
-  "entry": [
-   236.5,
-   190.5
-  ],
+  "textH": 0.88,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -709,13 +602,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   152.5,
-   229.1
-  ],
-  "entry": [
-   152.5,
+   155,
    229.5
   ],
+  "textH": 0.32,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -727,13 +617,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   224.3,
-   240.3
+   222.5,
+   243.5
   ],
-  "entry": [
-   225,
-   240.5
-  ],
+  "textH": 0.73,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -745,13 +632,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   224.2,
-   287.8
+   222.3,
+   284.6
   ],
-  "entry": [
-   224,
-   286.5
-  ],
+  "textH": 0.73,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -763,13 +647,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   83,
+   85.5,
    277
   ],
-  "entry": [
-   81,
-   272
-  ],
+  "textH": 0.67,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -781,13 +662,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   81.4,
-   342.4
+   82.6,
+   340.3
   ],
-  "entry": [
-   81.5,
-   341
-  ],
+  "textH": 0.99,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -799,13 +677,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   163.2,
-   355.2
+   163.4,
+   357.6
   ],
-  "entry": [
-   162.5,
-   357
-  ],
+  "textH": 0.33,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -817,31 +692,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   132.4,
-   239.9
+   132.2,
+   238.7
   ],
-  "entry": [
-   132.5,
-   238.5
-  ],
+  "textH": 0.37,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
   "id": "commandants-office",
   "name": "Commandants Office",
   "acronym": "CO",
-  "building": "Student Dormitory 1",
+  "building": "Barracks",
   "category": "Admin",
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   108,
-   108.4
+   61,
+   163.5
   ],
-  "entry": [
-   108,
-   108.5
-  ],
+  "textH": 0.98,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -853,13 +722,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   192,
-   342.5
-  ],
-  "entry": [
-   192,
+   188.5,
    341
   ],
+  "textH": 0.68,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -871,13 +737,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   220.8,
-   323
+   218,
+   320.1
   ],
-  "entry": [
-   221,
-   323
-  ],
+  "textH": 0.92,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -889,13 +752,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   135.7,
-   382.9
+   138,
+   381
   ],
-  "entry": [
-   135.5,
-   383
-  ],
+  "textH": 0.74,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -907,13 +767,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   143.6,
-   284.2
+   145.7,
+   282
   ],
-  "entry": [
-   144,
-   284
-  ],
+  "textH": 0.76,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -925,13 +782,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   147.6,
-   285.8
+   148.3,
+   283
   ],
-  "entry": [
-   148,
-   286
-  ],
+  "textH": 0.77,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -943,13 +797,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   49.6,
-   201.8
+   60,
+   203.7
   ],
-  "entry": [
-   64.5,
-   202
-  ],
+  "textH": 1.24,
   "description": "Campus building and landmark."
  },
  {
@@ -962,12 +813,9 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    103,
-   328.7
+   326.6
   ],
-  "entry": [
-   103,
-   328
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -979,13 +827,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   102.5,
-   323.6
+   101.5,
+   325
   ],
-  "entry": [
-   102.5,
-   323
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -997,13 +842,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   112.7,
-   328.6
+   110.5,
+   327
   ],
-  "entry": [
-   112.5,
-   328.5
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1015,13 +857,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   114.5,
-   324.9
+   112.1,
+   326
   ],
-  "entry": [
-   114.5,
-   325
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1033,13 +872,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   144.1,
-   383.3
+   143.5,
+   380
   ],
-  "entry": [
-   144,
-   382
-  ],
+  "textH": 0.65,
   "description": "Student support and welfare service point."
  },
  {
@@ -1051,13 +887,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   148.1,
-   383.5
+   148.5,
+   380
   ],
-  "entry": [
-   148,
-   381.5
-  ],
+  "textH": 0.71,
   "description": "Student support and welfare service point."
  },
  {
@@ -1069,13 +902,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   161.3,
-   311
+   162,
+   314
   ],
-  "entry": [
-   162.5,
-   311
-  ],
+  "textH": 0.72,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1087,13 +917,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   55.5,
-   188.2
+   60,
+   186.4
   ],
-  "entry": [
-   64.5,
-   190
-  ],
+  "textH": 0.87,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1105,13 +932,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   236.1,
-   170.8
-  ],
-  "entry": [
-   239,
+   232.6,
    171
   ],
+  "textH": 0.71,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1126,28 +950,22 @@ const LOCATIONS = [
    155.7,
    311.1
   ],
-  "entry": [
-   156.5,
-   311
-  ],
+  "textH": 0.83,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
   "id": "department-of-military-science-and-tactics-off",
   "name": "Department of Military Science and Tactics Office",
   "acronym": "DMSTO",
-  "building": "Student Dormitory 1",
+  "building": "Barracks",
   "category": "Admin",
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   110.5,
-   110.5
+   61,
+   168.5
   ],
-  "entry": [
-   110.5,
-   110.5
-  ],
+  "textH": 0.86,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1159,13 +977,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   97.6,
-   328.5
+   96.5,
+   327
   ],
-  "entry": [
-   97.5,
-   328.5
-  ],
+  "textH": 0.76,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1177,13 +992,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   207.1,
-   363.4
+   205.9,
+   360.9
   ],
-  "entry": [
-   205,
-   360
-  ],
+  "textH": 0.81,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -1195,13 +1007,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   199.5,
-   349.7
+   200.5,
+   351.1
   ],
-  "entry": [
-   199.5,
-   349
-  ],
+  "textH": 0.55,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -1214,12 +1023,9 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    107,
-   305.8
+   304.2
   ],
-  "entry": [
-   107,
-   305
-  ],
+  "textH": 0.38,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1231,13 +1037,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   203.7,
-   364.2
+   202.9,
+   362.6
   ],
-  "entry": [
-   202.5,
-   361.5
-  ],
+  "textH": 0.93,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -1249,13 +1052,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   209.8,
-   360.7
+   208.9,
+   359
   ],
-  "entry": [
-   208.5,
-   358
-  ],
+  "textH": 0.93,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -1267,13 +1067,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   46.1,
-   182.9
+   60,
+   182.2
   ],
-  "entry": [
-   65,
-   186
-  ],
+  "textH": 0.99,
   "description": "Campus building and landmark."
  },
  {
@@ -1285,13 +1082,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   55.9,
-   308.5
+   65.8,
+   305.5
   ],
-  "entry": [
-   58.5,
-   308.5
-  ],
+  "textH": 1.16,
   "description": "Campus building and landmark."
  },
  {
@@ -1303,13 +1097,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   143.9,
-   141.7
+   134.8,
+   141.5
   ],
-  "entry": [
-   144,
-   141
-  ],
+  "textH": 0.86,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1321,13 +1112,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   236,
-   176.1
+   232.5,
+   176.7
   ],
-  "entry": [
-   239,
-   176
-  ],
+  "textH": 0.94,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1339,13 +1127,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   140.1,
-   320
+   140.5,
+   317
   ],
-  "entry": [
-   141,
-   320
-  ],
+  "textH": 0.71,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1357,13 +1142,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   129.5,
-   234.3
-  ],
-  "entry": [
    128.5,
-   234.5
+   233.5
   ],
+  "textH": 0.42,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -1376,12 +1158,9 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    195.6,
-   359.5
+   357.9
   ],
-  "entry": [
-   197.5,
-   363.5
-  ],
+  "textH": 1.12,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -1393,13 +1172,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   78,
-   121.7
+   81.3,
+   123.7
   ],
-  "entry": [
-   72,
-   121.5
-  ],
+  "textH": 1,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1411,13 +1187,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   79,
-   116.3
+   82.2,
+   117.7
   ],
-  "entry": [
-   72,
-   116.5
-  ],
+  "textH": 1.03,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1429,13 +1202,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   80.9,
-   99.3
+   85,
+   100.2
   ],
-  "entry": [
-   72,
-   100
-  ],
+  "textH": 1.03,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1447,31 +1217,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   82,
-   91.9
+   86,
+   92.3
   ],
-  "entry": [
-   71.5,
-   92
-  ],
+  "textH": 1.03,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
   "id": "fpst-faculty-room",
   "name": "FPST Faculty Room",
   "acronym": "FPST",
-  "building": "Barracks",
+  "building": "SLSU Main Campus",
   "category": "Admin",
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   93.2,
-   113.8
+   95.3,
+   112.4
   ],
-  "entry": [
-   103.5,
-   117
-  ],
+  "textH": 1.15,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1484,12 +1248,9 @@ const LOCATIONS = [
   "hours": "Open during campus hours",
   "coords": [
    190.5,
-   370.3
+   367.5
   ],
-  "entry": [
-   191,
-   366.5
-  ],
+  "textH": 0.75,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -1501,13 +1262,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   138.3,
-   234
+   136,
+   233.5
   ],
-  "entry": [
-   138.5,
-   234
-  ],
+  "textH": 0.5,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -1519,13 +1277,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   120.1,
-   326.3
+   123.4,
+   326.5
   ],
-  "entry": [
-   120,
-   326
-  ],
+  "textH": 0.76,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1537,49 +1292,40 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   201.6,
-   342.5
+   202.5,
+   342.1
   ],
-  "entry": [
-   200.5,
-   340.5
-  ],
+  "textH": 0.66,
   "description": "Student support and welfare service point."
  },
  {
   "id": "graduate-duties-gs-11",
   "name": "Graduate Duties GS-11",
   "acronym": "GDG",
-  "building": "Student Dormitory 1",
+  "building": "SLSU Main Campus",
   "category": "Academic",
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   118.8,
-   118.8
+   199,
+   48.5
   ],
-  "entry": [
-   111,
-   118
-  ],
+  "textH": 1.05,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
   "id": "graduate-duties-gs-12",
   "name": "Graduate Duties GS-12",
   "acronym": "GDG",
-  "building": "Physical Education Building",
+  "building": "SLSU Main Campus",
   "category": "Academic",
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   135.9,
-   135.9
+   227.6,
+   48.5
   ],
-  "entry": [
-   136,
-   136
-  ],
+  "textH": 1.05,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1591,13 +1337,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   220.6,
-   43.4
+   221.6,
+   47.4
   ],
-  "entry": [
-   221,
-   44
-  ],
+  "textH": 0.79,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1609,13 +1352,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   146,
-   146.4
+   144.5,
+   153
   ],
-  "entry": [
-   146,
-   142
-  ],
+  "textH": 0.75,
   "description": "Sports and recreation facility open to students and staff."
  },
  {
@@ -1627,13 +1367,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   251.8,
-   124.2
+   252.3,
+   127
   ],
-  "entry": [
-   253,
-   125
-  ],
+  "textH": 0.84,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -1645,13 +1382,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   47.2,
-   271.6
+   47.7,
+   274.3
   ],
-  "entry": [
-   47,
-   272.5
-  ],
+  "textH": 0.84,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -1663,13 +1397,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   239.9,
-   331.1
+   240.3,
+   329.1
   ],
-  "entry": [
-   241,
-   331
-  ],
+  "textH": 0.57,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -1681,13 +1412,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   117.5,
-   380
+   117.4,
+   379.5
   ],
-  "entry": [
-   117.5,
-   380.5
-  ],
+  "textH": 0.33,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -1699,13 +1427,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   156.5,
-   156.4
+   215.5,
+   103
   ],
-  "entry": [
-   158,
-   142.5
-  ],
+  "textH": 1.42,
   "description": "Student support and welfare service point."
  },
  {
@@ -1718,12 +1443,9 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    152,
-   356.1
+   358.6
   ],
-  "entry": [
-   152,
-   356.5
-  ],
+  "textH": 0.47,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1736,12 +1458,9 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    155.5,
-   356.1
+   358.6
   ],
-  "entry": [
-   157.5,
-   356.5
-  ],
+  "textH": 0.47,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1754,12 +1473,9 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    159,
-   356.1
+   358.6
   ],
-  "entry": [
-   159,
-   356.5
-  ],
+  "textH": 0.47,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1771,13 +1487,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   148.5,
-   355.6
+   148.9,
+   357.1
   ],
-  "entry": [
-   148.5,
-   356.5
-  ],
+  "textH": 0.56,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1789,13 +1502,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   188.9,
-   324.8
+   188.5,
+   320.2
   ],
-  "entry": [
-   189,
-   324.5
-  ],
+  "textH": 1,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1807,13 +1517,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   79.4,
-   256.7
+   77.2,
+   257.5
   ],
-  "entry": [
-   79.5,
-   256.5
-  ],
+  "textH": 0.7,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1825,13 +1532,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   224.7,
-   256.4
+   218.5,
+   257
   ],
-  "entry": [
-   224.5,
-   256.5
-  ],
+  "textH": 1.1,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1843,13 +1547,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   224.9,
-   269.4
+   218.5,
+   271.4
   ],
-  "entry": [
-   225,
-   268.5
-  ],
+  "textH": 0.97,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1861,13 +1562,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   154.8,
-   320.1
-  ],
-  "entry": [
    155,
-   320.5
+   316.5
   ],
+  "textH": 0.58,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1879,13 +1577,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   158.8,
-   320.1
-  ],
-  "entry": [
    159,
-   319.5
+   316.5
   ],
+  "textH": 0.61,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1897,13 +1592,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   162.8,
-   320.1
+   162,
+   316.5
   ],
-  "entry": [
-   163,
-   319.5
-  ],
+  "textH": 0.62,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1915,13 +1607,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   235.5,
-   181.6
+   232.6,
+   182.3
   ],
-  "entry": [
-   232.5,
-   181.5
-  ],
+  "textH": 0.72,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1933,13 +1622,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   140.1,
-   311
-  ],
-  "entry": [
    140,
-   311.5
+   314
   ],
+  "textH": 0.61,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1952,12 +1638,9 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    144,
-   311.1
+   314
   ],
-  "entry": [
-   144,
-   311.5
-  ],
+  "textH": 0.63,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1969,13 +1652,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   147.9,
-   311.1
-  ],
-  "entry": [
    148,
-   311.5
+   314
   ],
+  "textH": 0.63,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -1987,13 +1667,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   59.9,
-   292.9
+   63,
+   289.5
   ],
-  "entry": [
-   60,
-   290
-  ],
+  "textH": 0.75,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -2005,13 +1682,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   107.1,
-   313.5
+   92,
+   308.4
   ],
-  "entry": [
-   107,
-   314
-  ],
+  "textH": 1.16,
   "description": "Campus building and landmark."
  },
  {
@@ -2023,13 +1697,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   109.1,
-   331.3
+   94.5,
+   326.1
   ],
-  "entry": [
-   109,
-   333.5
-  ],
+  "textH": 1.16,
   "description": "Campus building and landmark."
  },
  {
@@ -2041,13 +1712,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   115.1,
-   346.6
+   99.5,
+   341
   ],
-  "entry": [
-   115,
-   349
-  ],
+  "textH": 1.16,
   "description": "Campus building and landmark."
  },
  {
@@ -2059,13 +1727,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   121,
-   362.5
+   105.6,
+   357.6
   ],
-  "entry": [
-   126,
-   360
-  ],
+  "textH": 1.16,
   "description": "Campus building and landmark."
  },
  {
@@ -2078,12 +1743,9 @@ const LOCATIONS = [
   "hours": "Open during campus hours",
   "coords": [
    164.5,
-   386.3
+   379.2
   ],
-  "entry": [
-   164.5,
-   384
-  ],
+  "textH": 1.16,
   "description": "Campus building and landmark."
  },
  {
@@ -2095,13 +1757,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   163,
-   229.3
+   162.6,
+   231
   ],
-  "entry": [
-   163,
-   229.5
-  ],
+  "textH": 0.56,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -2113,13 +1772,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   54.9,
-   176.3
+   53.5,
+   178
   ],
-  "entry": [
-   66,
-   177
-  ],
+  "textH": 0.69,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2131,13 +1787,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   116.5,
-   308
-  ],
-  "entry": [
-   116.5,
+   130,
    308.5
   ],
+  "textH": 0.71,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2149,13 +1802,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   97.1,
-   323.7
+   98.5,
+   325
   ],
-  "entry": [
-   97,
-   324
-  ],
+  "textH": 0.71,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2167,13 +1817,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   111.1,
-   308.1
+   114.3,
+   305.5
   ],
-  "entry": [
-   111,
-   308.5
-  ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2185,13 +1832,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   102.7,
-   308.1
+   99.6,
+   310.5
   ],
-  "entry": [
-   102.5,
-   308.5
-  ],
+  "textH": 0.74,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2203,13 +1847,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   96.9,
-   308
+   93,
+   308.6
   ],
-  "entry": [
-   97,
-   308.5
-  ],
+  "textH": 0.74,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2221,13 +1862,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   126.4,
-   338.5
+   125.5,
+   340
   ],
-  "entry": [
-   126.5,
-   335
-  ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2239,13 +1877,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   121.6,
-   338.6
+   120.5,
+   340
   ],
-  "entry": [
-   121.5,
-   335
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2257,13 +1892,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   109.5,
-   338.6
+   107.5,
+   340
   ],
-  "entry": [
-   109.5,
-   335
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2275,13 +1907,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   103.5,
-   338.6
+   104.5,
+   340
   ],
-  "entry": [
-   103.5,
-   335
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2293,13 +1922,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   129.6,
-   357.4
-  ],
-  "entry": [
-   129,
+   134.8,
    357.5
   ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2311,13 +1937,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   120.7,
-   355.6
+   121,
+   353.2
   ],
-  "entry": [
-   120.5,
-   356
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2329,13 +1952,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   120.7,
-   358.6
+   121,
+   360.8
   ],
-  "entry": [
-   120.5,
-   356
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2347,13 +1967,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   110.7,
-   357.6
+   107.2,
+   357.5
   ],
-  "entry": [
-   110.5,
-   358
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2366,12 +1983,9 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    175.4,
-   383.6
+   381.4
   ],
-  "entry": [
-   175.5,
-   384
-  ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2384,12 +1998,9 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    170.4,
-   383.5
+   381.4
   ],
-  "entry": [
-   170.5,
-   384
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2401,13 +2012,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   165.2,
-   383.5
-  ],
-  "entry": [
    165,
-   384
+   381.4
   ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2419,13 +2027,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   159.7,
-   383.6
+   160,
+   381.4
   ],
-  "entry": [
-   159.5,
-   383
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2437,13 +2042,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   154.1,
-   383.6
+   155,
+   381.4
   ],
-  "entry": [
-   154,
-   384
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2455,13 +2057,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   138,
-   232.1
+   136,
+   231.4
   ],
-  "entry": [
-   138,
-   232
-  ],
+  "textH": 0.62,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -2473,13 +2072,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   203.3,
-   349.8
+   204.5,
+   351.1
   ],
-  "entry": [
-   203.5,
-   349.5
-  ],
+  "textH": 0.68,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -2491,13 +2087,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   138,
-   236
-  ],
-  "entry": [
-   138.5,
+   136,
    235.5
   ],
+  "textH": 0.68,
+  "description": "Campus food and refreshment outlet."
+ },
+ {
+  "id": "khera-s-snack-house",
+  "name": "Khera's Snack House",
+  "acronym": "KSH",
+  "building": "SLSU Main Campus",
+  "category": "Food",
+  "floor": "Ground Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   129.4,
+   228.9
+  ],
+  "textH": 0.57,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -2509,13 +2117,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   147.2,
-   236.5
+   147.7,
+   235
   ],
-  "entry": [
-   146.5,
-   236.5
-  ],
+  "textH": 0.32,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -2527,13 +2132,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   108.6,
-   323.5
+   110,
+   325
   ],
-  "entry": [
-   108.5,
-   324
-  ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2545,13 +2147,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   239.7,
-   335
+   240.9,
+   336.4
   ],
-  "entry": [
-   239.5,
-   335
-  ],
+  "textH": 0.68,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -2563,13 +2162,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   232.1,
-   221.6
+   223.3,
+   222.4
   ],
-  "entry": [
-   241,
-   221.5
-  ],
+  "textH": 1.47,
   "description": "Campus building and landmark."
  },
  {
@@ -2581,13 +2177,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   79.5,
-   267.6
+   77.2,
+   267.5
   ],
-  "entry": [
-   79.5,
-   267
-  ],
+  "textH": 0.4,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -2599,13 +2192,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   235.8,
-   326.3
+   238.8,
+   326.4
   ],
-  "entry": [
-   236,
-   327
-  ],
+  "textH": 0.7,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -2617,13 +2207,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   130.7,
-   227
+   131.1,
+   228.9
   ],
-  "entry": [
-   130.5,
-   227
-  ],
+  "textH": 0.57,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -2635,13 +2222,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   113.9,
-   282
+   113,
+   278
   ],
-  "entry": [
-   107,
-   282.5
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2653,13 +2237,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   121.8,
-   282
+   121,
+   278
   ],
-  "entry": [
-   122,
-   292
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2671,13 +2252,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   112.3,
-   233.6
+   112,
+   236.8
   ],
-  "entry": [
-   113,
-   234
-  ],
+  "textH": 0.76,
   "description": "Student support and welfare service point."
  },
  {
@@ -2689,13 +2267,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   101,
+   104.4,
    66.3
   ],
-  "entry": [
-   110.5,
-   67.5
-  ],
+  "textH": 1.05,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -2707,13 +2282,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   103,
-   51.3
+   106.3,
+   51.4
   ],
-  "entry": [
-   114.5,
-   59.5
-  ],
+  "textH": 1.05,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -2725,13 +2297,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   161.3,
-   285.8
+   160,
+   283
   ],
-  "entry": [
-   162,
-   286
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2743,13 +2312,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   156.4,
-   285.7
+   155,
+   283
   ],
-  "entry": [
-   157,
-   285
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2761,13 +2327,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   151.4,
-   285.7
+   150,
+   283
   ],
-  "entry": [
-   152,
-   285
-  ],
+  "textH": 0.75,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2779,13 +2342,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   152.7,
-   105.2
+   172.4,
+   108.7
   ],
-  "entry": [
-   170,
-   107
-  ],
+  "textH": 2.12,
   "description": "Sports and recreation facility open to students and staff."
  },
  {
@@ -2797,13 +2357,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   199.6,
-   286.6
-  ],
-  "entry": [
    198.5,
-   284
+   283.4
   ],
+  "textH": 0.71,
   "description": "Student support and welfare service point."
  },
  {
@@ -2815,13 +2372,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   155.6,
-   289.9
+   156.4,
+   281.2
   ],
-  "entry": [
-   155.5,
-   291.5
-  ],
+  "textH": 1.35,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2833,13 +2387,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   103,
-   103
+   61,
+   153.5
   ],
-  "entry": [
-   105.5,
-   103
-  ],
+  "textH": 0.71,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -2851,13 +2402,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   50.4,
-   176.3
+   49.5,
+   178
   ],
-  "entry": [
-   66,
-   177
-  ],
+  "textH": 0.68,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -2869,13 +2417,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   60.8,
-   301.5
-  ],
-  "entry": [
-   61,
+   64.4,
    302.5
   ],
+  "textH": 0.92,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -2887,13 +2432,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   62,
-   313.1
+   65.7,
+   313.6
   ],
-  "entry": [
-   62,
-   314
-  ],
+  "textH": 0.89,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -2905,13 +2447,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   196.8,
-   342.5
+   197,
+   342.1
   ],
-  "entry": [
-   197.5,
-   342.5
-  ],
+  "textH": 0.55,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -2923,13 +2462,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   212.5,
-   43.4
+   211.5,
+   47.3
   ],
-  "entry": [
-   212.5,
-   44.5
-  ],
+  "textH": 0.67,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -2941,13 +2477,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   90.6,
-   280.3
+   88.5,
+   280.4
   ],
-  "entry": [
-   88,
-   282.5
-  ],
+  "textH": 0.53,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -2959,13 +2492,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   115,
-   319.4
+   111.3,
+   318.7
   ],
-  "entry": [
-   115,
-   318.5
-  ],
+  "textH": 0.61,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -2977,13 +2507,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   85.3,
-   236.1
+   88,
+   235.5
   ],
-  "entry": [
-   87,
-   229
-  ],
+  "textH": 0.66,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -2995,13 +2522,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   220.9,
-   328.6
+   217,
+   327.5
   ],
-  "entry": [
-   221,
-   329.5
-  ],
+  "textH": 0.78,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -3013,13 +2537,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   61.3,
-   307.2
+   65,
+   308.6
   ],
-  "entry": [
-   61.5,
-   307
-  ],
+  "textH": 0.86,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -3031,13 +2552,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   149.3,
-   239.4
-  ],
-  "entry": [
-   149.5,
+   154,
    239.5
   ],
+  "textH": 0.33,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -3049,31 +2567,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   196.2,
-   324.6
+   196.5,
+   320.1
   ],
-  "entry": [
-   196,
-   320.5
-  ],
+  "textH": 0.73,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "open-air-bench",
   "name": "Open Air Bench",
   "acronym": "OAB",
-  "building": "Physical Education Building",
+  "building": "Criminology Building",
   "category": "Facilities",
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   139.1,
-   139.1
+   58.2,
+   218.8
   ],
-  "entry": [
-   139,
-   138
-  ],
+  "textH": 0.86,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3085,13 +2597,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   118.3,
-   141.7
+   118.6,
+   146.4
   ],
-  "entry": [
-   118.5,
-   139
-  ],
+  "textH": 0.87,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3103,13 +2612,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   84.8,
-   175.3
+   82.3,
+   171.6
   ],
-  "entry": [
-   74.5,
-   170.5
-  ],
+  "textH": 2.76,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3121,35 +2627,14 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   80.3,
-   212.3
+   80.5,
+   215
   ],
-  "entry": [
-   72.5,
-   212.5
-  ],
+  "textH": 0.69,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
   "id": "open-air-benches-3",
-  "name": "Open-Air Benches",
-  "acronym": "OB",
-  "building": "SLSU Main Campus",
-  "category": "Facilities",
-  "floor": "Ground Floor",
-  "hours": "Open during campus hours",
-  "coords": [
-   75.1,
-   237.6
-  ],
-  "entry": [
-   72.5,
-   237.5
-  ],
-  "description": "Campus amenity provided for students, staff and visitors."
- },
- {
-  "id": "open-air-benches-4",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "Industrial Technology Building 5",
@@ -3157,17 +2642,14 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   164.1,
-   365.9
+   163,
+   367.6
   ],
-  "entry": [
-   164,
-   364
-  ],
+  "textH": 0.69,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
-  "id": "open-air-benches-5",
+  "id": "open-air-benches-4",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "SLSU Main Campus",
@@ -3178,14 +2660,11 @@ const LOCATIONS = [
    167.8,
    319.5
   ],
-  "entry": [
-   166.5,
-   319.5
-  ],
+  "textH": 0.57,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
-  "id": "open-air-benches-6",
+  "id": "open-air-benches-5",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "Multi-Media Center (MMC)",
@@ -3193,17 +2672,14 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   142.4,
-   301.2
-  ],
-  "entry": [
    142.5,
-   299.5
+   302.7
   ],
+  "textH": 0.69,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
-  "id": "open-air-benches-7",
+  "id": "open-air-benches-6",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "Food Mart",
@@ -3211,13 +2687,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   185.8,
-   351.9
+   192,
+   352.5
   ],
-  "entry": [
-   194,
-   352
+  "textH": 0.87,
+  "description": "Campus amenity provided for students, staff and visitors."
+ },
+ {
+  "id": "open-air-benches-7",
+  "name": "Open-Air Benches",
+  "acronym": "OB",
+  "building": "SLSU Main Campus",
+  "category": "Facilities",
+  "floor": "Ground Floor",
+  "hours": "Open during campus hours",
+  "coords": [
+   77.5,
+   237.5
   ],
+  "textH": 0.73,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3230,12 +2718,9 @@ const LOCATIONS = [
   "hours": "Open during campus hours",
   "coords": [
    170,
-   352.7
+   354
   ],
-  "entry": [
-   170.5,
-   352.5
-  ],
+  "textH": 0.73,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3247,13 +2732,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   171.1,
-   231.3
+   170,
+   230
   ],
-  "entry": [
-   172,
-   232.5
-  ],
+  "textH": 0.75,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3265,13 +2747,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   161.1,
-   259.3
+   160.2,
+   257.5
   ],
-  "entry": [
-   155.5,
-   265
-  ],
+  "textH": 0.75,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3283,13 +2762,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   153.1,
-   279.3
+   152,
+   277.3
   ],
-  "entry": [
-   153,
-   281.5
-  ],
+  "textH": 0.75,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3301,13 +2777,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   134.1,
-   281.3
+   133.2,
+   279.4
   ],
-  "entry": [
-   142,
-   281.5
-  ],
+  "textH": 0.75,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3319,13 +2792,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   137.1,
-   256.3
+   136.3,
+   254.4
   ],
-  "entry": [
-   137,
-   251
-  ],
+  "textH": 0.75,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3337,13 +2807,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   149.1,
-   348.3
+   148,
+   346.4
   ],
-  "entry": [
-   149,
-   356.5
-  ],
+  "textH": 0.75,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3355,13 +2822,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   163.1,
-   348.3
+   162.2,
+   346.4
   ],
-  "entry": [
-   170,
-   347.5
-  ],
+  "textH": 0.75,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3373,13 +2837,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   163.1,
-   332.3
+   162.2,
+   330.3
   ],
-  "entry": [
-   170,
-   332.5
-  ],
+  "textH": 0.75,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3391,13 +2852,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   144.1,
-   332.3
+   143.2,
+   330.3
   ],
-  "entry": [
-   135.5,
-   334
-  ],
+  "textH": 0.75,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3409,13 +2867,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   241.3,
-   316
+   239.4,
+   315
   ],
-  "entry": [
-   241.5,
-   315.5
-  ],
+  "textH": 0.81,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3427,13 +2882,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   241.3,
-   307
+   239.4,
+   305.9
   ],
-  "entry": [
-   241.5,
-   306.5
-  ],
+  "textH": 0.81,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3445,13 +2897,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   180.4,
-   239.4
+   179,
+   239.3
   ],
-  "entry": [
-   177,
-   239.5
-  ],
+  "textH": 0.38,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3463,13 +2912,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   83.5,
-   281.2
+   83.6,
+   281.8
   ],
-  "entry": [
-   82.5,
-   283
-  ],
+  "textH": 0.19,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3482,12 +2928,9 @@ const LOCATIONS = [
   "hours": "Open during campus hours",
   "coords": [
    77.5,
-   275.1
+   275.5
   ],
-  "entry": [
-   77.5,
-   272
-  ],
+  "textH": 0.19,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3499,13 +2942,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   134.3,
-   309.5
+   133,
+   309.4
   ],
-  "entry": [
-   135,
-   311.5
-  ],
+  "textH": 0.38,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3517,13 +2957,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   141.5,
-   304.6
+   141.4,
+   305.6
   ],
-  "entry": [
-   141.5,
-   308.5
-  ],
+  "textH": 0.38,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3535,13 +2972,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   236.1,
-   345.3
+   234.8,
+   344.7
   ],
-  "entry": [
-   233.5,
-   343
-  ],
+  "textH": 0.98,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3553,13 +2987,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   233.1,
-   353.3
+   231.8,
+   352.7
   ],
-  "entry": [
-   230.5,
-   351
-  ],
+  "textH": 0.98,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3571,13 +3002,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   230.1,
-   361.3
+   228.8,
+   360.7
   ],
-  "entry": [
-   227.5,
-   359
-  ],
+  "textH": 0.98,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3589,13 +3017,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   238,
-   336.5
+   236.6,
+   336.4
   ],
-  "entry": [
-   238,
-   336.5
-  ],
+  "textH": 0.38,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3607,13 +3032,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   59.2,
-   175.8
+   60,
+   178.2
   ],
-  "entry": [
-   66,
-   177
-  ],
+  "textH": 0.43,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -3625,31 +3047,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   144,
-   144.8
+   143.7,
+   139.4
   ],
-  "entry": [
-   144,
-   142
-  ],
+  "textH": 0.92,
   "description": "Campus building and landmark."
  },
  {
   "id": "physical-plant-and-development-management-offi",
   "name": "Physical Plant and Development Management Office",
   "acronym": "PPDMO",
-  "building": "SLSU Main Campus",
+  "building": "Barracks",
   "category": "Admin",
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   62.2,
-   142.9
+   66.6,
+   144.6
   ],
-  "entry": [
-   70,
-   143
-  ],
+  "textH": 1.13,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -3661,13 +3077,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   85,
-   265.3
+   88.6,
+   265
   ],
-  "entry": [
-   81,
-   265.5
-  ],
+  "textH": 1,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -3679,13 +3092,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   118,
-   230.7
+   120.8,
+   232.5
   ],
-  "entry": [
-   118,
-   230.5
-  ],
+  "textH": 0.79,
   "description": "Campus building and landmark."
  },
  {
@@ -3697,13 +3107,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   127.4,
-   383
+   130.5,
+   381
   ],
-  "entry": [
-   127.5,
-   381.5
-  ],
+  "textH": 0.66,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -3715,13 +3122,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   53,
-   258.2
+   58.2,
+   258.8
   ],
-  "entry": [
-   65,
-   258
-  ],
+  "textH": 0.96,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -3733,13 +3137,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   53,
-   252.7
+   58.4,
+   252.4
   ],
-  "entry": [
-   65,
-   252.5
-  ],
+  "textH": 0.93,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -3751,13 +3152,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   196.9,
-   345
+   193.7,
+   341.1
   ],
-  "entry": [
-   197.5,
-   342.5
-  ],
+  "textH": 0.82,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -3769,32 +3167,41 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   234.4,
-   141.3
+   239.5,
+   142
   ],
-  "entry": [
-   228.5,
-   141.5
-  ],
+  "textH": 0.79,
   "description": "Student support and welfare service point."
  },
  {
   "id": "receiving-area",
   "name": "Receiving Area",
   "acronym": "RA",
-  "building": "Barracks",
+  "building": "SLSU Main Campus",
   "category": "Services",
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   95.3,
-   97
+   90.8,
+   91.6
   ],
-  "entry": [
-   106,
-   99
-  ],
+  "textH": 1.07,
   "description": "Student support and welfare service point."
+ },
+ {
+  "id": "records-management-office",
+  "name": "Records Management Office",
+  "acronym": "RMO",
+  "building": "Administration Building",
+  "category": "Admin",
+  "floor": "Ground Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   189.6,
+   337
+  ],
+  "textH": 0.72,
+  "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "registrar",
@@ -3805,13 +3212,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   217.8,
-   313.2
+   220.6,
+   312
   ],
-  "entry": [
-   218,
-   312.5
-  ],
+  "textH": 0.66,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -3823,13 +3227,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   96.5,
-   57.6
+   107,
+   59
   ],
-  "entry": [
-   111.5,
-   64
-  ],
+  "textH": 2.09,
   "description": "Campus building and landmark."
  },
  {
@@ -3841,13 +3242,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   47.7,
-   245.8
+   60,
+   240.5
   ],
-  "entry": [
-   65,
-   246
-  ],
+  "textH": 1.26,
   "description": "Campus building and landmark."
  },
  {
@@ -3859,13 +3257,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   156.4,
-   235.6
+   161,
+   236.3
   ],
-  "entry": [
-   156.5,
-   235.5
-  ],
+  "textH": 0.58,
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -3877,13 +3272,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   194.5,
-   194.8
+   255.4,
+   127.5
   ],
-  "entry": [
-   213,
-   209
-  ],
+  "textH": 1.05,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -3895,13 +3287,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   84.6,
-   242.4
+   88.6,
+   242.5
   ],
-  "entry": [
-   81,
-   252.5
-  ],
+  "textH": 0.87,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -3913,13 +3302,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   84.7,
-   248.8
+   88.6,
+   248.5
   ],
-  "entry": [
-   81,
-   252.5
-  ],
+  "textH": 0.87,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -3931,13 +3317,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   85,
-   254.9
-  ],
-  "entry": [
-   81,
+   88.6,
    255
   ],
+  "textH": 0.87,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -3949,13 +3332,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   85,
+   88.6,
    260
   ],
-  "entry": [
-   81,
-   260
-  ],
+  "textH": 0.87,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -3967,13 +3347,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   53.5,
-   227.7
+   58.8,
+   228.4
   ],
-  "entry": [
-   65,
-   227.5
-  ],
+  "textH": 0.71,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -3985,13 +3362,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   53.6,
-   234.7
-  ],
-  "entry": [
-   65,
+   58.6,
    234.5
   ],
+  "textH": 0.71,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -4003,13 +3377,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   53.6,
-   240.7
-  ],
-  "entry": [
-   65,
+   58.6,
    240.5
   ],
+  "textH": 0.72,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -4021,13 +3392,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   53.6,
-   246.7
+   58.4,
+   246.6
   ],
-  "entry": [
-   65,
-   246.5
-  ],
+  "textH": 0.72,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -4039,31 +3407,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   54.9,
-   272.5
+   45.7,
+   277
   ],
-  "entry": [
-   55,
-   276
-  ],
+  "textH": 1.57,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
   "id": "sepak-takraw-court",
   "name": "Sepak Takraw Court",
   "acronym": "STC",
-  "building": "Hotel De SLSU",
+  "building": "SLSU Main Campus",
   "category": "Sports",
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   165.1,
-   165.1
+   171.5,
+   157.5
   ],
-  "entry": [
-   165,
-   142.5
-  ],
+  "textH": 0.88,
   "description": "Sports and recreation facility open to students and staff."
  },
  {
@@ -4075,13 +3437,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   54.2,
-   293.8
+   64.5,
+   292.8
   ],
-  "entry": [
-   57.5,
-   296.5
-  ],
+  "textH": 1.47,
   "description": "Campus building and landmark."
  },
  {
@@ -4093,13 +3452,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   147.9,
-   320.1
-  ],
-  "entry": [
    148,
-   320
+   317
   ],
+  "textH": 0.73,
   "description": "Instructional space used for classes, laboratory work and student activities."
  },
  {
@@ -4111,13 +3467,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   50.5,
-   184.2
+   49.5,
+   182
   ],
-  "entry": [
-   65,
-   186
-  ],
+  "textH": 0.86,
   "description": "Records, storage and supply area maintained by the university."
  },
  {
@@ -4129,13 +3482,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   236.1,
-   163.1
+   234.2,
+   165.2
   ],
-  "entry": [
-   236,
-   164
-  ],
+  "textH": 0.91,
   "description": "Records, storage and supply area maintained by the university."
  },
  {
@@ -4147,13 +3497,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   217.2,
-   240.7
+   217.5,
+   242.4
   ],
-  "entry": [
-   217,
-   241.5
-  ],
+  "textH": 0.85,
   "description": "Records, storage and supply area maintained by the university."
  },
  {
@@ -4165,31 +3512,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   166.2,
-   287.1
+   166.3,
+   284.5
   ],
-  "entry": [
-   165.5,
-   286.5
-  ],
+  "textH": 0.38,
   "description": "Records, storage and supply area maintained by the university."
  },
  {
   "id": "storage-area",
   "name": "Storage Area",
   "acronym": "SA",
-  "building": "Barracks",
+  "building": "SLSU Main Campus",
   "category": "Archives",
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   93.9,
-   106.9
+   90,
+   108.5
   ],
-  "entry": [
-   105,
-   107
-  ],
+  "textH": 1.26,
   "description": "Records, storage and supply area maintained by the university."
  },
  {
@@ -4201,13 +3542,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   147.5,
-   228.5
+   146.4,
+   230
   ],
-  "entry": [
-   147.5,
-   228.5
-  ],
+  "textH": 0.32,
   "description": "Records, storage and supply area maintained by the university."
  },
  {
@@ -4220,12 +3558,9 @@ const LOCATIONS = [
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
    158.5,
-   228.6
+   230
   ],
-  "entry": [
-   158.5,
-   228.5
-  ],
+  "textH": 0.56,
   "description": "Records, storage and supply area maintained by the university."
  },
  {
@@ -4237,13 +3572,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   109.7,
-   110
+   169,
+   51.5
   ],
-  "entry": [
-   109.5,
-   110
-  ],
+  "textH": 0.97,
   "description": "Student support and welfare service point."
  },
  {
@@ -4255,13 +3587,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   135.5,
-   40.8
+   138,
+   49.2
   ],
-  "entry": [
-   135.5,
-   54.5
-  ],
+  "textH": 1.07,
   "description": "Student support and welfare service point."
  },
  {
@@ -4273,13 +3602,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   212,
-   329.2
+   207.1,
+   327.5
   ],
-  "entry": [
-   212,
-   329
-  ],
+  "textH": 0.88,
   "description": "Records, storage and supply area maintained by the university."
  },
  {
@@ -4294,10 +3620,7 @@ const LOCATIONS = [
    211.9,
    323
   ],
-  "entry": [
-   212,
-   323
-  ],
+  "textH": 0.88,
   "description": "Records, storage and supply area maintained by the university."
  },
  {
@@ -4309,13 +3632,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   187.1,
-   381.7
+   186.5,
+   378.6
   ],
-  "entry": [
-   187,
-   383
-  ],
+  "textH": 0.93,
   "description": "Records, storage and supply area maintained by the university."
  },
  {
@@ -4327,13 +3647,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   234.2,
-   149.1
+   234.5,
+   154
   ],
-  "entry": [
-   234,
-   148
-  ],
+  "textH": 0.75,
   "description": "Sports and recreation facility open to students and staff."
  },
  {
@@ -4345,13 +3662,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   83.3,
-   83.9
+   86.8,
+   84.4
   ],
-  "entry": [
-   71.5,
-   84
-  ],
+  "textH": 0.99,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -4363,31 +3677,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   79.3,
-   108.9
+   83,
+   109.3
   ],
-  "entry": [
-   72,
-   109
-  ],
+  "textH": 0.99,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
   "id": "toilet-area-3",
   "name": "Toilet Area",
   "acronym": "TA",
-  "building": "Student Dormitory 1",
+  "building": "SLSU Main Campus",
   "category": "Facilities",
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   110.9,
-   110.7
+   123.3,
+   106.6
   ],
-  "entry": [
-   111,
-   110.5
-  ],
+  "textH": 0.79,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -4399,13 +3707,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   205.1,
-   40.8
-  ],
-  "entry": [
    205.5,
-   41
+   43
   ],
+  "textH": 0.88,
+  "description": "Campus amenity provided for students, staff and visitors."
+ },
+ {
+  "id": "toilet-area-5",
+  "name": "Toilet Area",
+  "acronym": "TA",
+  "building": "Administration Building",
+  "category": "Facilities",
+  "floor": "Ground Floor",
+  "hours": "Open during campus hours",
+  "coords": [
+   190,
+   345
+  ],
+  "textH": 0.5,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -4417,13 +3737,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   132.3,
-   227.1
-  ],
-  "entry": [
    132.5,
-   226.5
+   228.9
   ],
+  "textH": 0.57,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -4435,31 +3752,25 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   125.4,
-   156.2
+   131,
+   157.2
   ],
-  "entry": [
-   130.5,
-   141.5
-  ],
+  "textH": 0.98,
   "description": "Sports and recreation facility open to students and staff."
  },
  {
   "id": "volleyball-court-2",
   "name": "Volleyball Court",
   "acronym": "VC",
-  "building": "Hotel De SLSU",
+  "building": "SLSU Main Campus",
   "category": "Landmark",
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   163.4,
-   156.2
+   158,
+   157.2
   ],
-  "entry": [
-   163.5,
-   142.5
-  ],
+  "textH": 0.98,
   "description": "Campus building and landmark."
  },
  {
@@ -4471,13 +3782,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   232.3,
+   233.2,
    314.6
   ],
-  "entry": [
-   233.5,
-   314.5
-  ],
+  "textH": 0.4,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -4489,13 +3797,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   232.4,
+   233.2,
    308.5
   ],
-  "entry": [
-   233.5,
-   308.5
-  ],
+  "textH": 0.4,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -4507,13 +3812,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   225.5,
-   315.6
+   224.3,
+   315.4
   ],
-  "entry": [
-   225.5,
-   318
-  ],
+  "textH": 0.4,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -4525,13 +3827,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   225.5,
-   309.5
+   224.3,
+   309.4
   ],
-  "entry": [
-   225,
-   312
-  ],
+  "textH": 0.4,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -4543,13 +3842,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   208.3,
-   307.2
+   208.4,
+   306.6
   ],
-  "entry": [
-   208.5,
-   307.5
-  ],
+  "textH": 0.37,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -4562,12 +3858,9 @@ const LOCATIONS = [
   "hours": "Open during campus hours",
   "coords": [
    214.6,
-   306.2
+   305.6
   ],
-  "entry": [
-   214.5,
-   306.5
-  ],
+  "textH": 0.37,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -4580,12 +3873,9 @@ const LOCATIONS = [
   "hours": "Open during campus hours",
   "coords": [
    197.5,
-   305.5
+   304.8
   ],
-  "entry": [
-   197.5,
-   306
-  ],
+  "textH": 0.37,
   "description": "Campus amenity provided for students, staff and visitors."
  },
  {
@@ -4597,13 +3887,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   137.9,
-   229.9
+   136.1,
+   229.3
   ],
-  "entry": [
-   138,
-   229.5
-  ],
+  "textH": 0.61,
   "description": "Campus food and refreshment outlet."
  },
  {
@@ -4615,13 +3902,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   201,
-   365.8
+   200.1,
+   364.3
   ],
-  "entry": [
-   200,
-   363
-  ],
+  "textH": 0.95,
   "description": "Campus food and refreshment outlet."
  }
 ];

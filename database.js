@@ -47,7 +47,7 @@ const get = (sql, params = []) => new Promise((resolve, reject) => {
 const LOCATION_COLUMNS = `
   l.id, l.slug, l.name, l.acronym, l.category, l.floor_level AS floor,
   l.operating_hours AS hours, l.description,
-  l.x, l.y, l.entry_x, l.entry_y,
+  l.x, l.y,
   b.name AS building, b.code AS building_code
 `;
 

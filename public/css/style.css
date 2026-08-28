@@ -625,14 +625,15 @@ body, html {
   to { stroke-dashoffset: -20; }
 }
 
-/* The final hop off the walkway into the room: lighter, so it reads as
-   "then head inside" rather than as a surveyed path. */
-.leaflet-interactive.route-entry-line {
+/* The short step onto the walk path at the start of a route and off it at the
+   end. Lighter, because these are the only parts not on a drawn path. */
+.leaflet-interactive.route-connector {
   stroke: var(--accent-strong);
   stroke-dasharray: 3, 7;
   opacity: 0.85;
   animation: dash 1.4s linear infinite;
 }
+
 
 /* Custom Tooltip Styling */
 .leaflet-tooltip {

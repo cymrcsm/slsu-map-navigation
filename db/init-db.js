@@ -71,9 +71,7 @@ const run = (sql, params = []) => new Promise((resolve, reject) => {
     code TEXT UNIQUE NOT NULL
   );`);
 
-  // One row per pin on the map. x/y are groundFloor_layer.svg coordinates;
-  // entry_x/entry_y are the nearest point on the campus walkable network, which
-  // is what the router actually navigates to.
+  // One row per pin on the map. x/y are groundFloor_layer.svg coordinates.
   await run(`CREATE TABLE locations (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     slug            TEXT UNIQUE NOT NULL,
@@ -86,8 +84,6 @@ const run = (sql, params = []) => new Promise((resolve, reject) => {
     description     TEXT,
     x               REAL NOT NULL,
     y               REAL NOT NULL,
-    entry_x         REAL NOT NULL,
-    entry_y         REAL NOT NULL,
     FOREIGN KEY (building_id) REFERENCES buildings(id) ON DELETE SET NULL,
     FOREIGN KEY (category)    REFERENCES categories(id)
   );`);
@@ -115,11 +111,11 @@ const run = (sql, params = []) => new Promise((resolve, reject) => {
   for (const l of locations) {
     await run(`INSERT INTO locations
       (slug, name, acronym, building_id, category, floor_level, operating_hours,
-       description, x, y, entry_x, entry_y)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+       description, x, y)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
       [l.id, l.name, l.acronym || null, buildingIds.get(l.building) || null,
        l.category, l.floor, l.hours, l.description,
-       l.coords[0], l.coords[1], l.entry[0], l.entry[1]]);
+       l.coords[0], l.coords[1]]);
   }
 
   await run('COMMIT;');

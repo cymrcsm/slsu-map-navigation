@@ -3,236 +3,15 @@
 // ==========================================
 // groundFloor_layer.svg is a 320 x 421 vector campus map. Every coordinate in
 // this file is expressed in that SVG user-space ([x, y], origin top-left).
-// CATEGORIES and LOCATIONS come from js/campus-data.js, WALK_MASK from
-// js/walkmask.js - both are generated from the SVG itself.
+// CATEGORIES and LOCATIONS come from js/campus-data.js, and WALK_PATHS from
+// js/walkpaths.js - both generated from the SVG.
+//
+// Walkability is the black lines drawn on the map and nothing else: a route
+// travels along them, and everything off them is a barrier.
 
 const MAP_WIDTH = 320;
 const MAP_HEIGHT = 421;
 
-// ==========================================
-// 1. WALKABLE SURFACE GRID
-// ==========================================
-// One bit per cell, 2 cells per map unit. A cell is walkable where the map is
-// #D9D0C9 (buildings, rooms, pavement), the grey road, or white inside the
-// oval / courts / grandstand.
-
-const GRID = (() => {
-  const bin = atob(WALK_MASK.bits);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return { W: WALK_MASK.width, H: WALK_MASK.height, S: WALK_MASK.scale, bytes };
-})();
-
-function cellWalkable(x, y) {
-  if (x < 0 || y < 0 || x >= GRID.W || y >= GRID.H) return false;
-  const i = y * GRID.W + x;
-  return (GRID.bytes[i >> 3] & (128 >> (i & 7))) !== 0;
-}
-
-const toCell = v => Math.round(v * GRID.S);
-const toUnit = v => v / GRID.S;
-
-// The campus splits into many walkable islands: each room is fenced off by its
-// own walls. Routing happens on the largest island - the roads, pavements and
-// open ground that actually connect the campus together. Everything else is
-// reached by a short final hop from the nearest point on that network.
-const MAIN = (() => {
-  const n = GRID.W * GRID.H;
-  const seen = new Uint8Array(n);
-  const inMain = new Uint8Array(n);
-  const queue = new Int32Array(n);
-  let bestStart = -1, bestSize = 0;
-
-  for (let s = 0; s < n; s++) {
-    if (seen[s] || !cellWalkable(s % GRID.W, (s / GRID.W) | 0)) continue;
-    let head = 0, tail = 0, size = 0;
-    queue[tail++] = s; seen[s] = 1;
-    while (head < tail) {
-      const cur = queue[head++]; size++;
-      const x = cur % GRID.W, y = (cur / GRID.W) | 0;
-      for (let dy = -1; dy <= 1; dy++) {
-        for (let dx = -1; dx <= 1; dx++) {
-          if (!dx && !dy) continue;
-          const nx = x + dx, ny = y + dy;
-          if (!cellWalkable(nx, ny)) continue;
-          const ni = ny * GRID.W + nx;
-          if (seen[ni]) continue;
-          seen[ni] = 1; queue[tail++] = ni;
-        }
-      }
-    }
-    if (size > bestSize) { bestSize = size; bestStart = s; }
-  }
-
-  // Second pass: flag only the winning island.
-  if (bestStart >= 0) {
-    let head = 0, tail = 0;
-    queue[tail++] = bestStart; inMain[bestStart] = 1;
-    while (head < tail) {
-      const cur = queue[head++];
-      const x = cur % GRID.W, y = (cur / GRID.W) | 0;
-      for (let dy = -1; dy <= 1; dy++) {
-        for (let dx = -1; dx <= 1; dx++) {
-          if (!dx && !dy) continue;
-          const nx = x + dx, ny = y + dy;
-          if (!cellWalkable(nx, ny)) continue;
-          const ni = ny * GRID.W + nx;
-          if (inMain[ni]) continue;
-          inMain[ni] = 1; queue[tail++] = ni;
-        }
-      }
-    }
-  }
-  return { flags: inMain, size: bestSize };
-})();
-
-const onNetwork = (x, y) =>
-  x >= 0 && y >= 0 && x < GRID.W && y < GRID.H && MAIN.flags[y * GRID.W + x] === 1;
-
-// Nearest cell on the walkable network, searched outward ring by ring.
-function nearestNetworkCell(coords, maxUnits = 40) {
-  const cx = toCell(coords[0]), cy = toCell(coords[1]);
-  if (onNetwork(cx, cy)) return [cx, cy];
-  const maxR = Math.round(maxUnits * GRID.S);
-  for (let r = 1; r <= maxR; r++) {
-    let best = null, bestD = Infinity;
-    for (let dy = -r; dy <= r; dy++) {
-      for (let dx = -r; dx <= r; dx++) {
-        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
-        const x = cx + dx, y = cy + dy;
-        if (!onNetwork(x, y)) continue;
-        const d = dx * dx + dy * dy;
-        if (d < bestD) { bestD = d; best = [x, y]; }
-      }
-    }
-    if (best) return best;
-  }
-  return null;
-}
-
-// ==========================================
-// 2. A* OVER THE WALKABLE GRID
-// ==========================================
-
-const SQRT2 = Math.SQRT2;
-
-// Binary min-heap keyed on fScore, storing cell indices.
-function makeHeap(fScore) {
-  const items = [];
-  return {
-    size: () => items.length,
-    push(v) {
-      items.push(v);
-      let i = items.length - 1;
-      while (i > 0) {
-        const p = (i - 1) >> 1;
-        if (fScore[items[p]] <= fScore[items[i]]) break;
-        [items[p], items[i]] = [items[i], items[p]]; i = p;
-      }
-    },
-    pop() {
-      const top = items[0], last = items.pop();
-      if (items.length) {
-        items[0] = last;
-        let i = 0;
-        for (;;) {
-          const l = 2 * i + 1, r = l + 1;
-          let m = i;
-          if (l < items.length && fScore[items[l]] < fScore[items[m]]) m = l;
-          if (r < items.length && fScore[items[r]] < fScore[items[m]]) m = r;
-          if (m === i) break;
-          [items[m], items[i]] = [items[i], items[m]]; i = m;
-        }
-      }
-      return top;
-    }
-  };
-}
-
-function findGridPath(startCell, goalCell) {
-  const n = GRID.W * GRID.H;
-  const [sx, sy] = startCell, [gx, gy] = goalCell;
-  const start = sy * GRID.W + sx, goal = gy * GRID.W + gx;
-  if (start === goal) return [startCell];
-
-  const g = new Float32Array(n).fill(Infinity);
-  const f = new Float32Array(n).fill(Infinity);
-  const from = new Int32Array(n).fill(-1);
-  const closed = new Uint8Array(n);
-
-  const h = (x, y) => {
-    const dx = Math.abs(x - gx), dy = Math.abs(y - gy);
-    return (dx + dy) + (SQRT2 - 2) * Math.min(dx, dy);
-  };
-
-  g[start] = 0; f[start] = h(sx, sy);
-  const open = makeHeap(f);
-  open.push(start);
-
-  while (open.size()) {
-    const cur = open.pop();
-    if (cur === goal) break;
-    if (closed[cur]) continue;
-    closed[cur] = 1;
-    const x = cur % GRID.W, y = (cur / GRID.W) | 0;
-
-    for (let dy = -1; dy <= 1; dy++) {
-      for (let dx = -1; dx <= 1; dx++) {
-        if (!dx && !dy) continue;
-        const nx = x + dx, ny = y + dy;
-        if (!onNetwork(nx, ny)) continue;
-        // No cutting diagonally through the corner of a blocked cell.
-        if (dx && dy && (!onNetwork(x + dx, y) || !onNetwork(x, y + dy))) continue;
-        const ni = ny * GRID.W + nx;
-        if (closed[ni]) continue;
-        const step = (dx && dy) ? SQRT2 : 1;
-        const tentative = g[cur] + step;
-        if (tentative < g[ni]) {
-          g[ni] = tentative;
-          f[ni] = tentative + h(nx, ny);
-          from[ni] = cur;
-          open.push(ni);
-        }
-      }
-    }
-  }
-
-  if (from[goal] === -1 && goal !== start) return [];
-  const path = [];
-  for (let c = goal; c !== -1; c = from[c]) path.push([c % GRID.W, (c / GRID.W) | 0]);
-  return path.reverse();
-}
-
-// Bresenham walk used to test whether two cells see each other across the network.
-function lineOfSight(a, b) {
-  let [x0, y0] = a; const [x1, y1] = b;
-  const dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0);
-  const sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
-  let err = dx - dy;
-  for (;;) {
-    if (!onNetwork(x0, y0)) return false;
-    if (x0 === x1 && y0 === y1) return true;
-    const e2 = 2 * err;
-    if (e2 > -dy) { err -= dy; x0 += sx; }
-    if (e2 < dx) { err += dx; y0 += sy; }
-  }
-}
-
-// Collapse the staircase the grid produces into a few straight legs.
-function simplifyPath(cells) {
-  if (cells.length < 3) return cells;
-  const out = [cells[0]];
-  let anchor = 0;
-  while (anchor < cells.length - 1) {
-    let far = anchor + 1;
-    for (let j = cells.length - 1; j > anchor + 1; j--) {
-      if (lineOfSight(cells[anchor], cells[j])) { far = j; break; }
-    }
-    out.push(cells[far]);
-    anchor = far;
-  }
-  return out;
-}
 
 // ==========================================
 // 3. HELPERS
@@ -265,12 +44,28 @@ function getCategoryName(categoryName) {
 
 const bounds = [[0, 0], [MAP_HEIGHT, MAP_WIDTH]];
 
-const ZOOM_FLOOR = 0.20;  // absolute backstop; the real limit is computed below
-const MAX_ZOOM = 5;
-const ROOM_ZOOM = 4;      // flyTo level when a location is selected
+const ZOOM_FLOOR = 0.5;   // absolute backstop; the real limit is computed below
 const ROUTE_MAX_ZOOM = 4; // ceiling used when fitting a drawn route
 const FIT_PADDING = 16;   // px of breathing room around the campus overview
 const PIN_ZOOM = 2.4;     // above this, markers grow from dots into full pins
+
+// The smallest lettering on this map is only 0.19 map units tall, so the old
+// ceiling of zoom 5 drew it at about 6px - unreadable. The map is vector and
+// stays sharp however far in we go, and 6.5 puts even the tiniest label at
+// roughly 17px.
+const MAX_ZOOM = 6.5;
+
+// Target on-screen height for a label's lettering, in CSS pixels.
+const READABLE_PX = 15;
+const MIN_ROOM_ZOOM = 3;  // a selection never flies in less far than this
+
+// The zoom at which this location's own label becomes comfortably readable. A
+// building name is legible far sooner than a 0.19-unit "COMFORT ROOM", so each
+// selection flies exactly as far as that label needs and no further.
+function readableZoom(loc) {
+  const h = loc && loc.textH > 0 ? loc.textH : 0.75;
+  return Math.min(MAX_ZOOM, Math.max(MIN_ROOM_ZOOM, Math.log2(READABLE_PX / h)));
+}
 
 // How tight the zoomed-all-the-way-out overview sits. 1.0 = the entire 320x421
 // canvas is visible, which leaves wide empty margins because the drawn campus
@@ -487,7 +282,7 @@ map.on('zoomend', () => {
 // 9. DETAIL PANEL
 // ==========================================
 
-function showLocationDetails(loc, flyZoom = ROOM_ZOOM) {
+function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   activeSelectedLocation = loc;
   clearActiveRoute();
 
@@ -648,50 +443,138 @@ function routeLengthUnits(points) {
   return total;
 }
 
+// The walking network, from js/walkpaths.js: the black lines drawn on the map.
+// Everything off those lines is a barrier, so a route travels along them and
+// only steps off at the very start and the very end.
+const NET = (() => {
+  const nodes = WALK_PATHS.nodes;
+  const adj = nodes.map(() => []);
+  WALK_PATHS.edges.forEach(([a, b]) => {
+    const w = Math.hypot(nodes[a][0] - nodes[b][0], nodes[a][1] - nodes[b][1]);
+    adj[a].push({ n: b, w });
+    adj[b].push({ n: a, w });
+  });
+  return { nodes: nodes, edges: WALK_PATHS.edges, adj: adj };
+})();
+
+// Closest point anywhere on the network to an arbitrary map position, together
+// with the edge it landed on so the router can splice into it.
+function projectOntoNetwork(pt) {
+  let best = null;
+  for (let e = 0; e < NET.edges.length; e++) {
+    const a = NET.edges[e][0], b = NET.edges[e][1];
+    const x1 = NET.nodes[a][0], y1 = NET.nodes[a][1];
+    const x2 = NET.nodes[b][0], y2 = NET.nodes[b][1];
+    const dx = x2 - x1, dy = y2 - y1;
+    const len2 = dx * dx + dy * dy;
+    let t = len2 ? ((pt[0] - x1) * dx + (pt[1] - y1) * dy) / len2 : 0;
+    t = t < 0 ? 0 : t > 1 ? 1 : t;
+    const cx = x1 + t * dx, cy = y1 + t * dy;
+    const d = Math.hypot(pt[0] - cx, pt[1] - cy);
+    if (!best || d < best.d) best = { d: d, e: e, a: a, b: b, p: [cx, cy] };
+  }
+  return best;
+}
+
+const dist2d = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]);
+
+/**
+ * Waypoints from one map position to another, following the drawn paths.
+ * The two endpoints are not included - drawRoute() adds them - but the points
+ * where the route joins and leaves the network are.
+ */
+function findWalkingPath(fromCoords, toCoords) {
+  const s = projectOntoNetwork(fromCoords);
+  const g = projectOntoNetwork(toCoords);
+  if (!s || !g) return [];
+  if (s.e === g.e) return [s.p, g.p];        // both on the same segment
+
+  // Splice the two projections in as temporary nodes so the search can start
+  // and finish partway along a segment rather than only at a drawn corner.
+  const N = NET.nodes.length, S = N, G = N + 1;
+  const adj = NET.adj.map(list => list.slice());
+  adj.push([], []);
+  const pos = i => (i === S ? s.p : i === G ? g.p : NET.nodes[i]);
+  const link = (i, j) => {
+    const w = dist2d(pos(i), pos(j));
+    adj[i].push({ n: j, w: w });
+    adj[j].push({ n: i, w: w });
+  };
+  link(S, s.a); link(S, s.b);
+  link(G, g.a); link(G, g.b);
+
+  // A* over a few hundred nodes, so a linear scan for the next node is faster
+  // than maintaining a heap and much easier to read.
+  const total = N + 2;
+  const gScore = new Float64Array(total).fill(Infinity);
+  const fScore = new Float64Array(total).fill(Infinity);
+  const from = new Int32Array(total).fill(-1);
+  const closed = new Uint8Array(total);
+  const open = new Set([S]);
+
+  gScore[S] = 0;
+  fScore[S] = dist2d(s.p, g.p);
+
+  while (open.size) {
+    let cur = -1, bestF = Infinity;
+    for (const n of open) if (fScore[n] < bestF) { bestF = fScore[n]; cur = n; }
+    if (cur === G) break;
+    open.delete(cur);
+    closed[cur] = 1;
+    for (const nb of adj[cur]) {
+      if (closed[nb.n]) continue;
+      const tentative = gScore[cur] + nb.w;
+      if (tentative < gScore[nb.n]) {
+        from[nb.n] = cur;
+        gScore[nb.n] = tentative;
+        fScore[nb.n] = tentative + dist2d(pos(nb.n), g.p);
+        open.add(nb.n);
+      }
+    }
+  }
+
+  if (from[G] === -1) return [];
+  const out = [];
+  for (let c = G; c !== -1; c = from[c]) out.push(pos(c));
+  return out.reverse();
+}
+
 function drawRoute(destination) {
   clearActiveRoute();
 
-  const startCell = nearestNetworkCell(kioskCoords);
-  const goalCell = nearestNetworkCell(destination.entry);
+  const path = findWalkingPath(kioskCoords, destination.coords);
 
-  if (!startCell || !goalCell) {
-    inspector.innerText = '⚠ Could not reach the campus walkway network from here.';
-    return;
-  }
-
-  const cells = findGridPath(startCell, goalCell);
-  if (!cells.length) {
-    inspector.innerText = '⚠ No walking route found to ' + destination.name + '.';
-    return;
-  }
-
-  const walk = simplifyPath(cells).map(([x, y]) => [toUnit(x), toUnit(y)]);
-  const mainPath = [kioskCoords, ...walk];
-
-  // Leg 1: along the campus walkways.
-  activeRouteLayers.push(L.polyline(mainPath.map(toLeafletCoords), {
-    weight: 5, opacity: 0.95, className: 'route-line', lineCap: 'round', lineJoin: 'round'
-  }).addTo(map));
-
-  // Leg 2: the short hop off the walkway into the room itself. Drawn lighter so
-  // it reads as "then head inside" rather than as a mapped path.
-  const lastWalk = walk[walk.length - 1];
-  const hop = Math.hypot(destination.coords[0] - lastWalk[0], destination.coords[1] - lastWalk[1]);
-  if (hop > 0.6) {
-    activeRouteLayers.push(L.polyline([lastWalk, destination.coords].map(toLeafletCoords), {
-      weight: 4, opacity: 0.9, className: 'route-entry-line', lineCap: 'round'
+  if (!path.length) {
+    // Nothing on the network reaches it: show the direct line and say so.
+    activeRouteLayers.push(L.polyline([kioskCoords, destination.coords].map(toLeafletCoords), {
+      weight: 5, opacity: 0.95, className: 'route-line', lineCap: 'round', lineJoin: 'round'
     }).addTo(map));
+    inspector.innerText = '🧭 ' + destination.name + ' — direct line, no path network reaches it';
+  } else {
+    // The stretch that runs along the drawn walk paths.
+    activeRouteLayers.push(L.polyline(path.map(toLeafletCoords), {
+      weight: 5, opacity: 0.95, className: 'route-line', lineCap: 'round', lineJoin: 'round'
+    }).addTo(map));
+
+    // The short steps onto the path at the start and off it at the end. Drawn
+    // lighter, because those are the only parts not on a drawn path.
+    [[kioskCoords, path[0]], [path[path.length - 1], destination.coords]].forEach(hop => {
+      if (dist2d(hop[0], hop[1]) > 0.4) {
+        activeRouteLayers.push(L.polyline(hop.map(toLeafletCoords), {
+          weight: 4, opacity: 0.9, className: 'route-connector', lineCap: 'round'
+        }).addTo(map));
+      }
+    });
+
+    // The map is 320 units wide and the campus road loop is about 250 m across,
+    // which puts roughly one metre in one map unit.
+    const metres = Math.round(routeLengthUnits([kioskCoords].concat(path, [destination.coords])));
+    inspector.innerText = '🧭 ' + destination.name + ' — about ' + metres + ' m on foot';
   }
 
-  const group = L.featureGroup(activeRouteLayers);
-  map.fitBounds(group.getBounds(), {
+  map.fitBounds(L.featureGroup(activeRouteLayers).getBounds(), {
     padding: [70, 70], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 1
   });
-
-  // The map is 320 units wide and the campus road loop is about 250 m across,
-  // which puts roughly one metre in one map unit. Good enough for a walking hint.
-  const metres = Math.round(routeLengthUnits(mainPath) + hop);
-  inspector.innerText = '🧭 ' + destination.name + ' — about ' + metres + ' m on foot';
 }
 
 // ==========================================
@@ -702,7 +585,9 @@ backToTutorialBtn.addEventListener('click', showTutorialView);
 
 recenterRoomBtn.addEventListener('click', () => {
   if (activeSelectedLocation) {
-    map.flyTo(toLeafletCoords(activeSelectedLocation.coords), MAX_ZOOM - 0.5, { animate: true });
+    // "Focus on Map" goes a step tighter than the automatic selection zoom.
+    const z = Math.min(MAX_ZOOM, readableZoom(activeSelectedLocation) + 1);
+    map.flyTo(toLeafletCoords(activeSelectedLocation.coords), z, { animate: true });
   }
 });
 
@@ -740,8 +625,7 @@ map.on('click', (e) => {
   }
 
   closeSuggestions();
-  const walkable = cellWalkable(toCell(x), toCell(y)) ? 'walkable' : 'blocked';
-  inspector.innerText = `coords: [${x}, ${y}] · ${walkable}`;
+  inspector.innerText = `coords: [${x}, ${y}]`;
 });
 
 // --- search ---
@@ -819,5 +703,4 @@ document.querySelectorAll('.floor-btn').forEach(btn => {
 // ==========================================
 
 renderMarkers();
-console.log('SLSU kiosk ready:', LOCATIONS.length, 'locations,',
-            MAIN.size, 'walkable cells on the campus network');
+console.log('SLSU kiosk ready:', LOCATIONS.length, 'locations. No walking network defined.');
