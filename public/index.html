@@ -17,10 +17,15 @@
       
       <!-- Top Search Bar & Category Dropdown Header -->
       <div class="sidebar-header">
-        <div class="search-input-wrapper">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="search-input" placeholder="Search room, office, acronym..." autocomplete="off" />
-          <button id="clear-search-btn" class="clear-btn">✕</button>
+        <div class="search-box">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Search room, office, acronym..."
+                   autocomplete="off" role="combobox" aria-expanded="false"
+                   aria-controls="search-suggestions" aria-autocomplete="list" />
+            <button id="clear-search-btn" class="clear-btn" aria-label="Clear search">✕</button>
+          </div>
+          <ul id="search-suggestions" class="suggestions hidden" role="listbox"></ul>
         </div>
 
         <div class="dropdown-wrapper">
@@ -47,7 +52,8 @@
               <div class="step-number">1</div>
               <div class="step-content">
                 <strong>Search or Filter</strong>
-                <p>Type an office, room code, or acronym in the search bar, or filter by category above.</p>
+                <p>Start typing an office, room code, building or acronym — matching places
+                   appear as you type. Pick one from the list, or narrow the map by category.</p>
               </div>
             </div>
 
@@ -159,6 +165,9 @@
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Generated campus data: every labelled room/office, and the walkable surface -->
+  <script src="js/campus-data.js"></script>
+  <script src="js/walkmask.js"></script>
   <!-- Custom JS Application -->
   <script src="js/app.js"></script>
 </body>

@@ -1,84 +1,138 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+/**
+ * Creates and seeds db/slsu_directory.db.
+ *
+ * The seed data is read straight out of public/js/campus-data.js — the file the
+ * map itself loads — so the database and the pins on the map are always the same
+ * set of places. Re-run with `npm run db:init` after regenerating that file.
+ */
+
 const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+const sqlite3 = require('sqlite3').verbose();
 
-const dbDir = path.join(__dirname);
-const dbPath = path.join(__dirname, 'slsu_directory.db');
+const ROOT = path.join(__dirname, '..');
+const DATA_FILE = path.join(ROOT, 'public', 'js', 'campus-data.js');
+const DB_PATH = path.join(__dirname, 'slsu_directory.db');
 
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+// --- load the generated dataset -------------------------------------------
+// campus-data.js is a plain script that declares two consts, so evaluate it in
+// a throwaway context rather than duplicating the data here.
+function loadCampusData() {
+  if (!fs.existsSync(DATA_FILE)) {
+    throw new Error(`Missing ${DATA_FILE}. It is generated from the campus SVG.`);
+  }
+  const sandbox = {};
+  vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(DATA_FILE, 'utf8') + '\n;this.CATEGORIES=CATEGORIES;this.LOCATIONS=LOCATIONS;', sandbox);
+  if (!Array.isArray(sandbox.LOCATIONS) || !sandbox.LOCATIONS.length) {
+    throw new Error('campus-data.js did not yield any LOCATIONS.');
+  }
+  return { categories: sandbox.CATEGORIES, locations: sandbox.LOCATIONS };
 }
 
-if (fs.existsSync(dbPath)) {
-  fs.unlinkSync(dbPath);
+const { categories, locations } = loadCampusData();
+
+// Building codes: initials, de-duplicated.
+const usedCodes = new Set();
+function buildingCode(name) {
+  let base = name.replace(/\(.*?\)/g, '')
+    .split(/[\s,\-/]+/)
+    .filter(w => w && !['and', 'of', 'the', 'for', 'to', 'in', 'on'].includes(w.toLowerCase()))
+    .map(w => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 8) || 'BLDG';
+  let code = base, n = 2;
+  while (usedCodes.has(code)) code = base + n++;
+  usedCodes.add(code);
+  return code;
 }
 
-const db = new sqlite3.Database(dbPath);
+if (fs.existsSync(DB_PATH)) fs.unlinkSync(DB_PATH);
+const db = new sqlite3.Database(DB_PATH);
 
-db.serialize(() => {
-  db.run(`PRAGMA foreign_keys = ON;`);
-
-  db.run(`CREATE TABLE buildings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    code TEXT UNIQUE NOT NULL,
-    category TEXT CHECK(category IN ('Administrative', 'Academic', 'Services', 'Amenities')) NOT NULL,
-    latitude REAL NOT NULL,
-    longitude REAL NOT NULL,
-    total_floors INTEGER DEFAULT 1,
-    description TEXT
-  );`);
-
-  db.run(`CREATE TABLE floors (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    building_id INTEGER NOT NULL,
-    floor_level INTEGER NOT NULL,
-    floor_plan_image TEXT,
-    FOREIGN KEY (building_id) REFERENCES buildings(id) ON DELETE CASCADE,
-    UNIQUE(building_id, floor_level)
-  );`);
-
-  db.run(`CREATE TABLE rooms (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    building_id INTEGER NOT NULL,
-    floor_level INTEGER NOT NULL,
-    room_number TEXT NOT NULL,
-    office_name TEXT NOT NULL,
-    department_head TEXT,
-    operating_hours TEXT DEFAULT '8:00 AM - 5:00 PM',
-    FOREIGN KEY (building_id) REFERENCES buildings(id) ON DELETE CASCADE
-  );`);
-
-  // Seed Real SLSU Main Campus Coordinates (Brgy. San Roque, Sogod)
-  const insertBuilding = db.prepare(`INSERT INTO buildings (name, code, category, latitude, longitude, total_floors, description) VALUES (?, ?, ?, ?, ?, ?, ?)`);
-  
-  // Admin Building
-  insertBuilding.run('Administration Building', 'ADMIN', 'Administrative', 10.39167, 124.97972, 2, 'Main administrative offices, Registrar, and Cashier.');
-  
-  // COECS Building
-  insertBuilding.run('College of Engineering & Computer Studies', 'COECS', 'Academic', 10.39210, 124.98010, 3, 'Classrooms, computer laboratories, and faculty offices.');
-  
-  // SLSU Main Library
-  insertBuilding.run('SLSU Main Library', 'LIB', 'Services', 10.39130, 124.97920, 2, 'University library, discussion rooms, and digital archives.');
-  
-  insertBuilding.finalize();
-
-  // Seed Floors
-  const insertFloor = db.prepare(`INSERT INTO floors (building_id, floor_level, floor_plan_image) VALUES (?, ?, ?)`);
-  insertFloor.run(1, 1, '/assets/floorplans/admin_fl1.png');
-  insertFloor.run(1, 2, '/assets/floorplans/admin_fl2.png');
-  insertFloor.run(2, 1, '/assets/floorplans/coecs_fl1.png');
-  insertFloor.finalize();
-
-  // Seed Rooms
-  const insertRoom = db.prepare(`INSERT INTO rooms (building_id, floor_level, room_number, office_name, department_head, operating_hours) VALUES (?, ?, ?, ?, ?, ?)`);
-  insertRoom.run(1, 1, '101', 'Office of the University Registrar', 'Dr. Maria Santos', '8:00 AM - 5:00 PM');
-  insertRoom.run(1, 1, '102', 'Cashier & Assessment Office', 'Mr. Juan Dela Cruz', '8:00 AM - 4:00 PM');
-  insertRoom.run(1, 2, '201', 'Office of the University President', 'Dr. Prose Ivy G. Yepes', '8:00 AM - 5:00 PM');
-  insertRoom.run(2, 1, 'Lab 1', 'Computer Laboratory 1', 'Engr. Alex Reyes', '7:30 AM - 6:00 PM');
-  insertRoom.finalize();
-
-  console.log('✔ SLSU Database re-initialized with updated campus coordinates.');
+const run = (sql, params = []) => new Promise((resolve, reject) => {
+  db.run(sql, params, function (err) { err ? reject(err) : resolve(this); });
 });
 
-db.close();
+(async () => {
+  await run('PRAGMA foreign_keys = ON;');
+
+  await run(`CREATE TABLE categories (
+    id    TEXT PRIMARY KEY,
+    name  TEXT NOT NULL,
+    color TEXT
+  );`);
+
+  await run(`CREATE TABLE buildings (
+    id   INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL,
+    code TEXT UNIQUE NOT NULL
+  );`);
+
+  // One row per pin on the map. x/y are groundFloor_layer.svg coordinates;
+  // entry_x/entry_y are the nearest point on the campus walkable network, which
+  // is what the router actually navigates to.
+  await run(`CREATE TABLE locations (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug            TEXT UNIQUE NOT NULL,
+    name            TEXT NOT NULL,
+    acronym         TEXT,
+    building_id     INTEGER,
+    category        TEXT NOT NULL,
+    floor_level     TEXT NOT NULL DEFAULT 'Ground Floor',
+    operating_hours TEXT,
+    description     TEXT,
+    x               REAL NOT NULL,
+    y               REAL NOT NULL,
+    entry_x         REAL NOT NULL,
+    entry_y         REAL NOT NULL,
+    FOREIGN KEY (building_id) REFERENCES buildings(id) ON DELETE SET NULL,
+    FOREIGN KEY (category)    REFERENCES categories(id)
+  );`);
+
+  await run('CREATE INDEX idx_locations_category ON locations(category);');
+  await run('CREATE INDEX idx_locations_building ON locations(building_id);');
+  await run('CREATE INDEX idx_locations_name     ON locations(name);');
+  await run('CREATE INDEX idx_locations_acronym  ON locations(acronym);');
+
+  await run('BEGIN TRANSACTION;');
+
+  for (const c of categories) {
+    if (c.id === 'ALL') continue;              // a UI filter, not a real category
+    await run('INSERT INTO categories (id, name, color) VALUES (?, ?, ?);',
+              [c.id, c.name, c.color || null]);
+  }
+
+  const buildingIds = new Map();
+  for (const name of [...new Set(locations.map(l => l.building))].sort()) {
+    const res = await run('INSERT INTO buildings (name, code) VALUES (?, ?);',
+                          [name, buildingCode(name)]);
+    buildingIds.set(name, res.lastID);
+  }
+
+  for (const l of locations) {
+    await run(`INSERT INTO locations
+      (slug, name, acronym, building_id, category, floor_level, operating_hours,
+       description, x, y, entry_x, entry_y)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+      [l.id, l.name, l.acronym || null, buildingIds.get(l.building) || null,
+       l.category, l.floor, l.hours, l.description,
+       l.coords[0], l.coords[1], l.entry[0], l.entry[1]]);
+  }
+
+  await run('COMMIT;');
+
+  const count = t => new Promise(r => db.get(`SELECT COUNT(*) n FROM ${t}`, (e, row) => r(row ? row.n : 0)));
+  console.log('✔ Database created at', DB_PATH);
+  console.log('  categories:', await count('categories'));
+  console.log('  buildings :', await count('buildings'));
+  console.log('  locations :', await count('locations'));
+
+  db.close();
+})().catch(err => {
+  console.error('❌ Failed to build the database:', err.message);
+  db.close();
+  process.exit(1);
+});

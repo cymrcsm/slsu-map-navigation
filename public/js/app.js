@@ -2,363 +2,240 @@
 // 0. MAP GEOMETRY
 // ==========================================
 // groundFloor_layer.svg is a 320 x 421 vector campus map. Every coordinate in
-// this file is expressed in that SVG user-space ([x, y], origin top-left) and is
-// converted to Leaflet's [lat, lng] ordering by toLeafletCoords().
+// this file is expressed in that SVG user-space ([x, y], origin top-left).
+// CATEGORIES and LOCATIONS come from js/campus-data.js, WALK_MASK from
+// js/walkmask.js - both are generated from the SVG itself.
 
 const MAP_WIDTH = 320;
 const MAP_HEIGHT = 421;
 
 // ==========================================
-// 1. CATEGORY & LOCATION DATA REGISTRY
+// 1. WALKABLE SURFACE GRID
 // ==========================================
-// Category colours are pulled from the groundFloor_layer.svg palette so the
-// pins, badges and route line read as part of the same map.
+// One bit per cell, 2 cells per map unit. A cell is walkable where the map is
+// #D9D0C9 (buildings, rooms, pavement), the grey road, or white inside the
+// oval / courts / grandstand.
 
-const CATEGORIES = [
-  { id: "ALL", name: "All Categories" },
-  { id: "Executive", name: "Executive & Administrative Offices", color: "#4E6B7C" },
-  { id: "Archives", name: "Archives & Records", color: "#8A6A45" },
-  { id: "Auxiliary", name: "Auxiliary & Institutional Services", color: "#4F7A5E" }
-];
+const GRID = (() => {
+  const bin = atob(WALK_MASK.bits);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return { W: WALK_MASK.width, H: WALK_MASK.height, S: WALK_MASK.scale, bytes };
+})();
 
-const LOCATIONS = [
-  {
-    id: "bargo",
-    name: "Business, Auxiliary and Resource Generation Office",
-    acronym: "BARGO",
-    building: "Administration Building",
-    category: "Auxiliary",
-    floor: "Ground Floor",
-    hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [196.0, 312.8],
-    doorNode: "c_north_bargo",
-    description: "Handles university auxiliary ventures, institutional income generation, and business facility rentals."
-  },
-  {
-    id: "cashier-office",
-    name: "Cashier & Assessment Office",
-    acronym: "CASHIER",
-    building: "Administration Building",
-    category: "Executive",
-    floor: "Ground Floor",
-    hours: "8:00 AM - 4:00 PM (Mon - Fri)",
-    coords: [211.1, 312.7],
-    doorNode: "c_north_cashier",
-    description: "Handles university fee assessments, student tuition payments, cashiering transactions, and financial clearances."
-  },
-  {
-    id: "registrar-office",
-    name: "Office of the University Registrar",
-    acronym: "REGISTRAR",
-    building: "Administration Building",
-    category: "Executive",
-    floor: "Ground Floor",
-    hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [217.8, 313.2],
-    doorNode: "c_mid_east",
-    description: "Handles student admissions, registration, enrollment records, transcripts, and scholastic verifications."
-  },
-  {
-    id: "office-president",
-    name: "Office of the President",
-    acronym: "OP",
-    building: "Administration Building",
-    category: "Executive",
-    floor: "Ground Floor",
-    hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [221.0, 328.6],
-    doorNode: "c_door_op",
-    description: "The primary executive office for university governance and administrative leadership."
-  },
-  {
-    id: "student-records-archive",
-    name: "Student Records Archive",
-    acronym: "SRA",
-    building: "Administration Building",
-    category: "Archives",
-    floor: "Ground Floor",
-    hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [212.0, 328.7],
-    doorNode: "c_door_sra",
-    description: "Central repository for student academic transcripts, permanent records, and enrollment archives."
-  },
-  {
-    id: "ovpaa-ovpaf",
-    name: "Office of the Vice President for Academic Affairs & Office of the Vice President for Administration and Finance",
-    acronym: "OVPAA / OVPAF",
-    building: "Administration Building",
-    category: "Executive",
-    floor: "Ground Floor",
-    hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [196.2, 324.6],
-    doorNode: "c_cross_ovpaa",
-    description: "Executive offices coordinating university curriculum, academic policies, operational administration, and fiscal management."
-  },
-  {
-    id: "human-resource",
-    name: "Human Resource Management",
-    acronym: "HRMO",
-    building: "Administration Building",
-    category: "Executive",
-    floor: "Ground Floor",
-    hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [188.9, 324.8],
-    doorNode: "c_cross_hrmo",
-    description: "Oversees personnel management, employee relations, recruitment, and faculty benefits."
-  },
-  {
-    id: "archives-center",
-    name: "Archives Center",
-    acronym: "ARCHIVES",
-    building: "Administration Building",
-    category: "Archives",
-    floor: "Ground Floor",
-    hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [183.7, 337.5],
-    doorNode: "door_archives",
-    description: "Institutional repository preserving historical records, university publications, and institutional artifacts."
-  },
-  {
-    id: "coa",
-    name: "Commission on Audit",
-    acronym: "COA",
-    building: "Administration Building",
-    category: "Executive",
-    floor: "Ground Floor",
-    hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [192.0, 342.5],
-    doorNode: "door_coa",
-    description: "Government auditing office reviewing university financial accounts, fiscal accountability, and compliance."
-  },
-  {
-    id: "quality-assurance",
-    name: "Office of the Director for Quality Assurance",
-    acronym: "ODQA",
-    building: "Administration Building",
-    category: "Executive",
-    floor: "Ground Floor",
-    hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [196.8, 342.5],
-    doorNode: "door_odqa",
-    description: "Leads institutional accreditation, quality management systems, and academic standard compliance."
-  },
-  {
-    id: "gad-center",
-    name: "Gender and Development Center (GAD)",
-    acronym: "GAD",
-    building: "Student Services Building",
-    category: "Auxiliary",
-    floor: "Ground Floor",
-    hours: "8:00 AM - 5:00 PM (Mon - Fri)",
-    coords: [201.6, 342.5],
-    doorNode: "door_gad",
-    description: "Promotes gender-responsive programs, advocacy initiatives, and campus-wide inclusivity support."
-  }
-];
-
-// ==========================================
-// 2. CORRIDOR NETWORK
-// ==========================================
-// Walkable node graph through the Administration Building, in
-// groundFloor_layer.svg coordinates. To re-pick any node, click the map and read
-// the coordinate inspector in the bottom-left corner.
-
-const CORRIDOR_NODES = {
-  // North Hallway Corridors
-  "c_north_west":        [184.92, 310.99],
-  "c_north_bargo":       [193.85, 310.78],
-  "c_north_mid":         [203.46, 310.55],
-  "c_north_cashier":     [212.50, 310.34],
-  "c_north_east":        [224.44, 310.05],
-  "c_mid_west":          [184.78, 316.87],
-  "c_mid_spine":         [203.33, 316.43],
-  "c_mid_east":          [224.32, 315.37],
-  "c_cross_west":        [184.66, 322.13],
-  "c_cross_hrmo":        [190.48, 321.99],
-  "c_cross_ovpaa":       [196.38, 321.85],
-  "c_cross_spine":       [203.21, 321.69],
-  "c_cross_east":        [224.19, 321.19],
-  "c_spine_op":          [203.07, 327.44],
-  "c_door_op":           [205.92, 327.37],
-  "c_spine_sra":         [203.01, 330.38],
-  "c_door_sra":          [205.85, 330.31],
-  "c_spine_lobby":       [202.92, 334.05],
-  "c_lobby_center":      [196.10, 334.21],
-
-  // Approach from the Lobby to the east side entrance
-  "lobby_to_entrance":   [196.02, 337.39],
-  "entrance_outside":    [194.05, 337.44],
-  "entrance_inside":     [191.34, 337.51],
-
-  // South Wing interior paths
-  "hall_archives_front": [190.26, 337.53],
-  "hall_main_vert":      [191.30, 339.22],
-  "hall_coa":            [191.33, 339.22],
-  "hall_odqa":           [196.20, 339.10],
-  "hall_gad":            [202.40, 338.96],
-
-  // Door openings
-  "door_archives":       [189.53, 337.55],
-  "door_coa":            [191.29, 340.86],
-  "door_odqa":           [196.16, 340.74],
-  "door_gad":            [202.36, 340.60],
-
-  // Outdoor bypass perimeter
-  "out_bot_m":           [195.82, 346.45],
-  "out_bot_e":           [207.38, 346.18],
-  "out_mid_e":           [207.59, 337.12],
-  "out_top_e":           [207.66, 333.94],
-  "out_bot_w":           [183.01, 346.75],
-  "out_mid_w":           [183.29, 334.52]
-};
-
-const CORRIDOR_EDGES = [
-  // North Corridor Connections
-  ["c_north_west", "c_north_bargo"],
-  ["c_north_bargo", "c_north_mid"],
-  ["c_north_mid", "c_north_cashier"],
-  ["c_north_cashier", "c_north_east"],
-  ["c_north_west", "c_mid_west"],
-  ["c_mid_west", "c_cross_west"],
-  ["c_north_east", "c_mid_east"],
-  ["c_mid_east", "c_cross_east"],
-  ["c_north_mid", "c_mid_spine"],
-  ["c_mid_spine", "c_cross_spine"],
-  ["c_cross_west", "c_cross_hrmo"],
-  ["c_cross_hrmo", "c_cross_ovpaa"],
-  ["c_cross_ovpaa", "c_cross_spine"],
-  ["c_cross_spine", "c_cross_east"],
-  ["c_cross_spine", "c_spine_op"],
-  ["c_spine_op", "c_door_op"],
-  ["c_spine_op", "c_spine_sra"],
-  ["c_spine_sra", "c_door_sra"],
-  ["c_spine_sra", "c_spine_lobby"],
-  ["c_spine_lobby", "c_lobby_center"],
-  ["c_spine_lobby", "out_top_e"],
-  ["c_lobby_center", "out_mid_w"],
-
-  // Connecting to the east entrance
-  ["c_lobby_center", "lobby_to_entrance"],
-  ["lobby_to_entrance", "entrance_outside"],
-  ["entrance_outside", "entrance_inside"],
-
-  ["entrance_inside", "hall_archives_front"],
-  ["hall_archives_front", "door_archives"],
-
-  ["entrance_inside", "hall_main_vert"],
-  ["hall_main_vert", "hall_coa"],
-  ["hall_coa", "door_coa"],
-
-  ["hall_coa", "hall_odqa"],
-  ["hall_odqa", "door_odqa"],
-
-  ["hall_odqa", "hall_gad"],
-  ["hall_gad", "door_gad"],
-
-  // Outdoor bypass paths
-  ["out_bot_m", "out_bot_e"],
-  ["out_bot_m", "out_bot_w"],
-  ["out_bot_w", "out_mid_w"],
-  ["out_bot_e", "out_mid_e"],
-  ["out_mid_e", "out_top_e"],
-
-  // Sweeping connection from the right-side outdoor path into the entrance
-  ["out_mid_e", "lobby_to_entrance"]
-];
-
-// ==========================================
-// 3. PATHFINDING (A*)
-// ==========================================
-
-function getDistance(p1, p2) {
-  return Math.hypot(p1[0] - p2[0], p1[1] - p2[1]);
+function cellWalkable(x, y) {
+  if (x < 0 || y < 0 || x >= GRID.W || y >= GRID.H) return false;
+  const i = y * GRID.W + x;
+  return (GRID.bytes[i >> 3] & (128 >> (i & 7))) !== 0;
 }
 
-function findNearestCorridorNode(coords) {
-  let closestNode = null;
-  let minDistance = Infinity;
+const toCell = v => Math.round(v * GRID.S);
+const toUnit = v => v / GRID.S;
 
-  for (const [nodeId, nodeCoords] of Object.entries(CORRIDOR_NODES)) {
-    const dist = getDistance(coords, nodeCoords);
-    if (dist < minDistance) {
-      minDistance = dist;
-      closestNode = nodeId;
-    }
-  }
-  return closestNode;
-}
+// The campus splits into many walkable islands: each room is fenced off by its
+// own walls. Routing happens on the largest island - the roads, pavements and
+// open ground that actually connect the campus together. Everything else is
+// reached by a short final hop from the nearest point on that network.
+const MAIN = (() => {
+  const n = GRID.W * GRID.H;
+  const seen = new Uint8Array(n);
+  const inMain = new Uint8Array(n);
+  const queue = new Int32Array(n);
+  let bestStart = -1, bestSize = 0;
 
-function buildGraph() {
-  const graph = {};
-  for (const nodeId in CORRIDOR_NODES) graph[nodeId] = [];
-
-  CORRIDOR_EDGES.forEach(([u, v]) => {
-    if (graph[u] && graph[v]) {
-      const dist = getDistance(CORRIDOR_NODES[u], CORRIDOR_NODES[v]);
-      graph[u].push({ node: v, cost: dist });
-      graph[v].push({ node: u, cost: dist });
-    }
-  });
-  return graph;
-}
-
-const NAV_GRAPH = buildGraph();
-
-function computeCorridorPath(startNodeId, endNodeId) {
-  if (startNodeId === endNodeId) return [CORRIDOR_NODES[startNodeId]];
-
-  const openSet = new Set([startNodeId]);
-  const cameFrom = {};
-  const gScore = {};
-  const fScore = {};
-
-  for (const node in CORRIDOR_NODES) {
-    gScore[node] = Infinity;
-    fScore[node] = Infinity;
-  }
-
-  gScore[startNodeId] = 0;
-  fScore[startNodeId] = getDistance(CORRIDOR_NODES[startNodeId], CORRIDOR_NODES[endNodeId]);
-
-  while (openSet.size > 0) {
-    let current = null;
-    let lowestF = Infinity;
-
-    for (const node of openSet) {
-      if (fScore[node] < lowestF) {
-        lowestF = fScore[node];
-        current = node;
+  for (let s = 0; s < n; s++) {
+    if (seen[s] || !cellWalkable(s % GRID.W, (s / GRID.W) | 0)) continue;
+    let head = 0, tail = 0, size = 0;
+    queue[tail++] = s; seen[s] = 1;
+    while (head < tail) {
+      const cur = queue[head++]; size++;
+      const x = cur % GRID.W, y = (cur / GRID.W) | 0;
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          if (!dx && !dy) continue;
+          const nx = x + dx, ny = y + dy;
+          if (!cellWalkable(nx, ny)) continue;
+          const ni = ny * GRID.W + nx;
+          if (seen[ni]) continue;
+          seen[ni] = 1; queue[tail++] = ni;
+        }
       }
     }
+    if (size > bestSize) { bestSize = size; bestStart = s; }
+  }
 
-    if (current === endNodeId) {
-      const path = [];
-      let temp = current;
-      while (temp) {
-        path.unshift(CORRIDOR_NODES[temp]);
-        temp = cameFrom[temp];
+  // Second pass: flag only the winning island.
+  if (bestStart >= 0) {
+    let head = 0, tail = 0;
+    queue[tail++] = bestStart; inMain[bestStart] = 1;
+    while (head < tail) {
+      const cur = queue[head++];
+      const x = cur % GRID.W, y = (cur / GRID.W) | 0;
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          if (!dx && !dy) continue;
+          const nx = x + dx, ny = y + dy;
+          if (!cellWalkable(nx, ny)) continue;
+          const ni = ny * GRID.W + nx;
+          if (inMain[ni]) continue;
+          inMain[ni] = 1; queue[tail++] = ni;
+        }
       }
-      return path;
     }
+  }
+  return { flags: inMain, size: bestSize };
+})();
 
-    openSet.delete(current);
+const onNetwork = (x, y) =>
+  x >= 0 && y >= 0 && x < GRID.W && y < GRID.H && MAIN.flags[y * GRID.W + x] === 1;
 
-    for (const neighbor of NAV_GRAPH[current]) {
-      const tentativeG = gScore[current] + neighbor.cost;
-      if (tentativeG < gScore[neighbor.node]) {
-        cameFrom[neighbor.node] = current;
-        gScore[neighbor.node] = tentativeG;
-        fScore[neighbor.node] = tentativeG + getDistance(CORRIDOR_NODES[neighbor.node], CORRIDOR_NODES[endNodeId]);
-        openSet.add(neighbor.node);
+// Nearest cell on the walkable network, searched outward ring by ring.
+function nearestNetworkCell(coords, maxUnits = 40) {
+  const cx = toCell(coords[0]), cy = toCell(coords[1]);
+  if (onNetwork(cx, cy)) return [cx, cy];
+  const maxR = Math.round(maxUnits * GRID.S);
+  for (let r = 1; r <= maxR; r++) {
+    let best = null, bestD = Infinity;
+    for (let dy = -r; dy <= r; dy++) {
+      for (let dx = -r; dx <= r; dx++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+        const x = cx + dx, y = cy + dy;
+        if (!onNetwork(x, y)) continue;
+        const d = dx * dx + dy * dy;
+        if (d < bestD) { bestD = d; best = [x, y]; }
+      }
+    }
+    if (best) return best;
+  }
+  return null;
+}
+
+// ==========================================
+// 2. A* OVER THE WALKABLE GRID
+// ==========================================
+
+const SQRT2 = Math.SQRT2;
+
+// Binary min-heap keyed on fScore, storing cell indices.
+function makeHeap(fScore) {
+  const items = [];
+  return {
+    size: () => items.length,
+    push(v) {
+      items.push(v);
+      let i = items.length - 1;
+      while (i > 0) {
+        const p = (i - 1) >> 1;
+        if (fScore[items[p]] <= fScore[items[i]]) break;
+        [items[p], items[i]] = [items[i], items[p]]; i = p;
+      }
+    },
+    pop() {
+      const top = items[0], last = items.pop();
+      if (items.length) {
+        items[0] = last;
+        let i = 0;
+        for (;;) {
+          const l = 2 * i + 1, r = l + 1;
+          let m = i;
+          if (l < items.length && fScore[items[l]] < fScore[items[m]]) m = l;
+          if (r < items.length && fScore[items[r]] < fScore[items[m]]) m = r;
+          if (m === i) break;
+          [items[m], items[i]] = [items[i], items[m]]; i = m;
+        }
+      }
+      return top;
+    }
+  };
+}
+
+function findGridPath(startCell, goalCell) {
+  const n = GRID.W * GRID.H;
+  const [sx, sy] = startCell, [gx, gy] = goalCell;
+  const start = sy * GRID.W + sx, goal = gy * GRID.W + gx;
+  if (start === goal) return [startCell];
+
+  const g = new Float32Array(n).fill(Infinity);
+  const f = new Float32Array(n).fill(Infinity);
+  const from = new Int32Array(n).fill(-1);
+  const closed = new Uint8Array(n);
+
+  const h = (x, y) => {
+    const dx = Math.abs(x - gx), dy = Math.abs(y - gy);
+    return (dx + dy) + (SQRT2 - 2) * Math.min(dx, dy);
+  };
+
+  g[start] = 0; f[start] = h(sx, sy);
+  const open = makeHeap(f);
+  open.push(start);
+
+  while (open.size()) {
+    const cur = open.pop();
+    if (cur === goal) break;
+    if (closed[cur]) continue;
+    closed[cur] = 1;
+    const x = cur % GRID.W, y = (cur / GRID.W) | 0;
+
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        if (!dx && !dy) continue;
+        const nx = x + dx, ny = y + dy;
+        if (!onNetwork(nx, ny)) continue;
+        // No cutting diagonally through the corner of a blocked cell.
+        if (dx && dy && (!onNetwork(x + dx, y) || !onNetwork(x, y + dy))) continue;
+        const ni = ny * GRID.W + nx;
+        if (closed[ni]) continue;
+        const step = (dx && dy) ? SQRT2 : 1;
+        const tentative = g[cur] + step;
+        if (tentative < g[ni]) {
+          g[ni] = tentative;
+          f[ni] = tentative + h(nx, ny);
+          from[ni] = cur;
+          open.push(ni);
+        }
       }
     }
   }
 
-  return [];
+  if (from[goal] === -1 && goal !== start) return [];
+  const path = [];
+  for (let c = goal; c !== -1; c = from[c]) path.push([c % GRID.W, (c / GRID.W) | 0]);
+  return path.reverse();
+}
+
+// Bresenham walk used to test whether two cells see each other across the network.
+function lineOfSight(a, b) {
+  let [x0, y0] = a; const [x1, y1] = b;
+  const dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+  let err = dx - dy;
+  for (;;) {
+    if (!onNetwork(x0, y0)) return false;
+    if (x0 === x1 && y0 === y1) return true;
+    const e2 = 2 * err;
+    if (e2 > -dy) { err -= dy; x0 += sx; }
+    if (e2 < dx) { err += dx; y0 += sy; }
+  }
+}
+
+// Collapse the staircase the grid produces into a few straight legs.
+function simplifyPath(cells) {
+  if (cells.length < 3) return cells;
+  const out = [cells[0]];
+  let anchor = 0;
+  while (anchor < cells.length - 1) {
+    let far = anchor + 1;
+    for (let j = cells.length - 1; j > anchor + 1; j--) {
+      if (lineOfSight(cells[anchor], cells[j])) { far = j; break; }
+    }
+    out.push(cells[far]);
+    anchor = far;
+  }
+  return out;
 }
 
 // ==========================================
-// 4. HELPER FUNCTIONS
+// 3. HELPERS
 // ==========================================
 
 // L.CRS.Simple counts latitude upwards, while the SVG counts y downwards, and
@@ -377,24 +254,33 @@ function getCategoryColor(categoryName) {
   return cat ? cat.color : '#4E6B7C';
 }
 
+function getCategoryName(categoryName) {
+  const cat = CATEGORIES.find(c => c.id === categoryName);
+  return cat ? cat.name : categoryName;
+}
+
 // ==========================================
-// 5. LEAFLET MAP INITIALIZATION
+// 4. LEAFLET MAP INITIALIZATION
 // ==========================================
 
 const bounds = [[0, 0], [MAP_HEIGHT, MAP_WIDTH]];
 
-// Zoom range for the 320x421 vector map. At zoom 0 one map unit is one screen
-// pixel, so the whole campus would be a 320px thumbnail; fitting it into the
-// kiosk map panel lands around zoom 1.25. Room-level detail sits well above
-// that, so the usable range is positive rather than the old negative range.
-const MIN_ZOOM = 0.5;
+const ZOOM_FLOOR = 0.20;  // absolute backstop; the real limit is computed below
 const MAX_ZOOM = 5;
 const ROOM_ZOOM = 4;      // flyTo level when a location is selected
 const ROUTE_MAX_ZOOM = 4; // ceiling used when fitting a drawn route
+const FIT_PADDING = 16;   // px of breathing room around the campus overview
+const PIN_ZOOM = 2.4;     // above this, markers grow from dots into full pins
+
+// How tight the zoomed-all-the-way-out overview sits. 1.0 = the entire 320x421
+// canvas is visible, which leaves wide empty margins because the drawn campus
+// only occupies the middle of it. Above 1.0 the canvas is cropped so the campus
+// itself fills the panel.
+const OVERVIEW_SCALE = 1.25;
 
 const map = L.map('map', {
   crs: L.CRS.Simple,
-  minZoom: MIN_ZOOM,
+  minZoom: ZOOM_FLOOR,
   maxZoom: MAX_ZOOM,
   zoomSnap: 0,      // continuous, so fitBounds fills the panel exactly
   zoomDelta: 0.5,   // but the +/- buttons still move in readable steps
@@ -407,22 +293,48 @@ const map = L.map('map', {
 
 L.imageOverlay('assets/groundFloor_layer.svg', bounds).addTo(map);
 
-function autoCenterCampus(animate = true) {
-  map.fitBounds(bounds, { animate: animate, padding: [16, 16] });
+const CAMPUS_CENTER = toLeafletCoords([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
+
+// The zoom at which the campus overview sits, and the point past which zooming
+// out is pointless. Derived from the live panel size rather than hard-coded, so
+// it holds on any kiosk resolution. L.CRS.Simple puts one map unit per pixel at
+// zoom 0, so the zoom for a given scale factor is just its base-2 logarithm.
+function overviewZoom() {
+  const size = map.getSize();
+  const usableX = Math.max(1, size.x - FIT_PADDING * 2);
+  const usableY = Math.max(1, size.y - FIT_PADDING * 2);
+  const scale = Math.min(usableX / MAP_WIDTH, usableY / MAP_HEIGHT) * OVERVIEW_SCALE;
+  return Math.max(ZOOM_FLOOR, Math.log2(scale));
 }
+
+function autoCenterCampus(animate = true) {
+  map.setView(CAMPUS_CENTER, overviewZoom(), { animate: animate });
+}
+
+// Drop the limit to the floor before raising it, so a shrinking window can
+// relax it again instead of staying pinned at the widest value it ever had.
+function clampZoomOut() {
+  map.setMinZoom(ZOOM_FLOOR);
+  map.setMinZoom(overviewZoom());
+}
+
+map.on('resize', clampZoomOut);
+clampZoomOut();
 autoCenterCampus(false);
 
 setTimeout(() => {
   map.invalidateSize();
+  clampZoomOut();
   autoCenterCampus(false);
 }, 200);
 
 // ==========================================
-// 6. UI ELEMENT REFERENCES
+// 5. UI ELEMENT REFERENCES
 // ==========================================
 
 const searchInput = document.getElementById('search-input');
 const clearSearchBtn = document.getElementById('clear-search-btn');
+const suggestionList = document.getElementById('search-suggestions');
 const categoryDropdown = document.getElementById('category-dropdown');
 
 const tutorialView = document.getElementById('tutorial-view');
@@ -441,17 +353,15 @@ const detailHours = document.getElementById('detail-hours');
 const detailDesc = document.getElementById('detail-desc');
 
 let activeSelectedLocation = null;
-let activeRouteLayer = null;
+let activeRouteLayers = [];
 const markerLayer = L.layerGroup().addTo(map);
 
 // ==========================================
-// 7. KIOSK POSITIONING (PERSISTENT STATE)
+// 6. KIOSK POSITIONING (PERSISTENT STATE)
 // ==========================================
 
 const DEFAULT_KIOSK_COORDS = [196.1, 334.2]; // Administration Building lobby
 
-// A kiosk position saved against the previous, much larger floor plan falls
-// outside the new 320x421 map, so discard anything that no longer fits.
 function readStoredKioskCoords() {
   try {
     const saved = JSON.parse(localStorage.getItem('kiosk_coords'));
@@ -471,7 +381,7 @@ let kioskMarker = null;
 
 const kioskIcon = L.divIcon({
   className: 'kiosk-custom-icon',
-  html: `<div class="kiosk-pulsing-marker" title="Current Kiosk Location"></div>`,
+  html: '<div class="kiosk-pulsing-marker" title="Current Kiosk Location"></div>',
   iconSize: [22, 22],
   iconAnchor: [11, 11]
 });
@@ -482,80 +392,114 @@ function renderKioskMarker() {
     kioskMarker.setLatLng(leafletPos);
   } else {
     kioskMarker = L.marker(leafletPos, { icon: kioskIcon, zIndexOffset: 1000 }).addTo(map);
-    kioskMarker.bindTooltip("📍 You Are Here (Kiosk)", { permanent: true, direction: "top", offset: [0, -12] });
+    kioskMarker.bindTooltip('📍 You Are Here (Kiosk)', { permanent: true, direction: 'top', offset: [0, -12] });
   }
 }
 renderKioskMarker();
 
 // ==========================================
-// 8. POPULATE DROPDOWN & RENDER PINS
+// 7. CATEGORY DROPDOWN
 // ==========================================
+
+const categoryCounts = {};
+LOCATIONS.forEach(l => { categoryCounts[l.category] = (categoryCounts[l.category] || 0) + 1; });
 
 categoryDropdown.innerHTML = '';
 CATEGORIES.forEach(cat => {
   const opt = document.createElement('option');
   opt.value = cat.id;
-  opt.textContent = cat.name;
+  opt.textContent = cat.id === 'ALL'
+    ? `${cat.name} (${LOCATIONS.length})`
+    : `${cat.name} (${categoryCounts[cat.id] || 0})`;
   categoryDropdown.appendChild(opt);
 });
 
-// Pins are drawn inline so each one can carry its category colour from the
-// groundFloor_layer.svg palette, instead of the flat white assets/location.svg
-// that disappeared against the light building fills.
-function buildPinIcon(color) {
-  return L.divIcon({
-    className: 'location-pin-icon',
-    html: `
-      <svg viewBox="0 0 24 32" width="26" height="34" aria-hidden="true">
-        <path d="M12 0.9C5.9 0.9 1 5.8 1 11.9c0 7.8 9.4 18.1 10.1 18.9a1.2 1.2 0 0 0 1.8 0C13.6 30 23 19.7 23 11.9 23 5.8 18.1 0.9 12 0.9Z"
-              fill="${color}" stroke="#FEFDF9" stroke-width="1.6" stroke-linejoin="round"/>
-        <circle cx="12" cy="11.9" r="4.1" fill="#FEFDF9"/>
-      </svg>`,
-    iconSize: [26, 34],
-    iconAnchor: [13, 32],
-    popupAnchor: [0, -32]
-  });
+// ==========================================
+// 8. MARKERS
+// ==========================================
+// 254 pins is a lot for one screen, so they render as small category-coloured
+// dots when zoomed out and grow into full pins once the map is zoomed in.
+
+function pinSvg(color) {
+  return '<svg viewBox="0 0 24 32" width="24" height="32" aria-hidden="true">' +
+    '<path d="M12 0.9C5.9 0.9 1 5.8 1 11.9c0 7.8 9.4 18.1 10.1 18.9a1.2 1.2 0 0 0 1.8 0C13.6 30 23 19.7 23 11.9 23 5.8 18.1 0.9 12 0.9Z"' +
+    ' fill="' + color + '" stroke="#FEFDF9" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<circle cx="12" cy="11.9" r="4.1" fill="#FEFDF9"/></svg>';
 }
 
-const PIN_ICONS = {};
-CATEGORIES.forEach(cat => {
-  if (cat.color) PIN_ICONS[cat.id] = buildPinIcon(cat.color);
+const ICON_CACHE = {};
+function iconFor(category, big) {
+  const key = category + (big ? ':pin' : ':dot');
+  if (ICON_CACHE[key]) return ICON_CACHE[key];
+  const color = getCategoryColor(category);
+  const icon = big
+    ? L.divIcon({ className: 'location-pin-icon', html: pinSvg(color),
+                  iconSize: [24, 32], iconAnchor: [12, 30], popupAnchor: [0, -30] })
+    : L.divIcon({ className: 'location-dot-icon',
+                  html: '<span class="dot" style="background:' + color + '"></span>',
+                  iconSize: [12, 12], iconAnchor: [6, 6], popupAnchor: [0, -6] });
+  ICON_CACHE[key] = icon;
+  return icon;
+}
+
+let bigPins = map.getZoom() >= PIN_ZOOM;
+const markerFor = new Map();   // location id -> L.Marker
+
+LOCATIONS.forEach(loc => {
+  const marker = L.marker(toLeafletCoords(loc.coords), {
+    icon: iconFor(loc.category, bigPins),
+    title: loc.acronym ? `${loc.name} (${loc.acronym})` : loc.name,
+    riseOnHover: true
+  });
+  marker.on('click', () => showLocationDetails(loc));
+  markerFor.set(loc.id, marker);
 });
 
-function renderMarkers(selectedCategory = "ALL", searchQuery = "") {
+let visibleIds = new Set(LOCATIONS.map(l => l.id));
+
+function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
+  const q = searchQuery.trim().toLowerCase();
+  const matches = LOCATIONS.filter(loc => {
+    if (selectedCategory !== 'ALL' && loc.category !== selectedCategory) return false;
+    if (!q) return true;
+    return loc.name.toLowerCase().includes(q) ||
+           loc.acronym.toLowerCase().includes(q) ||
+           loc.building.toLowerCase().includes(q);
+  });
+
   markerLayer.clearLayers();
-  const q = searchQuery.toLowerCase().trim();
-
-  const filtered = LOCATIONS.filter(loc => {
-    const matchesCat = selectedCategory === "ALL" || loc.category === selectedCategory;
-    const matchesSearch = !q ||
-      loc.name.toLowerCase().includes(q) ||
-      loc.acronym.toLowerCase().includes(q) ||
-      loc.building.toLowerCase().includes(q);
-    return matchesCat && matchesSearch;
-  });
-
-  filtered.forEach(loc => {
-    const leafletPosition = toLeafletCoords(loc.coords);
-    const icon = PIN_ICONS[loc.category] || buildPinIcon(getCategoryColor(loc.category));
-    const marker = L.marker(leafletPosition, { icon: icon, title: loc.acronym });
-
-    marker.on('click', () => showLocationDetails(loc));
-    markerLayer.addLayer(marker);
-  });
+  visibleIds = new Set(matches.map(l => l.id));
+  matches.forEach(loc => markerLayer.addLayer(markerFor.get(loc.id)));
+  return matches;
 }
 
-function showLocationDetails(loc) {
+// Swap dot icons for pin icons when crossing the zoom threshold.
+map.on('zoomend', () => {
+  const want = map.getZoom() >= PIN_ZOOM;
+  if (want === bigPins) return;
+  bigPins = want;
+  LOCATIONS.forEach(loc => {
+    if (visibleIds.has(loc.id)) markerFor.get(loc.id).setIcon(iconFor(loc.category, bigPins));
+  });
+});
+
+// ==========================================
+// 9. DETAIL PANEL
+// ==========================================
+
+function showLocationDetails(loc, flyZoom = ROOM_ZOOM) {
   activeSelectedLocation = loc;
   clearActiveRoute();
 
   const pinColor = getCategoryColor(loc.category);
-  detailBadge.textContent = loc.category;
-  detailBadge.style.background = `${pinColor}1A`;
+  detailBadge.textContent = getCategoryName(loc.category);
+  detailBadge.style.background = pinColor + '1A';
   detailBadge.style.color = pinColor;
 
   detailTitle.textContent = loc.name;
-  detailBuilding.textContent = `${loc.building} (${loc.acronym})`;
+  detailBuilding.textContent = loc.acronym
+    ? `${loc.building} · ${loc.acronym}`
+    : loc.building;
   detailFloor.textContent = loc.floor;
   detailHours.textContent = loc.hours;
   detailDesc.textContent = loc.description;
@@ -563,8 +507,7 @@ function showLocationDetails(loc) {
   tutorialView.classList.add('hidden');
   detailView.classList.remove('hidden');
 
-  const leafletPosition = toLeafletCoords(loc.coords);
-  map.flyTo(leafletPosition, ROOM_ZOOM, { animate: true, duration: 0.8 });
+  map.flyTo(toLeafletCoords(loc.coords), flyZoom, { animate: true, duration: 0.8 });
 }
 
 function showTutorialView() {
@@ -575,95 +518,212 @@ function showTutorialView() {
 }
 
 // ==========================================
-// 9. ROUTING / ASK FOR DIRECTIONS
+// 10. SEARCH WITH LIVE SUGGESTIONS
+// ==========================================
+
+const MAX_SUGGESTIONS = 8;
+
+// Rank so that the thing you typed the start of comes first.
+function scoreMatch(loc, q) {
+  const name = loc.name.toLowerCase();
+  const acr = loc.acronym.toLowerCase();
+  const bld = loc.building.toLowerCase();
+
+  if (acr && acr === q) return 0;
+  if (name === q) return 1;
+  if (acr && acr.startsWith(q)) return 2;
+  if (name.startsWith(q)) return 3;
+  // start of any word in the name, e.g. "reg" matching "Office of the Registrar"
+  if (new RegExp('\\b' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(name)) return 4;
+  if (name.includes(q)) return 5;
+  if (bld.startsWith(q)) return 6;
+  if (bld.includes(q)) return 7;
+  if (acr && acr.includes(q)) return 8;
+  return -1;
+}
+
+function searchLocations(query, category = 'ALL', limit = Infinity) {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  const scored = [];
+  for (const loc of LOCATIONS) {
+    if (category !== 'ALL' && loc.category !== category) continue;
+    const s = scoreMatch(loc, q);
+    if (s >= 0) scored.push({ loc, s });
+  }
+  scored.sort((a, b) => a.s - b.s || a.loc.name.localeCompare(b.loc.name));
+  return scored.slice(0, limit).map(r => r.loc);
+}
+
+let suggestions = [];
+let activeSuggestion = -1;
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// Wrap the matched run of characters so the user can see why a row matched.
+function highlight(text, q) {
+  const i = text.toLowerCase().indexOf(q);
+  if (i < 0) return escapeHtml(text);
+  return escapeHtml(text.slice(0, i)) +
+         '<mark>' + escapeHtml(text.slice(i, i + q.length)) + '</mark>' +
+         escapeHtml(text.slice(i + q.length));
+}
+
+function renderSuggestions(query) {
+  const q = query.trim().toLowerCase();
+  suggestions = q ? searchLocations(query, categoryDropdown.value, MAX_SUGGESTIONS) : [];
+  activeSuggestion = -1;
+
+  if (!suggestions.length) {
+    if (q) {
+      suggestionList.innerHTML = '<li class="suggestion-empty">No match for “' + escapeHtml(query.trim()) + '”</li>';
+      suggestionList.classList.remove('hidden');
+      searchInput.setAttribute('aria-expanded', 'true');
+    } else {
+      closeSuggestions();
+    }
+    return;
+  }
+
+  suggestionList.innerHTML = suggestions.map((loc, i) => {
+    const color = getCategoryColor(loc.category);
+    const sub = loc.acronym && !loc.name.includes(loc.acronym)
+      ? highlight(loc.acronym, q) + ' · ' + escapeHtml(loc.building)
+      : escapeHtml(loc.building);
+    return '<li class="suggestion" role="option" id="sug-' + i + '" data-index="' + i + '">' +
+             '<span class="suggestion-swatch" style="background:' + color + '"></span>' +
+             '<span class="suggestion-text">' +
+               '<strong>' + highlight(loc.name, q) + '</strong>' +
+               '<small>' + sub + '</small>' +
+             '</span>' +
+           '</li>';
+  }).join('');
+  suggestionList.classList.remove('hidden');
+  searchInput.setAttribute('aria-expanded', 'true');
+}
+
+function closeSuggestions() {
+  suggestionList.classList.add('hidden');
+  suggestionList.innerHTML = '';
+  suggestions = [];
+  activeSuggestion = -1;
+  searchInput.setAttribute('aria-expanded', 'false');
+}
+
+function highlightSuggestion(index) {
+  const items = suggestionList.querySelectorAll('.suggestion');
+  items.forEach(el => el.classList.remove('active'));
+  if (index < 0 || index >= items.length) { activeSuggestion = -1; return; }
+  activeSuggestion = index;
+  items[index].classList.add('active');
+  items[index].scrollIntoView({ block: 'nearest' });
+}
+
+function chooseSuggestion(index) {
+  const loc = suggestions[index];
+  if (!loc) return;
+  searchInput.value = loc.name;
+  closeSuggestions();
+  renderMarkers(categoryDropdown.value, '');
+  showLocationDetails(loc);
+}
+
+// ==========================================
+// 11. ROUTING
 // ==========================================
 
 function clearActiveRoute() {
-  if (activeRouteLayer) {
-    map.removeLayer(activeRouteLayer);
-    activeRouteLayer = null;
+  activeRouteLayers.forEach(l => map.removeLayer(l));
+  activeRouteLayers = [];
+}
+
+function routeLengthUnits(points) {
+  let total = 0;
+  for (let i = 1; i < points.length; i++) {
+    total += Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]);
   }
+  return total;
 }
 
 function drawRoute(destination) {
   clearActiveRoute();
 
-  const targetNodeId = destination.doorNode;
-  const startCorridorId = findNearestCorridorNode(kioskCoords);
+  const startCell = nearestNetworkCell(kioskCoords);
+  const goalCell = nearestNetworkCell(destination.entry);
 
-  if (!startCorridorId) return;
-
-  const corridorPathNodes = computeCorridorPath(startCorridorId, targetNodeId);
-
-  if (corridorPathNodes.length === 0 && startCorridorId !== targetNodeId) {
-    inspector.innerText = "⚠ No corridor route found to that destination.";
-    console.warn(`No path in corridor graph: ${startCorridorId} -> ${targetNodeId}`);
+  if (!startCell || !goalCell) {
+    inspector.innerText = '⚠ Could not reach the campus walkway network from here.';
     return;
   }
 
-  // Build the raw point-to-point sequence directly down the corridor edges
-  const finalWaypoints = [kioskCoords];
+  const cells = findGridPath(startCell, goalCell);
+  if (!cells.length) {
+    inspector.innerText = '⚠ No walking route found to ' + destination.name + '.';
+    return;
+  }
 
-  corridorPathNodes.forEach(pt => {
-    const last = finalWaypoints[finalWaypoints.length - 1];
-    if (!last || last[0] !== pt[0] || last[1] !== pt[1]) {
-      finalWaypoints.push(pt);
-    }
+  const walk = simplifyPath(cells).map(([x, y]) => [toUnit(x), toUnit(y)]);
+  const mainPath = [kioskCoords, ...walk];
+
+  // Leg 1: along the campus walkways.
+  activeRouteLayers.push(L.polyline(mainPath.map(toLeafletCoords), {
+    weight: 5, opacity: 0.95, className: 'route-line', lineCap: 'round', lineJoin: 'round'
+  }).addTo(map));
+
+  // Leg 2: the short hop off the walkway into the room itself. Drawn lighter so
+  // it reads as "then head inside" rather than as a mapped path.
+  const lastWalk = walk[walk.length - 1];
+  const hop = Math.hypot(destination.coords[0] - lastWalk[0], destination.coords[1] - lastWalk[1]);
+  if (hop > 0.6) {
+    activeRouteLayers.push(L.polyline([lastWalk, destination.coords].map(toLeafletCoords), {
+      weight: 4, opacity: 0.9, className: 'route-entry-line', lineCap: 'round'
+    }).addTo(map));
+  }
+
+  const group = L.featureGroup(activeRouteLayers);
+  map.fitBounds(group.getBounds(), {
+    padding: [70, 70], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 1
   });
 
-  finalWaypoints.push(destination.coords);
-
-  const leafletWaypoints = finalWaypoints.map(pt => toLeafletCoords(pt));
-
-  activeRouteLayer = L.polyline(leafletWaypoints, {
-    weight: 5,
-    opacity: 0.95,
-    className: 'route-line',
-    lineCap: 'round',
-    lineJoin: 'round'
-  }).addTo(map);
-
-  map.fitBounds(activeRouteLayer.getBounds(), {
-    padding: [70, 70],
-    maxZoom: ROUTE_MAX_ZOOM,
-    animate: true,
-    duration: 1
-  });
+  // The map is 320 units wide and the campus road loop is about 250 m across,
+  // which puts roughly one metre in one map unit. Good enough for a walking hint.
+  const metres = Math.round(routeLengthUnits(mainPath) + hop);
+  inspector.innerText = '🧭 ' + destination.name + ' — about ' + metres + ' m on foot';
 }
 
 // ==========================================
-// 10. EVENT LISTENERS
+// 12. EVENT LISTENERS
 // ==========================================
 
 backToTutorialBtn.addEventListener('click', showTutorialView);
 
 recenterRoomBtn.addEventListener('click', () => {
   if (activeSelectedLocation) {
-    const leafletPosition = toLeafletCoords(activeSelectedLocation.coords);
-    map.flyTo(leafletPosition, MAX_ZOOM - 0.5, { animate: true });
+    map.flyTo(toLeafletCoords(activeSelectedLocation.coords), MAX_ZOOM - 0.5, { animate: true });
   }
 });
 
 getDirectionsBtn.addEventListener('click', () => {
-  if (activeSelectedLocation) {
-    drawRoute(activeSelectedLocation);
-  }
+  if (activeSelectedLocation) drawRoute(activeSelectedLocation);
 });
 
 setKioskBtn.addEventListener('click', () => {
   isSettingKioskLocation = !isSettingKioskLocation;
   if (isSettingKioskLocation) {
     setKioskBtn.classList.add('active-placement');
-    inspector.innerText = "📍 Click anywhere on the map to set the new Kiosk position.";
+    inspector.innerText = '📍 Click anywhere on the map to set the new Kiosk position.';
   } else {
     setKioskBtn.classList.remove('active-placement');
-    inspector.innerText = "Click map to log coordinates";
+    inspector.innerText = 'Click map to log coordinates';
   }
 });
 
 map.on('click', (e) => {
   // One decimal place: the map is only 320 units wide, so whole numbers are too
-  // coarse to place a pin or a corridor node accurately.
+  // coarse to place a pin accurately.
   const [rawX, rawY] = fromLeafletCoords(e.latlng);
   const x = Math.round(rawX * 10) / 10;
   const y = Math.round(rawY * 10) / 10;
@@ -675,27 +735,67 @@ map.on('click', (e) => {
     isSettingKioskLocation = false;
     setKioskBtn.classList.remove('active-placement');
     inspector.innerText = `✔ Kiosk position updated to: [${x}, ${y}]`;
-
-    if (activeRouteLayer && activeSelectedLocation) {
-      drawRoute(activeSelectedLocation);
-    }
+    if (activeRouteLayers.length && activeSelectedLocation) drawRoute(activeSelectedLocation);
     return;
   }
 
-  inspector.innerText = `coords: [${x}, ${y}]`;
+  closeSuggestions();
+  const walkable = cellWalkable(toCell(x), toCell(y)) ? 'walkable' : 'blocked';
+  inspector.innerText = `coords: [${x}, ${y}] · ${walkable}`;
 });
 
+// --- search ---
 searchInput.addEventListener('input', (e) => {
+  renderSuggestions(e.target.value);
   renderMarkers(categoryDropdown.value, e.target.value);
+});
+
+searchInput.addEventListener('focus', () => {
+  if (searchInput.value.trim()) renderSuggestions(searchInput.value);
+});
+
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' && suggestions.length) {
+    e.preventDefault();
+    highlightSuggestion((activeSuggestion + 1) % suggestions.length);
+  } else if (e.key === 'ArrowUp' && suggestions.length) {
+    e.preventDefault();
+    highlightSuggestion((activeSuggestion - 1 + suggestions.length) % suggestions.length);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (activeSuggestion >= 0) chooseSuggestion(activeSuggestion);
+    else if (suggestions.length) chooseSuggestion(0);
+  } else if (e.key === 'Escape') {
+    closeSuggestions();
+  }
+});
+
+suggestionList.addEventListener('mousedown', (e) => {
+  const li = e.target.closest('.suggestion');
+  if (!li) return;
+  e.preventDefault();                       // keep focus, avoid the blur race
+  chooseSuggestion(Number(li.dataset.index));
+});
+
+suggestionList.addEventListener('mousemove', (e) => {
+  const li = e.target.closest('.suggestion');
+  if (li) highlightSuggestion(Number(li.dataset.index));
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.search-box')) closeSuggestions();
 });
 
 clearSearchBtn.addEventListener('click', () => {
   searchInput.value = '';
+  closeSuggestions();
   renderMarkers(categoryDropdown.value, '');
+  searchInput.focus();
 });
 
 categoryDropdown.addEventListener('change', (e) => {
   renderMarkers(e.target.value, searchInput.value);
+  if (searchInput.value.trim()) renderSuggestions(searchInput.value);
 });
 
 // Map Controls
@@ -706,7 +806,7 @@ document.getElementById('recenter-map-btn').addEventListener('click', () => {
   showTutorialView();
 });
 
-// Floor Button Toggles
+// Floor Button Toggles (2F / 3F layers are wired up separately)
 document.querySelectorAll('.floor-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.floor-btn').forEach(b => b.classList.remove('active'));
@@ -714,5 +814,10 @@ document.querySelectorAll('.floor-btn').forEach(btn => {
   });
 });
 
-// Initial Marker Render
+// ==========================================
+// 13. BOOT
+// ==========================================
+
 renderMarkers();
+console.log('SLSU kiosk ready:', LOCATIONS.length, 'locations,',
+            MAIN.size, 'walkable cells on the campus network');
