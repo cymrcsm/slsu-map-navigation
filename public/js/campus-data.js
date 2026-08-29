@@ -1,54 +1,87 @@
-// GENERATED FILE - do not edit by hand.
-// Built from public/assets/groundFloor_layer.svg: every named room, office and
-// facility label on the ground floor layer, minus the ramps and stairs.
-//   coords  the pin position on the map
-//   textH   height of the label lettering in map units, used to pick a zoom
-//           level at which that particular label is actually readable
-
 const CATEGORIES = [
   {
     "id": "ALL",
     "name": "All Categories"
   },
   {
-    "id": "Academic",
-    "name": "Academic Rooms & Laboratories",
-    "color": "#4E6B7C"
-  },
-  {
-    "id": "Admin",
-    "name": "Administrative & Faculty Offices",
+    "id": "admin-offices",
+    "name": "Administrative & Management Offices",
     "color": "#8A6A45"
   },
   {
-    "id": "Archives",
-    "name": "Archives, Storage & Supply",
-    "color": "#6E6257"
+    "id": "academic-departments",
+    "name": "Academic Departments & College Deans",
+    "color": "#4E6B7C"
   },
   {
-    "id": "Services",
-    "name": "Student Services & Health",
-    "color": "#8E5C90"
+    "id": "faculty-rooms",
+    "name": "Faculty Rooms & Consultation Desks",
+    "color": "#5E7F8C"
   },
   {
-    "id": "Food",
-    "name": "Food & Retail",
+    "id": "classrooms",
+    "name": "Instructional Classrooms & Lecture Halls",
+    "color": "#3F6B8A"
+  },
+  {
+    "id": "laboratories",
+    "name": "Specialized Technical & Simulation Laboratories",
+    "color": "#2F6E6B"
+  },
+  {
+    "id": "student-orgs",
+    "name": "Student Organizations & Leadership Offices",
+    "color": "#7A5C8E"
+  },
+  {
+    "id": "libraries",
+    "name": "Libraries & Information Centers",
+    "color": "#4A5D8F"
+  },
+  {
+    "id": "health-services",
+    "name": "Medical, Health & Student Support Services",
+    "color": "#A85C6B"
+  },
+  {
+    "id": "food-commercial",
+    "name": "Canteens, Food Hubs & Commercial Centers",
     "color": "#C97F3A"
   },
   {
-    "id": "Sports",
-    "name": "Sports & Recreation",
+    "id": "comfort-rooms",
+    "name": "Comfort Rooms & Hygiene Facilities (CR)",
+    "color": "#6E8A9A"
+  },
+  {
+    "id": "lodging",
+    "name": "Lodging, Residential & Dormitory Facilities",
+    "color": "#9A6E4E"
+  },
+  {
+    "id": "sports-recreation",
+    "name": "Sports Grounds, Gymnasiums & Recreation",
     "color": "#4F7A5E"
   },
   {
-    "id": "Facilities",
-    "name": "Facilities & Amenities",
+    "id": "security-gates",
+    "name": "Security, Gates & Military Headquarters",
+    "color": "#6B4F3A"
+  },
+  {
+    "id": "parking-waiting",
+    "name": "Parking & Transit Waiting Areas",
     "color": "#6E7A6F"
   },
   {
-    "id": "Landmark",
-    "name": "Buildings & Landmarks",
-    "color": "#2F4A57"
+    "id": "auxiliary-services",
+    "name": "Auxiliary & Community Services",
+    "color": "#8E7A4E"
+  },
+  {
+    "id": "stock-archives",
+    "name": "Stock Rooms, Bodegas & Archives",
+    "color": "#6E6257"
   }
 ];
 
@@ -58,7 +91,11 @@ const LOCATIONS = [
   "name": "AITS Office",
   "acronym": "AITS",
   "building": "Industrial Technology Building 2",
-  "category": "Admin",
+  "categories": [
+   "student-orgs",
+   "health-services",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -66,14 +103,16 @@ const LOCATIONS = [
    327
   ],
   "textH": 0.68,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Office of a recognised student organisation or council."
  },
  {
   "id": "archives-center",
   "name": "Archives Center",
   "acronym": "AC",
   "building": "Administration Building",
-  "category": "Archives",
+  "categories": [
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -88,7 +127,10 @@ const LOCATIONS = [
   "name": "Area 1",
   "acronym": "AREA1",
   "building": "Industrial Technology Building 3",
-  "category": "Academic",
+  "categories": [
+   "classrooms",
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -96,14 +138,17 @@ const LOCATIONS = [
    342.6
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "area-3",
   "name": "Area 3",
   "acronym": "AREA3",
   "building": "Industrial Technology Building 3",
-  "category": "Academic",
+  "categories": [
+   "classrooms",
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -111,14 +156,17 @@ const LOCATIONS = [
    342.6
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "area-4",
   "name": "Area 4",
   "acronym": "AREA4",
   "building": "Industrial Technology Building 3",
-  "category": "Academic",
+  "categories": [
+   "classrooms",
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -126,14 +174,17 @@ const LOCATIONS = [
    340
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "area-5",
   "name": "Area 5",
   "acronym": "AREA5",
   "building": "Industrial Technology Building 3",
-  "category": "Academic",
+  "categories": [
+   "classrooms",
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -141,14 +192,16 @@ const LOCATIONS = [
    342.6
   ],
   "textH": 0.74,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "arkyn-s-snack-house",
   "name": "Arkyn's Snack House",
   "acronym": "ASH",
   "building": "SLSU Main Campus",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -156,14 +209,16 @@ const LOCATIONS = [
    228.9
   ],
   "textH": 0.58,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "as-101",
   "name": "AS-101",
   "acronym": "AS-101",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -171,14 +226,16 @@ const LOCATIONS = [
    245
   ],
   "textH": 0.7,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "as-102",
   "name": "AS-102",
   "acronym": "AS-102",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -186,14 +243,16 @@ const LOCATIONS = [
    245
   ],
   "textH": 0.7,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "as-103",
   "name": "AS-103",
   "acronym": "AS-103",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -201,14 +260,16 @@ const LOCATIONS = [
    245
   ],
   "textH": 0.7,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "as-104",
   "name": "AS-104",
   "acronym": "AS-104",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -216,14 +277,16 @@ const LOCATIONS = [
    245
   ],
   "textH": 0.7,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "as-105",
   "name": "AS-105",
   "acronym": "AS-105",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -231,14 +294,16 @@ const LOCATIONS = [
    283.4
   ],
   "textH": 0.7,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "as-106",
   "name": "AS-106",
   "acronym": "AS-106",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -246,14 +311,16 @@ const LOCATIONS = [
    283.4
   ],
   "textH": 0.7,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "as-107",
   "name": "AS-107",
   "acronym": "AS-107",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -261,14 +328,16 @@ const LOCATIONS = [
    283.4
   ],
   "textH": 0.7,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "as-108",
   "name": "AS-108",
   "acronym": "AS-108",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -276,29 +345,34 @@ const LOCATIONS = [
    283.4
   ],
   "textH": 0.7,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "assessment-area",
   "name": "Assessment Area",
   "acronym": "AA",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
-  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    87,
    121
   ],
   "textH": 1.16,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "bargo-production",
   "name": "BARGO Production",
   "acronym": "BARGO",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "auxiliary-services",
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -306,29 +380,34 @@ const LOCATIONS = [
    239
   ],
   "textH": 0.73,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Auxiliary unit or community service provided by the university."
  },
  {
   "id": "barracks",
   "name": "Barracks",
   "acronym": "",
   "building": "Barracks",
-  "category": "Services",
+  "categories": [
+   "security-gates",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
-  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "hours": "Open during campus hours",
   "coords": [
    61,
    158.5
   ],
   "textH": 0.71,
-  "description": "Student support and welfare service point."
+  "description": "Security post, campus gate or military training headquarters."
  },
  {
   "id": "basketball-court",
   "name": "Basketball Court",
   "acronym": "BC",
   "building": "Physical Education Building",
-  "category": "Sports",
+  "categories": [
+   "sports-recreation"
+  ],
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
@@ -336,14 +415,16 @@ const LOCATIONS = [
    157.8
   ],
   "textH": 0.76,
-  "description": "Sports and recreation facility open to students and staff."
+  "description": "Sports ground or recreation facility open to students and staff."
  },
  {
   "id": "beach-volleyball-court",
   "name": "Beach Volleyball Court",
   "acronym": "BVC",
   "building": "SLSU Main Campus",
-  "category": "Sports",
+  "categories": [
+   "sports-recreation"
+  ],
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
@@ -351,14 +432,17 @@ const LOCATIONS = [
    153.6
   ],
   "textH": 1.05,
-  "description": "Sports and recreation facility open to students and staff."
+  "description": "Sports ground or recreation facility open to students and staff."
  },
  {
   "id": "business-auxiliary-and-resource-generation-off",
   "name": "Business, Auxiliary, and Resource Generation Office (BARGO)",
   "acronym": "BARGO",
   "building": "Administration Building",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -373,7 +457,9 @@ const LOCATIONS = [
   "name": "Campus Oval",
   "acronym": "CO",
   "building": "SLSU Main Campus",
-  "category": "Sports",
+  "categories": [
+   "sports-recreation"
+  ],
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
@@ -381,14 +467,16 @@ const LOCATIONS = [
    185.5
   ],
   "textH": 3.74,
-  "description": "Sports and recreation facility open to students and staff."
+  "description": "Sports ground or recreation facility open to students and staff."
  },
  {
   "id": "cashier",
   "name": "Cashier",
   "acronym": "",
   "building": "Administration Building",
-  "category": "Admin",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -403,7 +491,9 @@ const LOCATIONS = [
   "name": "CB-101",
   "acronym": "CB-101",
   "building": "Criminology Building",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -411,14 +501,16 @@ const LOCATIONS = [
    211.5
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "cb-102",
   "name": "CB-102",
   "acronym": "CB-102",
   "building": "Criminology Building",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -426,14 +518,16 @@ const LOCATIONS = [
    207.5
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "cb-103",
   "name": "CB-103",
   "acronym": "CB-103",
   "building": "Criminology Building",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -441,14 +535,16 @@ const LOCATIONS = [
    203.5
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "cb-104",
   "name": "CB-104",
   "acronym": "CB-104",
   "building": "Criminology Building",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -456,14 +552,14 @@ const LOCATIONS = [
    199.5
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "center-for-organic-and-natural-food-research-c",
   "name": "Center for Organic and Natural Food Research (CONFOR) and Common Service Facility",
   "acronym": "CONFOR",
   "building": "Center for Organic and Natural Food Research (CONFOR) and Common Service Facility",
-  "category": "Landmark",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -471,14 +567,16 @@ const LOCATIONS = [
    379.8
   ],
   "textH": 1.06,
-  "description": "Campus building and landmark."
+  "description": "Campus location."
  },
  {
   "id": "chemistry-lab",
   "name": "Chemistry Lab",
   "acronym": "CL",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -486,14 +584,19 @@ const LOCATIONS = [
    270
   ],
   "textH": 0.93,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "cjso-office",
   "name": "CJSO Office",
   "acronym": "CJSO",
   "building": "Faculty of Criminal Justice Building",
-  "category": "Admin",
+  "categories": [
+   "student-orgs",
+   "health-services",
+   "security-gates",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -501,14 +604,16 @@ const LOCATIONS = [
    182
   ],
   "textH": 0.83,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Office of a recognised student organisation or council."
  },
  {
   "id": "cm-snack-house",
   "name": "CM Snack House",
   "acronym": "CM",
   "building": "SLSU Main Campus",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -516,14 +621,16 @@ const LOCATIONS = [
    228.9
   ],
   "textH": 0.7,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "comfort-room",
   "name": "Comfort Room",
   "acronym": "CR",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -531,14 +638,16 @@ const LOCATIONS = [
    122
   ],
   "textH": 1.18,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "comfort-room-2",
   "name": "Comfort Room",
   "acronym": "CR",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -546,14 +655,16 @@ const LOCATIONS = [
    86
   ],
   "textH": 1.18,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "comfort-room-3",
   "name": "Comfort Room",
   "acronym": "CR",
   "building": "Criminology Building",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -561,14 +672,16 @@ const LOCATIONS = [
    195.5
   ],
   "textH": 0.95,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "comfort-room-4",
   "name": "Comfort Room",
   "acronym": "CR",
   "building": "Criminology Building",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -576,14 +689,16 @@ const LOCATIONS = [
    220
   ],
   "textH": 0.95,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "comfort-room-5",
   "name": "Comfort Room",
   "acronym": "CR",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -591,14 +706,16 @@ const LOCATIONS = [
    188.3
   ],
   "textH": 0.88,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "comfort-room-6",
   "name": "Comfort Room",
   "acronym": "CR",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -606,14 +723,16 @@ const LOCATIONS = [
    229.5
   ],
   "textH": 0.32,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "comfort-room-7",
   "name": "Comfort Room",
   "acronym": "CR",
   "building": "Library",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -621,14 +740,16 @@ const LOCATIONS = [
    243.5
   ],
   "textH": 0.73,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "comfort-room-8",
   "name": "Comfort Room",
   "acronym": "CR",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -636,14 +757,16 @@ const LOCATIONS = [
    284.6
   ],
   "textH": 0.73,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "comfort-room-9",
   "name": "Comfort Room",
   "acronym": "CR",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -651,14 +774,16 @@ const LOCATIONS = [
    277
   ],
   "textH": 0.67,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "comfort-room-10",
   "name": "Comfort Room",
   "acronym": "CR",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -666,14 +791,16 @@ const LOCATIONS = [
    340.3
   ],
   "textH": 0.99,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "comfort-room-11",
   "name": "Comfort Room",
   "acronym": "CR",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -681,14 +808,16 @@ const LOCATIONS = [
    357.6
   ],
   "textH": 0.33,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "comfort-rooms",
   "name": "Comfort Rooms",
   "acronym": "CR",
   "building": "Medical-Dental Clinic",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -696,14 +825,18 @@ const LOCATIONS = [
    238.7
   ],
   "textH": 0.37,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "commandants-office",
   "name": "Commandants Office",
   "acronym": "CO",
   "building": "Barracks",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "academic-departments",
+   "security-gates"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -718,7 +851,9 @@ const LOCATIONS = [
   "name": "Commission on Audit",
   "acronym": "CA",
   "building": "Administration Building",
-  "category": "Admin",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -733,7 +868,9 @@ const LOCATIONS = [
   "name": "Conference Room",
   "acronym": "CR",
   "building": "Administration Building",
-  "category": "Admin",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -748,7 +885,9 @@ const LOCATIONS = [
   "name": "CONFOR and CSF Office",
   "acronym": "CONFOR",
   "building": "Center for Organic and Natural Food Research (CONFOR) and Common Service Facility",
-  "category": "Admin",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -763,7 +902,9 @@ const LOCATIONS = [
   "name": "CPE Lab 1",
   "acronym": "CPE",
   "building": "Multi-Media Center (MMC)",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -771,14 +912,16 @@ const LOCATIONS = [
    282
   ],
   "textH": 0.76,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "cpe-lab-2",
   "name": "CPE Lab 2",
   "acronym": "CPE",
   "building": "Multi-Media Center (MMC)",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -786,29 +929,34 @@ const LOCATIONS = [
    283
   ],
   "textH": 0.77,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "criminology-building",
   "name": "Criminology Building",
   "acronym": "CB",
   "building": "Criminology Building",
-  "category": "Landmark",
+  "categories": [
+   "academic-departments",
+   "classrooms"
+  ],
   "floor": "Ground Floor",
-  "hours": "Open during campus hours",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
    60,
    203.7
   ],
   "textH": 1.24,
-  "description": "Campus building and landmark."
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "ct2-101",
   "name": "CT2-101",
   "acronym": "",
   "building": "Industrial Technology Building 2",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -816,14 +964,16 @@ const LOCATIONS = [
    326.6
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "ct2-102",
   "name": "CT2-102",
   "acronym": "",
   "building": "Industrial Technology Building 2",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -831,14 +981,16 @@ const LOCATIONS = [
    325
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "ct2-103",
   "name": "CT2-103",
   "acronym": "",
   "building": "Industrial Technology Building 2",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -846,14 +998,16 @@ const LOCATIONS = [
    327
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "ct2-104",
   "name": "CT2-104",
   "acronym": "",
   "building": "Office of the Faculty of Industrial and Technology Management",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -861,14 +1015,16 @@ const LOCATIONS = [
    326
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "cultural-affairs",
   "name": "Cultural Affairs",
   "acronym": "CA",
   "building": "Center for Organic and Natural Food Research (CONFOR) and Common Service Facility",
-  "category": "Services",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -876,14 +1032,16 @@ const LOCATIONS = [
    380
   ],
   "textH": 0.65,
-  "description": "Student support and welfare service point."
+  "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "cultural-affairs-office",
   "name": "Cultural Affairs Office",
   "acronym": "CAO",
   "building": "Industrial Technology Building 5",
-  "category": "Services",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -891,14 +1049,16 @@ const LOCATIONS = [
    380
   ],
   "textH": 0.71,
-  "description": "Student support and welfare service point."
+  "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "dean-s-office",
   "name": "Dean's Office",
   "acronym": "DO",
   "building": "Multi-Media Center (MMC)",
-  "category": "Admin",
+  "categories": [
+   "academic-departments"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -906,14 +1066,17 @@ const LOCATIONS = [
    314
   ],
   "textH": 0.72,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "dean-s-office-and-faculty-room",
   "name": "Dean's Office and Faculty Room",
   "acronym": "DOFR",
   "building": "Faculty of Criminal Justice Building",
-  "category": "Admin",
+  "categories": [
+   "academic-departments",
+   "faculty-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -921,14 +1084,17 @@ const LOCATIONS = [
    186.4
   ],
   "textH": 0.87,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "dean-s-office-and-faculty-room-2",
   "name": "Dean's Office and Faculty Room",
   "acronym": "DOFR",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "academic-departments",
+   "faculty-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -936,29 +1102,36 @@ const LOCATIONS = [
    171
   ],
   "textH": 0.71,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "defense-room",
   "name": "Defense Room",
   "acronym": "DR",
   "building": "Multi-Media Center (MMC)",
-  "category": "Academic",
+  "categories": [
+   "faculty-rooms",
+   "classrooms",
+   "laboratories"
+  ],
   "floor": "Ground Floor",
-  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
    155.7,
    311.1
   ],
   "textH": 0.83,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Faculty workspace for preparation and student consultation."
  },
  {
   "id": "department-of-military-science-and-tactics-off",
   "name": "Department of Military Science and Tactics Office",
   "acronym": "DMSTO",
   "building": "Barracks",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "security-gates"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -973,7 +1146,9 @@ const LOCATIONS = [
   "name": "DIT Faculty Room",
   "acronym": "DIT",
   "building": "Industrial Technology Building 2",
-  "category": "Admin",
+  "categories": [
+   "faculty-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -981,14 +1156,16 @@ const LOCATIONS = [
    327
   ],
   "textH": 0.76,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Faculty workspace for preparation and student consultation."
  },
  {
   "id": "don-macchiatos",
   "name": "Don Macchiatos",
   "acronym": "DM",
   "building": "Food Mart",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -996,14 +1173,16 @@ const LOCATIONS = [
    360.9
   ],
   "textH": 0.81,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "duri-to",
   "name": "Duri-To",
   "acronym": "",
   "building": "Quality Assurance Center",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1011,14 +1190,16 @@ const LOCATIONS = [
    351.1
   ],
   "textH": 0.55,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "elt-102",
   "name": "ELT-102",
   "acronym": "ELT-102",
   "building": "Industrial Technology Building 1",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1026,14 +1207,16 @@ const LOCATIONS = [
    304.2
   ],
   "textH": 0.38,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "empty-stall",
   "name": "Empty Stall",
   "acronym": "ES",
   "building": "Food Mart",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1041,14 +1224,16 @@ const LOCATIONS = [
    362.6
   ],
   "textH": 0.93,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "empty-stall-2",
   "name": "Empty Stall",
   "acronym": "ES",
   "building": "Food Mart",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1056,29 +1241,35 @@ const LOCATIONS = [
    359
   ],
   "textH": 0.93,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "faculty-of-criminal-justice-building",
   "name": "Faculty of Criminal Justice Building",
   "acronym": "FCJB",
   "building": "Faculty of Criminal Justice Building",
-  "category": "Landmark",
+  "categories": [
+   "academic-departments",
+   "faculty-rooms",
+   "laboratories",
+   "student-orgs",
+   "security-gates"
+  ],
   "floor": "Ground Floor",
-  "hours": "Open during campus hours",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
    60,
    182.2
   ],
   "textH": 0.99,
-  "description": "Campus building and landmark."
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "faculty-of-industrial-and-technology-managemen",
   "name": "Faculty of Industrial and Technology Management",
   "acronym": "FITM",
   "building": "Faculty of Industrial and Technology Management",
-  "category": "Landmark",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -1086,14 +1277,18 @@ const LOCATIONS = [
    305.5
   ],
   "textH": 1.16,
-  "description": "Campus building and landmark."
+  "description": "Campus location."
  },
  {
   "id": "faculty-room",
   "name": "Faculty Room",
   "acronym": "FR",
   "building": "Physical Education Building",
-  "category": "Admin",
+  "categories": [
+   "academic-departments",
+   "faculty-rooms",
+   "sports-recreation"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -1101,14 +1296,16 @@ const LOCATIONS = [
    141.5
   ],
   "textH": 0.86,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "faculty-room-2",
   "name": "Faculty Room",
   "acronym": "FR",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "faculty-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -1116,14 +1313,16 @@ const LOCATIONS = [
    176.7
   ],
   "textH": 0.94,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Faculty workspace for preparation and student consultation."
  },
  {
   "id": "faculty-room-3",
   "name": "Faculty Room",
   "acronym": "FR",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "faculty-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -1131,29 +1330,31 @@ const LOCATIONS = [
    317
   ],
   "textH": 0.71,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Faculty workspace for preparation and student consultation."
  },
  {
   "id": "food-court-fc",
   "name": "Food Court (FC)",
   "acronym": "FC",
   "building": "Medical-Dental Clinic",
-  "category": "Food",
+  "categories": [],
   "floor": "Ground Floor",
-  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "hours": "Open during campus hours",
   "coords": [
    128.5,
    233.5
   ],
   "textH": 0.42,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus location."
  },
  {
   "id": "food-mart",
   "name": "Food Mart",
   "acronym": "FM",
   "building": "Food Mart",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1161,14 +1362,16 @@ const LOCATIONS = [
    357.9
   ],
   "textH": 1.12,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "fpst-101",
   "name": "FPST 101",
   "acronym": "FPST101",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1176,14 +1379,16 @@ const LOCATIONS = [
    123.7
   ],
   "textH": 1,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "fpst-102",
   "name": "FPST 102",
   "acronym": "FPST102",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1191,14 +1396,16 @@ const LOCATIONS = [
    117.7
   ],
   "textH": 1.03,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "fpst-103",
   "name": "FPST 103",
   "acronym": "FPST103",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1206,14 +1413,16 @@ const LOCATIONS = [
    100.2
   ],
   "textH": 1.03,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "fpst-104",
   "name": "FPST 104",
   "acronym": "FPST104",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1221,14 +1430,17 @@ const LOCATIONS = [
    92.3
   ],
   "textH": 1.03,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "fpst-faculty-room",
   "name": "FPST Faculty Room",
   "acronym": "FPST",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "academic-departments",
+   "faculty-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -1236,14 +1448,14 @@ const LOCATIONS = [
    112.4
   ],
   "textH": 1.15,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "free-wifi-zone",
   "name": "Free Wifi Zone",
   "acronym": "FWZ",
   "building": "Supply and Property Building",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -1251,14 +1463,16 @@ const LOCATIONS = [
    367.5
   ],
   "textH": 0.75,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "fruitz-blend-and-food-beverage",
   "name": "Fruitz: Blend and Food Beverage",
   "acronym": "FBFB",
   "building": "SLSU Main Campus",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1266,14 +1480,16 @@ const LOCATIONS = [
    233.5
   ],
   "textH": 0.5,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "garments",
   "name": "Garments",
   "acronym": "",
   "building": "Office of the Faculty of Industrial and Technology Management",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1281,14 +1497,17 @@ const LOCATIONS = [
    326.5
   ],
   "textH": 0.76,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "gender-and-development-center-gad",
   "name": "Gender and Development Center (GAD)",
   "acronym": "GAD",
   "building": "Administration Building",
-  "category": "Services",
+  "categories": [
+   "admin-offices",
+   "health-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -1296,14 +1515,16 @@ const LOCATIONS = [
    342.1
   ],
   "textH": 0.66,
-  "description": "Student support and welfare service point."
+  "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "graduate-duties-gs-11",
   "name": "Graduate Duties GS-11",
   "acronym": "GDG",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1311,14 +1532,16 @@ const LOCATIONS = [
    48.5
   ],
   "textH": 1.05,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "graduate-duties-gs-12",
   "name": "Graduate Duties GS-12",
   "acronym": "GDG",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1326,14 +1549,17 @@ const LOCATIONS = [
    48.5
   ],
   "textH": 1.05,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "graduate-programs-operations-office",
   "name": "Graduate Programs Operations Office",
   "acronym": "GPOO",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "academic-departments"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -1348,22 +1574,29 @@ const LOCATIONS = [
   "name": "Grandstand",
   "acronym": "",
   "building": "Physical Education Building",
-  "category": "Sports",
+  "categories": [
+   "classrooms",
+   "sports-recreation",
+   "security-gates",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
-  "hours": "Open daily, 6:00 AM - 8:00 PM",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    144.5,
    153
   ],
   "textH": 0.75,
-  "description": "Sports and recreation facility open to students and staff."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "guard-house",
   "name": "Guard House",
   "acronym": "GH",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "security-gates"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -1371,14 +1604,16 @@ const LOCATIONS = [
    127
   ],
   "textH": 0.84,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Security post, campus gate or military training headquarters."
  },
  {
   "id": "guard-house-2",
   "name": "Guard House",
   "acronym": "GH",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "security-gates"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -1386,14 +1621,16 @@ const LOCATIONS = [
    274.3
   ],
   "textH": 0.84,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Security post, campus gate or military training headquarters."
  },
  {
   "id": "guard-house-3",
   "name": "Guard House",
   "acronym": "GH",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "security-gates"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -1401,14 +1638,16 @@ const LOCATIONS = [
    329.1
   ],
   "textH": 0.57,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Security post, campus gate or military training headquarters."
  },
  {
   "id": "handwashing-area",
   "name": "Handwashing Area",
   "acronym": "HA",
   "building": "Center for Organic and Natural Food Research (CONFOR) and Common Service Facility",
-  "category": "Facilities",
+  "categories": [
+   "comfort-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -1416,29 +1655,36 @@ const LOCATIONS = [
    379.5
   ],
   "textH": 0.33,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Comfort room and hygiene facility."
  },
  {
   "id": "hotel-de-slsu",
   "name": "Hotel De SLSU",
   "acronym": "HDS",
   "building": "Hotel De SLSU",
-  "category": "Services",
+  "categories": [
+   "laboratories",
+   "food-commercial",
+   "lodging",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
-  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    215.5,
    103
   ],
   "textH": 1.42,
-  "description": "Student support and welfare service point."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "htm-101",
   "name": "HTM-101",
   "acronym": "HTM-101",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1446,14 +1692,16 @@ const LOCATIONS = [
    358.6
   ],
   "textH": 0.47,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "htm-102",
   "name": "HTM-102",
   "acronym": "HTM-102",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1461,14 +1709,16 @@ const LOCATIONS = [
    358.6
   ],
   "textH": 0.47,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "htm-103",
   "name": "HTM-103",
   "acronym": "HTM-103",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1476,14 +1726,18 @@ const LOCATIONS = [
    358.6
   ],
   "textH": 0.47,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "html-office",
   "name": "HTML Office",
   "acronym": "HTML",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "student-orgs",
+   "health-services",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -1491,14 +1745,16 @@ const LOCATIONS = [
    357.1
   ],
   "textH": 0.56,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Office of a recognised student organisation or council."
  },
  {
   "id": "human-resource-management-hrm",
   "name": "Human Resource Management (HRM)",
   "acronym": "HRM",
   "building": "Administration Building",
-  "category": "Admin",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -1513,7 +1769,9 @@ const LOCATIONS = [
   "name": "Hydraulics Lab",
   "acronym": "HL",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1521,29 +1779,35 @@ const LOCATIONS = [
    257.5
   ],
   "textH": 0.7,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "ias-conference-room",
   "name": "IAS Conference Room",
   "acronym": "IAS",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "classrooms",
+   "libraries"
+  ],
   "floor": "Ground Floor",
-  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    218.5,
    257
   ],
   "textH": 1.1,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "ias-faculty-room",
   "name": "IAS Faculty Room",
   "acronym": "IAS",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "academic-departments",
+   "faculty-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -1551,14 +1815,16 @@ const LOCATIONS = [
    271.4
   ],
   "textH": 0.97,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "ict-1",
   "name": "ICT-1",
   "acronym": "ICT-1",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1566,14 +1832,16 @@ const LOCATIONS = [
    316.5
   ],
   "textH": 0.58,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "ict-2",
   "name": "ICT-2",
   "acronym": "ICT-2",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1581,14 +1849,16 @@ const LOCATIONS = [
    316.5
   ],
   "textH": 0.61,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "ict-3",
   "name": "ICT-3",
   "acronym": "ICT-3",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1596,14 +1866,16 @@ const LOCATIONS = [
    316.5
   ],
   "textH": 0.62,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "ie-103",
   "name": "IE-103",
   "acronym": "IE-103",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1611,14 +1883,16 @@ const LOCATIONS = [
    182.3
   ],
   "textH": 0.72,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "ilab-1",
   "name": "iLAB-1",
   "acronym": "",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1626,14 +1900,16 @@ const LOCATIONS = [
    314
   ],
   "textH": 0.61,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "ilab-2",
   "name": "iLAB-2",
   "acronym": "",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1641,14 +1917,16 @@ const LOCATIONS = [
    314
   ],
   "textH": 0.63,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "ilab-3",
   "name": "iLAB-3",
   "acronym": "",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1656,14 +1934,17 @@ const LOCATIONS = [
    314
   ],
   "textH": 0.63,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "in-collaboration-with-information-technology-d",
   "name": "In Collaboration with Information Technology Department and Research, Development and Extension Office",
   "acronym": "CITDRDEO",
   "building": "SLSU ICT Center",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "academic-departments"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -1678,7 +1959,7 @@ const LOCATIONS = [
   "name": "Industrial Technology Building 1",
   "acronym": "ITB1",
   "building": "Industrial Technology Building 1",
-  "category": "Landmark",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -1686,14 +1967,14 @@ const LOCATIONS = [
    308.4
   ],
   "textH": 1.16,
-  "description": "Campus building and landmark."
+  "description": "Campus location."
  },
  {
   "id": "industrial-technology-building-2",
   "name": "Industrial Technology Building 2",
   "acronym": "ITB2",
   "building": "Industrial Technology Building 2",
-  "category": "Landmark",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -1701,14 +1982,14 @@ const LOCATIONS = [
    326.1
   ],
   "textH": 1.16,
-  "description": "Campus building and landmark."
+  "description": "Campus location."
  },
  {
   "id": "industrial-technology-building-3",
   "name": "Industrial Technology Building 3",
   "acronym": "ITB3",
   "building": "Industrial Technology Building 3",
-  "category": "Landmark",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -1716,14 +1997,14 @@ const LOCATIONS = [
    341
   ],
   "textH": 1.16,
-  "description": "Campus building and landmark."
+  "description": "Campus location."
  },
  {
   "id": "industrial-technology-building-4",
   "name": "Industrial Technology Building 4",
   "acronym": "ITB4",
   "building": "Industrial Technology Building 4",
-  "category": "Landmark",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -1731,14 +2012,14 @@ const LOCATIONS = [
    357.6
   ],
   "textH": 1.16,
-  "description": "Campus building and landmark."
+  "description": "Campus location."
  },
  {
   "id": "industrial-technology-building-5",
   "name": "Industrial Technology Building 5",
   "acronym": "ITB5",
   "building": "Industrial Technology Building 5",
-  "category": "Landmark",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -1746,14 +2027,17 @@ const LOCATIONS = [
    379.2
   ],
   "textH": 1.16,
-  "description": "Campus building and landmark."
+  "description": "Campus location."
  },
  {
   "id": "innovation-assets-management-and-transfer-unit",
   "name": "Innovation Assets Management and Transfer Unit",
   "acronym": "IAMTU",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -1768,7 +2052,9 @@ const LOCATIONS = [
   "name": "Interrogation Room",
   "acronym": "IR",
   "building": "Faculty of Criminal Justice Building",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1776,14 +2062,16 @@ const LOCATIONS = [
    178
   ],
   "textH": 0.69,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "it-101",
   "name": "IT-101",
   "acronym": "IT-101",
   "building": "Industrial Technology Building 1",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1791,14 +2079,16 @@ const LOCATIONS = [
    308.5
   ],
   "textH": 0.71,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-101-2",
   "name": "IT-101",
   "acronym": "IT-101",
   "building": "Industrial Technology Building 2",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1806,14 +2096,16 @@ const LOCATIONS = [
    325
   ],
   "textH": 0.71,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-102",
   "name": "IT-102",
   "acronym": "IT-102",
   "building": "Industrial Technology Building 1",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1821,14 +2113,16 @@ const LOCATIONS = [
    305.5
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-103",
   "name": "IT-103",
   "acronym": "IT-103",
   "building": "Industrial Technology Building 1",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1836,14 +2130,16 @@ const LOCATIONS = [
    310.5
   ],
   "textH": 0.74,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-104",
   "name": "IT-104",
   "acronym": "IT-104",
   "building": "Industrial Technology Building 1",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1851,14 +2147,16 @@ const LOCATIONS = [
    308.6
   ],
   "textH": 0.74,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-301",
   "name": "IT-301",
   "acronym": "IT-301",
   "building": "Industrial Technology Building 3",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1866,14 +2164,16 @@ const LOCATIONS = [
    340
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-302",
   "name": "IT-302",
   "acronym": "IT-302",
   "building": "Industrial Technology Building 3",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1881,14 +2181,16 @@ const LOCATIONS = [
    340
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-303",
   "name": "IT-303",
   "acronym": "IT-303",
   "building": "Industrial Technology Building 2",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1896,14 +2198,16 @@ const LOCATIONS = [
    340
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-304",
   "name": "IT-304",
   "acronym": "IT-304",
   "building": "Industrial Technology Building 2",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1911,29 +2215,31 @@ const LOCATIONS = [
    340
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-401",
   "name": "IT-401",
   "acronym": "IT-401",
   "building": "Industrial Technology Building 4",
-  "category": "Academic",
+  "categories": [],
   "floor": "Ground Floor",
-  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "hours": "Open during campus hours",
   "coords": [
    134.8,
    357.5
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Campus location."
  },
  {
   "id": "it-402",
   "name": "IT-402",
   "acronym": "IT-402",
   "building": "Industrial Technology Building 4",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1941,14 +2247,16 @@ const LOCATIONS = [
    353.2
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-403",
   "name": "IT-403",
   "acronym": "IT-403",
   "building": "Industrial Technology Building 4",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1956,14 +2264,16 @@ const LOCATIONS = [
    360.8
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-404",
   "name": "IT-404",
   "acronym": "IT-404",
   "building": "Industrial Technology Building 4",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1971,14 +2281,16 @@ const LOCATIONS = [
    357.5
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-501",
   "name": "IT-501",
   "acronym": "IT-501",
   "building": "Industrial Technology Building 5",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -1986,14 +2298,16 @@ const LOCATIONS = [
    381.4
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-502",
   "name": "IT-502",
   "acronym": "IT-502",
   "building": "Industrial Technology Building 5",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2001,14 +2315,16 @@ const LOCATIONS = [
    381.4
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-503",
   "name": "IT-503",
   "acronym": "IT-503",
   "building": "Industrial Technology Building 5",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2016,14 +2332,16 @@ const LOCATIONS = [
    381.4
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-504",
   "name": "IT-504",
   "acronym": "IT-504",
   "building": "Industrial Technology Building 5",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2031,14 +2349,16 @@ const LOCATIONS = [
    381.4
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "it-505",
   "name": "IT-505",
   "acronym": "IT-505",
   "building": "Industrial Technology Building 5",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2046,14 +2366,16 @@ const LOCATIONS = [
    381.4
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "jam-d-lite",
   "name": "Jam D' Lite",
   "acronym": "JDL",
   "building": "SLSU Main Campus",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2061,14 +2383,16 @@ const LOCATIONS = [
    231.4
   ],
   "textH": 0.62,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "jam-d-lite-2",
   "name": "Jam D' Lite",
   "acronym": "JDL",
   "building": "Quality Assurance Center",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2076,14 +2400,16 @@ const LOCATIONS = [
    351.1
   ],
   "textH": 0.68,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "julies-bakeshop",
   "name": "Julies Bakeshop",
   "acronym": "JB",
   "building": "SLSU Main Campus",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2091,14 +2417,16 @@ const LOCATIONS = [
    235.5
   ],
   "textH": 0.68,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "khera-s-snack-house",
   "name": "Khera's Snack House",
   "acronym": "KSH",
   "building": "SLSU Main Campus",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2106,14 +2434,16 @@ const LOCATIONS = [
    228.9
   ],
   "textH": 0.57,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "kitchen",
   "name": "Kitchen",
   "acronym": "",
   "building": "SLSU Main Campus",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2121,14 +2451,16 @@ const LOCATIONS = [
    235
   ],
   "textH": 0.32,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "lab-area",
   "name": "Lab Area",
   "acronym": "LA",
   "building": "Office of the Faculty of Industrial and Technology Management",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2136,59 +2468,69 @@ const LOCATIONS = [
    325
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "landbank-atm",
   "name": "Landbank ATM",
   "acronym": "LA",
   "building": "SLSU Main Campus",
-  "category": "Food",
+  "categories": [
+   "admin-offices",
+   "food-commercial",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
-  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
    240.9,
    336.4
   ],
   "textH": 0.68,
-  "description": "Campus food and refreshment outlet."
+  "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "library",
   "name": "Library",
   "acronym": "",
   "building": "Library",
-  "category": "Landmark",
+  "categories": [
+   "libraries"
+  ],
   "floor": "Ground Floor",
-  "hours": "Open during campus hours",
+  "hours": "8:00 AM - 6:00 PM (Mon - Fri)",
   "coords": [
    223.3,
    222.4
   ],
   "textH": 1.47,
-  "description": "Campus building and landmark."
+  "description": "Library and information resource centre."
  },
  {
   "id": "machineries",
   "name": "Machineries",
   "acronym": "",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
-  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    77.2,
    267.5
   ],
   "textH": 0.4,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "main-gate",
   "name": "Main Gate",
   "acronym": "MG",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "security-gates"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2196,14 +2538,16 @@ const LOCATIONS = [
    326.4
   ],
   "textH": 0.7,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Security post, campus gate or military training headquarters."
  },
  {
   "id": "marie-s-snack-house",
   "name": "Marie's Snack House",
   "acronym": "MSH",
   "building": "Medical-Dental Clinic",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2211,14 +2555,16 @@ const LOCATIONS = [
    228.9
   ],
   "textH": 0.57,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "mecha-1",
   "name": "Mecha 1",
   "acronym": "MECHA1",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2226,14 +2572,16 @@ const LOCATIONS = [
    278
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "mecha-2",
   "name": "Mecha 2",
   "acronym": "MECHA2",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2241,14 +2589,18 @@ const LOCATIONS = [
    278
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "medical-dental-clinic",
   "name": "Medical-Dental Clinic",
   "acronym": "MC",
   "building": "Medical-Dental Clinic",
-  "category": "Services",
+  "categories": [
+   "admin-offices",
+   "health-services",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2256,14 +2608,16 @@ const LOCATIONS = [
    236.8
   ],
   "textH": 0.76,
-  "description": "Student support and welfare service point."
+  "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "messhall-1",
   "name": "Messhall 1",
   "acronym": "M1",
   "building": "Related Subject Building 2",
-  "category": "Food",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2271,14 +2625,16 @@ const LOCATIONS = [
    66.3
   ],
   "textH": 1.05,
-  "description": "Campus food and refreshment outlet."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "messhall-2",
   "name": "Messhall 2",
   "acronym": "M2",
   "building": "Related Subject Building 2",
-  "category": "Food",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2286,14 +2642,16 @@ const LOCATIONS = [
    51.4
   ],
   "textH": 1.05,
-  "description": "Campus food and refreshment outlet."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "mmc-1",
   "name": "MMC 1",
   "acronym": "MMC1",
   "building": "Multi-Media Center (MMC)",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2301,14 +2659,16 @@ const LOCATIONS = [
    283
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "mmc-2",
   "name": "MMC 2",
   "acronym": "MMC2",
   "building": "Multi-Media Center (MMC)",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2316,14 +2676,16 @@ const LOCATIONS = [
    283
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "mmc-3",
   "name": "MMC 3",
   "acronym": "MMC3",
   "building": "Multi-Media Center (MMC)",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2331,29 +2693,37 @@ const LOCATIONS = [
    283
   ],
   "textH": 0.75,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "multi-purpose-court-mpc",
   "name": "Multi Purpose Court (MPC)",
   "acronym": "MPC",
   "building": "Multi Purpose Court (MPC)",
-  "category": "Sports",
+  "categories": [
+   "classrooms",
+   "student-orgs",
+   "sports-recreation",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
-  "hours": "Open daily, 6:00 AM - 8:00 PM",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    172.4,
    108.7
   ],
   "textH": 2.12,
-  "description": "Sports and recreation facility open to students and staff."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "multi-faith-room-old-ias-conference-room",
   "name": "Multi-Faith Room/old IAS Conference Room",
   "acronym": "MROICR",
   "building": "SLSU Main Campus",
-  "category": "Services",
+  "categories": [
+   "health-services",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2361,14 +2731,17 @@ const LOCATIONS = [
    283.4
   ],
   "textH": 0.71,
-  "description": "Student support and welfare service point."
+  "description": "Medical, health or student welfare service point."
  },
  {
   "id": "multi-media-center-mmc",
   "name": "Multi-Media Center (MMC)",
   "acronym": "MMC",
   "building": "Multi-Media Center (MMC)",
-  "category": "Academic",
+  "categories": [
+   "classrooms",
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2376,14 +2749,19 @@ const LOCATIONS = [
    281.2
   ],
   "textH": 1.35,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "nstp-office",
   "name": "NSTP Office",
   "acronym": "NSTP",
   "building": "Barracks",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "academic-departments",
+   "security-gates",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2398,7 +2776,9 @@ const LOCATIONS = [
   "name": "Observation Room",
   "acronym": "OR",
   "building": "Faculty of Criminal Justice Building",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -2406,14 +2786,18 @@ const LOCATIONS = [
    178
   ],
   "textH": 0.68,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "office-of-techvoc",
   "name": "Office of Techvoc",
   "acronym": "OT",
   "building": "Faculty of Industrial and Technology Management",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "academic-departments",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2428,7 +2812,9 @@ const LOCATIONS = [
   "name": "Office of the Dean",
   "acronym": "OD",
   "building": "Faculty of Industrial and Technology Management",
-  "category": "Admin",
+  "categories": [
+   "academic-departments"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2436,14 +2822,16 @@ const LOCATIONS = [
    313.6
   ],
   "textH": 0.89,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "office-of-the-director-for-quality-assurance",
   "name": "Office of the Director for Quality Assurance",
   "acronym": "ODQA",
   "building": "Administration Building",
-  "category": "Admin",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2458,7 +2846,11 @@ const LOCATIONS = [
   "name": "Office of the Director of Curriculum Innovation, Credentialing, and Life Long Learning",
   "acronym": "ODCICLLL",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "academic-departments",
+   "faculty-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2473,7 +2865,11 @@ const LOCATIONS = [
   "name": "Office of the Engineering Student Organization",
   "acronym": "OESO",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "student-orgs",
+   "health-services",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2481,14 +2877,17 @@ const LOCATIONS = [
    280.4
   ],
   "textH": 0.53,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Office of a recognised student organisation or council."
  },
  {
   "id": "office-of-the-faculty-of-industrial-and-techno",
   "name": "Office of the Faculty of Industrial and Technology Management",
   "acronym": "OFITM",
   "building": "Office of the Faculty of Industrial and Technology Management",
-  "category": "Admin",
+  "categories": [
+   "academic-departments",
+   "faculty-rooms"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2496,14 +2895,18 @@ const LOCATIONS = [
    318.7
   ],
   "textH": 0.61,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "office-of-the-pice-slsu-student-chapter",
   "name": "Office of the PICE SLSU Student Chapter",
   "acronym": "OPSSC",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "student-orgs",
+   "health-services",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2511,14 +2914,16 @@ const LOCATIONS = [
    235.5
   ],
   "textH": 0.66,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Office of a recognised student organisation or council."
  },
  {
   "id": "office-of-the-president",
   "name": "Office of the President",
   "acronym": "OP",
   "building": "Administration Building",
-  "category": "Admin",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2533,7 +2938,10 @@ const LOCATIONS = [
   "name": "Office of the SLSU Peso Manager",
   "acronym": "OSPM",
   "building": "Faculty of Industrial and Technology Management",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2548,7 +2956,11 @@ const LOCATIONS = [
   "name": "Office of the Vice President",
   "acronym": "OVP",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "academic-departments",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2563,7 +2975,9 @@ const LOCATIONS = [
   "name": "Office of the Vice President for Academic Affairs (VPAA) Office of the Vice President for Administration and Finance (VPAF)",
   "acronym": "VPAA",
   "building": "Administration Building",
-  "category": "Admin",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -2578,7 +2992,7 @@ const LOCATIONS = [
   "name": "Open Air Bench",
   "acronym": "OAB",
   "building": "Criminology Building",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2586,14 +3000,14 @@ const LOCATIONS = [
    218.8
   ],
   "textH": 0.86,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "open-air-bench-2",
   "name": "Open-Air Bench",
   "acronym": "OB",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2601,14 +3015,14 @@ const LOCATIONS = [
    146.4
   ],
   "textH": 0.87,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "open-air-benches",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2616,14 +3030,14 @@ const LOCATIONS = [
    171.6
   ],
   "textH": 2.76,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "open-air-benches-2",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2631,14 +3045,14 @@ const LOCATIONS = [
    215
   ],
   "textH": 0.69,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "open-air-benches-3",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "Industrial Technology Building 5",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2646,14 +3060,14 @@ const LOCATIONS = [
    367.6
   ],
   "textH": 0.69,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "open-air-benches-4",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2661,14 +3075,14 @@ const LOCATIONS = [
    319.5
   ],
   "textH": 0.57,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "open-air-benches-5",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "Multi-Media Center (MMC)",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2676,14 +3090,14 @@ const LOCATIONS = [
    302.7
   ],
   "textH": 0.69,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "open-air-benches-6",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "Food Mart",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2691,14 +3105,14 @@ const LOCATIONS = [
    352.5
   ],
   "textH": 0.87,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "open-air-benches-7",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2706,14 +3120,14 @@ const LOCATIONS = [
    237.5
   ],
   "textH": 0.73,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "open-air-benches-8",
   "name": "Open-Air Benches",
   "acronym": "OB",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2721,14 +3135,16 @@ const LOCATIONS = [
    354
   ],
   "textH": 0.73,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "parking-area",
   "name": "Parking Area",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2736,14 +3152,16 @@ const LOCATIONS = [
    230
   ],
   "textH": 0.75,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-2",
   "name": "Parking Area",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2751,14 +3169,16 @@ const LOCATIONS = [
    257.5
   ],
   "textH": 0.75,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-3",
   "name": "Parking Area",
   "acronym": "PA",
   "building": "Multi-Media Center (MMC)",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2766,14 +3186,16 @@ const LOCATIONS = [
    277.3
   ],
   "textH": 0.75,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-4",
   "name": "Parking Area",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2781,14 +3203,16 @@ const LOCATIONS = [
    279.4
   ],
   "textH": 0.75,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-5",
   "name": "Parking Area",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2796,14 +3220,16 @@ const LOCATIONS = [
    254.4
   ],
   "textH": 0.75,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-6",
   "name": "Parking Area",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2811,14 +3237,16 @@ const LOCATIONS = [
    346.4
   ],
   "textH": 0.75,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-7",
   "name": "Parking Area",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2826,14 +3254,16 @@ const LOCATIONS = [
    346.4
   ],
   "textH": 0.75,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-8",
   "name": "Parking Area",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2841,14 +3271,16 @@ const LOCATIONS = [
    330.3
   ],
   "textH": 0.75,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-9",
   "name": "Parking Area",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2856,14 +3288,16 @@ const LOCATIONS = [
    330.3
   ],
   "textH": 0.75,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-10",
   "name": "Parking Area",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2871,14 +3305,16 @@ const LOCATIONS = [
    315
   ],
   "textH": 0.81,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-11",
   "name": "Parking Area",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2886,14 +3322,16 @@ const LOCATIONS = [
    305.9
   ],
   "textH": 0.81,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-motorcycles",
   "name": "Parking Area (Motorcycles)",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2901,14 +3339,16 @@ const LOCATIONS = [
    239.3
   ],
   "textH": 0.38,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-motorcycles-2",
   "name": "Parking Area (Motorcycles)",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2916,14 +3356,16 @@ const LOCATIONS = [
    281.8
   ],
   "textH": 0.19,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-motorcycles-3",
   "name": "Parking Area (Motorcycles)",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2931,14 +3373,16 @@ const LOCATIONS = [
    275.5
   ],
   "textH": 0.19,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-motorcycles-4",
   "name": "Parking Area (Motorcycles)",
   "acronym": "PA",
   "building": "Office of the Faculty of Industrial and Technology Management",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2946,14 +3390,16 @@ const LOCATIONS = [
    309.4
   ],
   "textH": 0.38,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-motorcycles-5",
   "name": "Parking Area (Motorcycles)",
   "acronym": "PA",
   "building": "Multi-Media Center (MMC)",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2961,14 +3407,16 @@ const LOCATIONS = [
    305.6
   ],
   "textH": 0.38,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-motorcycles-6",
   "name": "Parking Area (Motorcycles)",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2976,14 +3424,16 @@ const LOCATIONS = [
    344.7
   ],
   "textH": 0.98,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-motorcycles-7",
   "name": "Parking Area (Motorcycles)",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -2991,14 +3441,16 @@ const LOCATIONS = [
    352.7
   ],
   "textH": 0.98,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-motorcycles-8",
   "name": "Parking Area (Motorcycles)",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3006,14 +3458,16 @@ const LOCATIONS = [
    360.7
   ],
   "textH": 0.98,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "parking-area-motorcycles-9",
   "name": "Parking Area (Motorcycles)",
   "acronym": "PA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3021,14 +3475,17 @@ const LOCATIONS = [
    336.4
   ],
   "textH": 0.38,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "pe-room",
   "name": "PE Room",
   "acronym": "PE",
   "building": "Faculty of Criminal Justice Building",
-  "category": "Academic",
+  "categories": [
+   "laboratories",
+   "security-gates"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3036,29 +3493,40 @@ const LOCATIONS = [
    178.2
   ],
   "textH": 0.43,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "physical-education-building",
   "name": "Physical Education Building",
   "acronym": "PEB",
   "building": "Physical Education Building",
-  "category": "Landmark",
+  "categories": [
+   "academic-departments",
+   "faculty-rooms",
+   "classrooms",
+   "health-services",
+   "sports-recreation"
+  ],
   "floor": "Ground Floor",
-  "hours": "Open during campus hours",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
    143.7,
    139.4
   ],
   "textH": 0.92,
-  "description": "Campus building and landmark."
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "physical-plant-and-development-management-offi",
   "name": "Physical Plant and Development Management Office",
   "acronym": "PPDMO",
   "building": "Barracks",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "laboratories",
+   "auxiliary-services",
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3073,7 +3541,9 @@ const LOCATIONS = [
   "name": "Physics Lab",
   "acronym": "PL",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3081,29 +3551,36 @@ const LOCATIONS = [
    265
   ],
   "textH": 1,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "plenary-hall",
   "name": "Plenary Hall",
   "acronym": "PH",
   "building": "Medical-Dental Clinic",
-  "category": "Landmark",
+  "categories": [
+   "admin-offices",
+   "classrooms",
+   "libraries",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
-  "hours": "Open during campus hours",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
    120.8,
    232.5
   ],
   "textH": 0.79,
-  "description": "Campus building and landmark."
+  "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "product-display-and-business-center",
   "name": "Product Display and Business Center",
   "acronym": "PDBC",
   "building": "Center for Organic and Natural Food Research (CONFOR) and Common Service Facility",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3111,14 +3588,16 @@ const LOCATIONS = [
    381
   ],
   "textH": 0.66,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "prose-laboratory",
   "name": "Prose Laboratory",
   "acronym": "PL",
   "building": "Related Subjects Building",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3126,14 +3605,16 @@ const LOCATIONS = [
    258.8
   ],
   "textH": 0.96,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "prose-lecture-area",
   "name": "Prose Lecture Area",
   "acronym": "PLA",
   "building": "Related Subjects Building",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3141,29 +3622,31 @@ const LOCATIONS = [
    252.4
   ],
   "textH": 0.93,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "quality-assurance-center",
   "name": "Quality Assurance Center",
   "acronym": "QAC",
   "building": "Quality Assurance Center",
-  "category": "Admin",
+  "categories": [],
   "floor": "Ground Floor",
-  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "hours": "Open during campus hours",
   "coords": [
    193.7,
    341.1
   ],
   "textH": 0.82,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Campus location."
  },
  {
   "id": "radyo-pilipinas",
   "name": "Radyo Pilipinas",
   "acronym": "RP",
   "building": "SLSU Main Campus",
-  "category": "Services",
+  "categories": [
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3171,29 +3654,33 @@ const LOCATIONS = [
    142
   ],
   "textH": 0.79,
-  "description": "Student support and welfare service point."
+  "description": "Auxiliary unit or community service provided by the university."
  },
  {
   "id": "receiving-area",
   "name": "Receiving Area",
   "acronym": "RA",
   "building": "SLSU Main Campus",
-  "category": "Services",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
-  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    90.8,
    91.6
   ],
   "textH": 1.07,
-  "description": "Student support and welfare service point."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "records-management-office",
   "name": "Records Management Office",
   "acronym": "RMO",
   "building": "Administration Building",
-  "category": "Admin",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3208,7 +3695,9 @@ const LOCATIONS = [
   "name": "Registrar",
   "acronym": "",
   "building": "Administration Building",
-  "category": "Admin",
+  "categories": [
+   "admin-offices"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3223,7 +3712,7 @@ const LOCATIONS = [
   "name": "Related Subject Building 2",
   "acronym": "RSB2",
   "building": "Related Subject Building 2",
-  "category": "Landmark",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3231,29 +3720,34 @@ const LOCATIONS = [
    59
   ],
   "textH": 2.09,
-  "description": "Campus building and landmark."
+  "description": "Campus location."
  },
  {
   "id": "related-subjects-building",
   "name": "Related Subjects Building",
   "acronym": "RSB",
   "building": "Related Subjects Building",
-  "category": "Landmark",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
-  "hours": "Open during campus hours",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    60,
    240.5
   ],
   "textH": 1.26,
-  "description": "Campus building and landmark."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "ries-ethics-and-review-services-ries-managemen",
   "name": "RIES Ethics and Review Services RIES Management Information Office RIES Communication Office RIES Knowledge Management Office",
   "acronym": "RIES",
   "building": "SLSU Main Campus",
-  "category": "Admin",
+  "categories": [
+   "admin-offices",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3268,7 +3762,9 @@ const LOCATIONS = [
   "name": "Rizal Gate",
   "acronym": "RG",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "security-gates"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3276,14 +3772,16 @@ const LOCATIONS = [
    127.5
   ],
   "textH": 1.05,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Security post, campus gate or military training headquarters."
  },
  {
   "id": "room-e-101",
   "name": "Room E-101",
   "acronym": "RE",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3291,14 +3789,16 @@ const LOCATIONS = [
    242.5
   ],
   "textH": 0.87,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "room-e-102",
   "name": "Room E-102",
   "acronym": "RE",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3306,14 +3806,16 @@ const LOCATIONS = [
    248.5
   ],
   "textH": 0.87,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "room-e-103",
   "name": "Room E-103",
   "acronym": "RE",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3321,14 +3823,16 @@ const LOCATIONS = [
    255
   ],
   "textH": 0.87,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "room-e-104",
   "name": "Room E-104",
   "acronym": "RE",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3336,14 +3840,16 @@ const LOCATIONS = [
    260
   ],
   "textH": 0.87,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "rs-101",
   "name": "RS-101",
   "acronym": "RS-101",
   "building": "Related Subjects Building",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3351,14 +3857,16 @@ const LOCATIONS = [
    228.4
   ],
   "textH": 0.71,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "rs-102",
   "name": "RS-102",
   "acronym": "RS-102",
   "building": "Related Subjects Building",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3366,14 +3874,16 @@ const LOCATIONS = [
    234.5
   ],
   "textH": 0.71,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "rs-103",
   "name": "RS-103",
   "acronym": "RS-103",
   "building": "Related Subjects Building",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3381,14 +3891,16 @@ const LOCATIONS = [
    240.5
   ],
   "textH": 0.72,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "rs-104",
   "name": "RS-104",
   "acronym": "RS-104",
   "building": "Related Subjects Building",
-  "category": "Academic",
+  "categories": [
+   "classrooms"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3396,14 +3908,16 @@ const LOCATIONS = [
    246.6
   ],
   "textH": 0.72,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
   "id": "san-roque-gate",
   "name": "San Roque Gate",
   "acronym": "SRG",
   "building": "SLSU ICT Center",
-  "category": "Facilities",
+  "categories": [
+   "security-gates"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3411,14 +3925,16 @@ const LOCATIONS = [
    277
   ],
   "textH": 1.57,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Security post, campus gate or military training headquarters."
  },
  {
   "id": "sepak-takraw-court",
   "name": "Sepak Takraw Court",
   "acronym": "STC",
   "building": "SLSU Main Campus",
-  "category": "Sports",
+  "categories": [
+   "sports-recreation"
+  ],
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
@@ -3426,14 +3942,14 @@ const LOCATIONS = [
    157.5
   ],
   "textH": 0.88,
-  "description": "Sports and recreation facility open to students and staff."
+  "description": "Sports ground or recreation facility open to students and staff."
  },
  {
   "id": "slsu-ict-center",
   "name": "SLSU ICT Center",
   "acronym": "SLSU",
   "building": "SLSU ICT Center",
-  "category": "Landmark",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3441,14 +3957,16 @@ const LOCATIONS = [
    292.8
   ],
   "textH": 1.47,
-  "description": "Campus building and landmark."
+  "description": "Campus location."
  },
  {
   "id": "smart-lab",
   "name": "Smart Lab",
   "acronym": "SL",
   "building": "SLSU Main Campus",
-  "category": "Academic",
+  "categories": [
+   "laboratories"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3456,14 +3974,16 @@ const LOCATIONS = [
    317
   ],
   "textH": 0.73,
-  "description": "Instructional space used for classes, laboratory work and student activities."
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "stock-room",
   "name": "Stock Room",
   "acronym": "SR",
   "building": "Faculty of Criminal Justice Building",
-  "category": "Archives",
+  "categories": [
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3478,7 +3998,9 @@ const LOCATIONS = [
   "name": "Stock Room",
   "acronym": "SR",
   "building": "SLSU Main Campus",
-  "category": "Archives",
+  "categories": [
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3493,7 +4015,9 @@ const LOCATIONS = [
   "name": "Stock Room",
   "acronym": "SR",
   "building": "SLSU Main Campus",
-  "category": "Archives",
+  "categories": [
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3508,7 +4032,9 @@ const LOCATIONS = [
   "name": "Stock Room",
   "acronym": "SR",
   "building": "Multi-Media Center (MMC)",
-  "category": "Archives",
+  "categories": [
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3523,7 +4049,9 @@ const LOCATIONS = [
   "name": "Storage Area",
   "acronym": "SA",
   "building": "SLSU Main Campus",
-  "category": "Archives",
+  "categories": [
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3538,7 +4066,9 @@ const LOCATIONS = [
   "name": "Storage Room",
   "acronym": "SR",
   "building": "SLSU Main Campus",
-  "category": "Archives",
+  "categories": [
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3553,7 +4083,9 @@ const LOCATIONS = [
   "name": "Storage Room",
   "acronym": "SR",
   "building": "SLSU Main Campus",
-  "category": "Archives",
+  "categories": [
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3568,7 +4100,11 @@ const LOCATIONS = [
   "name": "Student Dormitory 1",
   "acronym": "SD1",
   "building": "Student Dormitory 1",
-  "category": "Services",
+  "categories": [
+   "health-services",
+   "lodging",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3576,14 +4112,18 @@ const LOCATIONS = [
    51.5
   ],
   "textH": 0.97,
-  "description": "Student support and welfare service point."
+  "description": "Medical, health or student welfare service point."
  },
  {
   "id": "student-dormitory-2",
   "name": "Student Dormitory 2",
   "acronym": "SD2",
   "building": "Student Dormitory 2",
-  "category": "Services",
+  "categories": [
+   "health-services",
+   "lodging",
+   "auxiliary-services"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3591,14 +4131,16 @@ const LOCATIONS = [
    49.2
   ],
   "textH": 1.07,
-  "description": "Student support and welfare service point."
+  "description": "Medical, health or student welfare service point."
  },
  {
   "id": "student-records-archives",
   "name": "Student Records Archives",
   "acronym": "SRA",
   "building": "Administration Building",
-  "category": "Archives",
+  "categories": [
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3613,7 +4155,9 @@ const LOCATIONS = [
   "name": "Student Records Archives",
   "acronym": "SRA",
   "building": "Administration Building",
-  "category": "Archives",
+  "categories": [
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3628,7 +4172,10 @@ const LOCATIONS = [
   "name": "Supply and Property Building",
   "acronym": "SPB",
   "building": "Supply and Property Building",
-  "category": "Archives",
+  "categories": [
+   "admin-offices",
+   "stock-archives"
+  ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
@@ -3636,14 +4183,16 @@ const LOCATIONS = [
    378.6
   ],
   "textH": 0.93,
-  "description": "Records, storage and supply area maintained by the university."
+  "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "tennis-court",
   "name": "Tennis Court",
   "acronym": "TC",
   "building": "SLSU Main Campus",
-  "category": "Sports",
+  "categories": [
+   "sports-recreation"
+  ],
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
@@ -3651,14 +4200,14 @@ const LOCATIONS = [
    154
   ],
   "textH": 0.75,
-  "description": "Sports and recreation facility open to students and staff."
+  "description": "Sports ground or recreation facility open to students and staff."
  },
  {
   "id": "toilet-area",
   "name": "Toilet Area",
   "acronym": "TA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3666,14 +4215,14 @@ const LOCATIONS = [
    84.4
   ],
   "textH": 0.99,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "toilet-area-2",
   "name": "Toilet Area",
   "acronym": "TA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3681,14 +4230,14 @@ const LOCATIONS = [
    109.3
   ],
   "textH": 0.99,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "toilet-area-3",
   "name": "Toilet Area",
   "acronym": "TA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3696,14 +4245,14 @@ const LOCATIONS = [
    106.6
   ],
   "textH": 0.79,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "toilet-area-4",
   "name": "Toilet Area",
   "acronym": "TA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3711,14 +4260,14 @@ const LOCATIONS = [
    43
   ],
   "textH": 0.88,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "toilet-area-5",
   "name": "Toilet Area",
   "acronym": "TA",
   "building": "Administration Building",
-  "category": "Facilities",
+  "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3726,14 +4275,16 @@ const LOCATIONS = [
    345
   ],
   "textH": 0.5,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Campus location."
  },
  {
   "id": "twin-s-snack-house",
   "name": "Twin's Snack House",
   "acronym": "TSH",
   "building": "Medical-Dental Clinic",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3741,14 +4292,16 @@ const LOCATIONS = [
    228.9
   ],
   "textH": 0.57,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "volleyball-court",
   "name": "Volleyball Court",
   "acronym": "VC",
   "building": "Physical Education Building",
-  "category": "Sports",
+  "categories": [
+   "sports-recreation"
+  ],
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
@@ -3756,29 +4309,33 @@ const LOCATIONS = [
    157.2
   ],
   "textH": 0.98,
-  "description": "Sports and recreation facility open to students and staff."
+  "description": "Sports ground or recreation facility open to students and staff."
  },
  {
   "id": "volleyball-court-2",
   "name": "Volleyball Court",
   "acronym": "VC",
   "building": "SLSU Main Campus",
-  "category": "Landmark",
+  "categories": [
+   "sports-recreation"
+  ],
   "floor": "Ground Floor",
-  "hours": "Open during campus hours",
+  "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
    158,
    157.2
   ],
   "textH": 0.98,
-  "description": "Campus building and landmark."
+  "description": "Sports ground or recreation facility open to students and staff."
  },
  {
   "id": "waiting-area",
   "name": "Waiting Area",
   "acronym": "WA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3786,14 +4343,16 @@ const LOCATIONS = [
    314.6
   ],
   "textH": 0.4,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "waiting-area-2",
   "name": "Waiting Area",
   "acronym": "WA",
   "building": "SLSU Main Campus",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3801,14 +4360,16 @@ const LOCATIONS = [
    308.5
   ],
   "textH": 0.4,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "waiting-area-3",
   "name": "Waiting Area",
   "acronym": "WA",
   "building": "Administration Building",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3816,14 +4377,16 @@ const LOCATIONS = [
    315.4
   ],
   "textH": 0.4,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "waiting-area-4",
   "name": "Waiting Area",
   "acronym": "WA",
   "building": "Administration Building",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3831,14 +4394,16 @@ const LOCATIONS = [
    309.4
   ],
   "textH": 0.4,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "waiting-area-5",
   "name": "Waiting Area",
   "acronym": "WA",
   "building": "Administration Building",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3846,14 +4411,16 @@ const LOCATIONS = [
    306.6
   ],
   "textH": 0.37,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "waiting-area-6",
   "name": "Waiting Area",
   "acronym": "WA",
   "building": "Administration Building",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3861,14 +4428,16 @@ const LOCATIONS = [
    305.6
   ],
   "textH": 0.37,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "waiting-area-7",
   "name": "Waiting Area",
   "acronym": "WA",
   "building": "Administration Building",
-  "category": "Facilities",
+  "categories": [
+   "parking-waiting"
+  ],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
@@ -3876,14 +4445,16 @@ const LOCATIONS = [
    304.8
   ],
   "textH": 0.37,
-  "description": "Campus amenity provided for students, staff and visitors."
+  "description": "Parking bay or transit waiting area."
  },
  {
   "id": "what-if-silogan",
   "name": "What If Silogan",
   "acronym": "WIS",
   "building": "SLSU Main Campus",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3891,14 +4462,16 @@ const LOCATIONS = [
    229.3
   ],
   "textH": 0.61,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  },
  {
   "id": "yang-s-house",
   "name": "Yang's House",
   "acronym": "YH",
   "building": "Food Mart",
-  "category": "Food",
+  "categories": [
+   "food-commercial"
+  ],
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
@@ -3906,6 +4479,6 @@ const LOCATIONS = [
    364.3
   ],
   "textH": 0.95,
-  "description": "Campus food and refreshment outlet."
+  "description": "Campus food outlet or commercial stall."
  }
 ];

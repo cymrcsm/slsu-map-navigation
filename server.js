@@ -10,7 +10,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Small helper so a thrown error in any handler turns into a clean 500.
 const route = handler => (req, res) => {
   Promise.resolve(handler(req, res)).catch(err => {
     console.error(`${req.method} ${req.originalUrl} failed:`, err.message);
@@ -18,19 +17,16 @@ const route = handler => (req, res) => {
   });
 };
 
-// Categories, each with the number of locations in it.
 app.get('/api/categories', route(async (req, res) => {
   const data = await db.getCategories();
   res.json({ count: data.length, data });
 }));
 
-// Buildings, each with the number of locations in it.
 app.get('/api/buildings', route(async (req, res) => {
   const data = await db.getBuildings();
   res.json({ count: data.length, data });
 }));
 
-// Locations, optionally filtered: /api/locations?category=Admin&building=Library
 app.get('/api/locations', route(async (req, res) => {
   const { category, building, limit } = req.query;
   const data = await db.getLocations({
@@ -41,15 +37,12 @@ app.get('/api/locations', route(async (req, res) => {
   res.json({ count: data.length, data });
 }));
 
-// A single location, by numeric id or by slug ("office-of-the-president").
 app.get('/api/locations/:id', route(async (req, res) => {
   const row = await db.getLocation(req.params.id);
   if (!row) return res.status(404).json({ error: 'Location not found' });
   res.json(row);
 }));
 
-// Type-ahead search over names, acronyms and building names.
-// /api/search?q=regis&category=Admin&limit=8
 app.get('/api/search', route(async (req, res) => {
   const q = req.query.q;
   if (!q || !String(q).trim()) {
@@ -66,7 +59,6 @@ app.get('/api/health', route(async (req, res) => {
   res.json({ status: 'ok', ...(await db.getStats()) });
 }));
 
-// Anything that is not an API path serves the kiosk UI.
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

@@ -1,14 +1,3 @@
-/**
- * database.js — SQLite access layer for the SLSU Campus Kiosk.
- *
- * Owns the connection and every query the server needs. server.js should not
- * open the database or write SQL itself; it calls the functions exported here.
- *
- * The schema is created and seeded by `npm run db:init` (db/init-db.js), which
- * reads the same generated dataset the map uses (public/js/campus-data.js), so
- * the pins on the map and the rows in the database cannot drift apart.
- */
-
 const path = require('path');
 const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
@@ -17,7 +6,6 @@ const DB_PATH = process.env.KIOSK_DB || path.join(__dirname, 'db', 'slsu_directo
 
 let db = null;
 
-/** Open the database read-only. Safe to call more than once. */
 function connect() {
   if (db) return db;
   if (!fs.existsSync(DB_PATH)) {
@@ -32,8 +20,6 @@ function connect() {
   return db;
 }
 
-// --- tiny promise wrappers so callers can use async/await -------------------
-
 const all = (sql, params = []) => new Promise((resolve, reject) => {
   connect().all(sql, params, (err, rows) => (err ? reject(err) : resolve(rows || [])));
 });
@@ -42,27 +28,26 @@ const get = (sql, params = []) => new Promise((resolve, reject) => {
   connect().get(sql, params, (err, row) => (err ? reject(err) : resolve(row || null)));
 });
 
-// --- queries ---------------------------------------------------------------
-
 const LOCATION_COLUMNS = `
-  l.id, l.slug, l.name, l.acronym, l.category, l.floor_level AS floor,
+  l.id, l.slug, l.name, l.acronym, l.floor_level AS floor,
   l.operating_hours AS hours, l.description,
   l.x, l.y,
-  b.name AS building, b.code AS building_code
+  b.name AS building, b.code AS building_code,
+  (SELECT GROUP_CONCAT(lc.category)
+     FROM (SELECT category FROM location_categories
+            WHERE location_id = l.id ORDER BY position) lc) AS categories
 `;
 
-/** Every category, with how many locations sit in each. */
 function getCategories() {
   return all(`
-    SELECT c.id, c.name, c.color, COUNT(l.id) AS count
+    SELECT c.id, c.name, c.color, COUNT(lc.location_id) AS count
     FROM categories c
-    LEFT JOIN locations l ON l.category = c.id
+    LEFT JOIN location_categories lc ON lc.category = c.id
     GROUP BY c.id, c.name, c.color
     ORDER BY c.name
   `);
 }
 
-/** Every building, with how many locations sit in each. */
 function getBuildings() {
   return all(`
     SELECT b.id, b.name, b.code, COUNT(l.id) AS location_count
@@ -73,11 +58,13 @@ function getBuildings() {
   `);
 }
 
-/** Locations, optionally narrowed to one category and/or building. */
 function getLocations({ category, building, limit = 500 } = {}) {
   const where = [];
   const params = [];
-  if (category && category !== 'ALL') { where.push('l.category = ?'); params.push(category); }
+  if (category && category !== 'ALL') {
+    where.push('EXISTS (SELECT 1 FROM location_categories lc2 WHERE lc2.location_id = l.id AND lc2.category = ?)');
+    params.push(category);
+  }
   if (building) { where.push('b.name = ?'); params.push(building); }
   params.push(limit);
   return all(`
@@ -90,7 +77,6 @@ function getLocations({ category, building, limit = 500 } = {}) {
   `, params);
 }
 
-/** A single location by numeric id or by slug. */
 function getLocation(idOrSlug) {
   return get(`
     SELECT ${LOCATION_COLUMNS}
@@ -100,13 +86,6 @@ function getLocation(idOrSlug) {
   `, [idOrSlug, String(idOrSlug)]);
 }
 
-/**
- * Search names, acronyms and building names.
- *
- * Ordering mirrors the client-side ranking in public/js/app.js so the kiosk and
- * the API agree on what "best match" means: exact acronym, then acronym prefix,
- * then name prefix, then anything containing the term.
- */
 function searchLocations(query, { category, limit = 10 } = {}) {
   const q = String(query || '').trim().toLowerCase();
   if (!q) return Promise.resolve([]);
@@ -129,7 +108,7 @@ function searchLocations(query, { category, limit = 10 } = {}) {
     WHERE (LOWER(l.name)    LIKE $like
         OR LOWER(l.acronym) LIKE $like
         OR LOWER(b.name)    LIKE $like)
-      ${narrowed ? 'AND l.category = $cat' : ''}
+      ${narrowed ? 'AND EXISTS (SELECT 1 FROM location_categories lc3 WHERE lc3.location_id = l.id AND lc3.category = $cat)' : ''}
     ORDER BY rank, LENGTH(l.name), l.name
     LIMIT $limit
   `;
@@ -138,14 +117,14 @@ function searchLocations(query, { category, limit = 10 } = {}) {
   return all(sql, params);
 }
 
-/** Row counts, handy for a health check. */
 async function getStats() {
-  const [loc, bld, cat] = await Promise.all([
+  const [loc, bld, cat, mem] = await Promise.all([
     get('SELECT COUNT(*) AS n FROM locations'),
     get('SELECT COUNT(*) AS n FROM buildings'),
-    get('SELECT COUNT(*) AS n FROM categories')
+    get('SELECT COUNT(*) AS n FROM categories'),
+    get('SELECT COUNT(*) AS n FROM location_categories')
   ]);
-  return { locations: loc.n, buildings: bld.n, categories: cat.n, path: DB_PATH };
+  return { locations: loc.n, buildings: bld.n, categories: cat.n, memberships: mem.n, path: DB_PATH };
 }
 
 function close() {

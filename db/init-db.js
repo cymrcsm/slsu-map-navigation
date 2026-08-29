@@ -1,11 +1,3 @@
-/**
- * Creates and seeds db/slsu_directory.db.
- *
- * The seed data is read straight out of public/js/campus-data.js — the file the
- * map itself loads — so the database and the pins on the map are always the same
- * set of places. Re-run with `npm run db:init` after regenerating that file.
- */
-
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
@@ -15,9 +7,6 @@ const ROOT = path.join(__dirname, '..');
 const DATA_FILE = path.join(ROOT, 'public', 'js', 'campus-data.js');
 const DB_PATH = path.join(__dirname, 'slsu_directory.db');
 
-// --- load the generated dataset -------------------------------------------
-// campus-data.js is a plain script that declares two consts, so evaluate it in
-// a throwaway context rather than duplicating the data here.
 function loadCampusData() {
   if (!fs.existsSync(DATA_FILE)) {
     throw new Error(`Missing ${DATA_FILE}. It is generated from the campus SVG.`);
@@ -33,7 +22,6 @@ function loadCampusData() {
 
 const { categories, locations } = loadCampusData();
 
-// Building codes: initials, de-duplicated.
 const usedCodes = new Set();
 function buildingCode(name) {
   let base = name.replace(/\(.*?\)/g, '')
@@ -71,24 +59,31 @@ const run = (sql, params = []) => new Promise((resolve, reject) => {
     code TEXT UNIQUE NOT NULL
   );`);
 
-  // One row per pin on the map. x/y are groundFloor_layer.svg coordinates.
   await run(`CREATE TABLE locations (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     slug            TEXT UNIQUE NOT NULL,
     name            TEXT NOT NULL,
     acronym         TEXT,
     building_id     INTEGER,
-    category        TEXT NOT NULL,
     floor_level     TEXT NOT NULL DEFAULT 'Ground Floor',
     operating_hours TEXT,
     description     TEXT,
     x               REAL NOT NULL,
     y               REAL NOT NULL,
-    FOREIGN KEY (building_id) REFERENCES buildings(id) ON DELETE SET NULL,
+    FOREIGN KEY (building_id) REFERENCES buildings(id) ON DELETE SET NULL
+  );`);
+
+  await run(`CREATE TABLE location_categories (
+    location_id INTEGER NOT NULL,
+    category    TEXT    NOT NULL,
+    position    INTEGER NOT NULL,       -- 0 = primary, following the document's order
+    PRIMARY KEY (location_id, category),
+    FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE CASCADE,
     FOREIGN KEY (category)    REFERENCES categories(id)
   );`);
 
-  await run('CREATE INDEX idx_locations_category ON locations(category);');
+  await run('CREATE INDEX idx_loccat_category ON location_categories(category);');
+  await run('CREATE INDEX idx_loccat_location ON location_categories(location_id);');
   await run('CREATE INDEX idx_locations_building ON locations(building_id);');
   await run('CREATE INDEX idx_locations_name     ON locations(name);');
   await run('CREATE INDEX idx_locations_acronym  ON locations(acronym);');
@@ -96,7 +91,7 @@ const run = (sql, params = []) => new Promise((resolve, reject) => {
   await run('BEGIN TRANSACTION;');
 
   for (const c of categories) {
-    if (c.id === 'ALL') continue;              // a UI filter, not a real category
+    if (c.id === 'ALL') continue;
     await run('INSERT INTO categories (id, name, color) VALUES (?, ?, ?);',
               [c.id, c.name, c.color || null]);
   }
@@ -109,13 +104,18 @@ const run = (sql, params = []) => new Promise((resolve, reject) => {
   }
 
   for (const l of locations) {
-    await run(`INSERT INTO locations
-      (slug, name, acronym, building_id, category, floor_level, operating_hours,
+    const res = await run(`INSERT INTO locations
+      (slug, name, acronym, building_id, floor_level, operating_hours,
        description, x, y)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
       [l.id, l.name, l.acronym || null, buildingIds.get(l.building) || null,
-       l.category, l.floor, l.hours, l.description,
-       l.coords[0], l.coords[1]]);
+       l.floor, l.hours, l.description, l.coords[0], l.coords[1]]);
+    const locId = res.lastID;
+    const cats = l.categories || [];
+    for (let i = 0; i < cats.length; i++) {
+      await run('INSERT INTO location_categories (location_id, category, position) VALUES (?, ?, ?);',
+                [locId, cats[i], i]);
+    }
   }
 
   await run('COMMIT;');
@@ -125,6 +125,7 @@ const run = (sql, params = []) => new Promise((resolve, reject) => {
   console.log('  categories:', await count('categories'));
   console.log('  buildings :', await count('buildings'));
   console.log('  locations :', await count('locations'));
+  console.log('  memberships:', await count('location_categories'));
 
   db.close();
 })().catch(err => {

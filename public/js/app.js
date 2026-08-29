@@ -1,25 +1,6 @@
-// ==========================================
-// 0. MAP GEOMETRY
-// ==========================================
-// groundFloor_layer.svg is a 320 x 421 vector campus map. Every coordinate in
-// this file is expressed in that SVG user-space ([x, y], origin top-left).
-// CATEGORIES and LOCATIONS come from js/campus-data.js, and WALK_PATHS from
-// js/walkpaths.js - both generated from the SVG.
-//
-// Walkability is the black lines drawn on the map and nothing else: a route
-// travels along them, and everything off them is a barrier.
-
 const MAP_WIDTH = 320;
 const MAP_HEIGHT = 421;
 
-
-// ==========================================
-// 3. HELPERS
-// ==========================================
-
-// L.CRS.Simple counts latitude upwards, while the SVG counts y downwards, and
-// the image overlay pins svg-y 0 to the top of the bounds. Flip y so a stored
-// [x, y] lands on the same spot it occupies in groundFloor_layer.svg.
 function toLeafletCoords(xyCoords) {
   return [MAP_HEIGHT - xyCoords[1], xyCoords[0]];
 }
@@ -28,57 +9,48 @@ function fromLeafletCoords(latlng) {
   return [latlng.lng, MAP_HEIGHT - latlng.lat];
 }
 
-function getCategoryColor(categoryName) {
-  const cat = CATEGORIES.find(c => c.id === categoryName);
-  return cat ? cat.color : '#4E6B7C';
+const UNCATEGORISED_COLOR = '#7C736A';
+
+function getCategoryColor(categoryId) {
+  const cat = CATEGORIES.find(c => c.id === categoryId);
+  return cat && cat.color ? cat.color : UNCATEGORISED_COLOR;
 }
 
-function getCategoryName(categoryName) {
-  const cat = CATEGORIES.find(c => c.id === categoryName);
-  return cat ? cat.name : categoryName;
+function getCategoryName(categoryId) {
+  const cat = CATEGORIES.find(c => c.id === categoryId);
+  return cat ? cat.name : categoryId;
 }
+
+const primaryCategory = loc => (loc.categories && loc.categories[0]) || null;
+const locationColor = loc => getCategoryColor(primaryCategory(loc));
+const inCategory = (loc, id) =>
+  id === 'ALL' || (loc.categories && loc.categories.indexOf(id) !== -1);
 
 // ==========================================
 // 4. LEAFLET MAP INITIALIZATION
 // ==========================================
 
 const bounds = [[0, 0], [MAP_HEIGHT, MAP_WIDTH]];
-
-const ZOOM_FLOOR = 0.5;   // absolute backstop; the real limit is computed below
-const ROUTE_MAX_ZOOM = 4; // ceiling used when fitting a drawn route
-const FIT_PADDING = 16;   // px of breathing room around the campus overview
-const PIN_ZOOM = 2.4;     // above this, markers grow from dots into full pins
-
-// The smallest lettering on this map is only 0.19 map units tall, so the old
-// ceiling of zoom 5 drew it at about 6px - unreadable. The map is vector and
-// stays sharp however far in we go, and 6.5 puts even the tiniest label at
-// roughly 17px.
+const ZOOM_FLOOR = 0.5;   
+const ROUTE_MAX_ZOOM = 4; 
+const FIT_PADDING = 16;   
+const PIN_ZOOM = 2.4;    
 const MAX_ZOOM = 6.5;
-
-// Target on-screen height for a label's lettering, in CSS pixels.
 const READABLE_PX = 15;
-const MIN_ROOM_ZOOM = 3;  // a selection never flies in less far than this
+const MIN_ROOM_ZOOM = 3;  
 
-// The zoom at which this location's own label becomes comfortably readable. A
-// building name is legible far sooner than a 0.19-unit "COMFORT ROOM", so each
-// selection flies exactly as far as that label needs and no further.
 function readableZoom(loc) {
   const h = loc && loc.textH > 0 ? loc.textH : 0.75;
   return Math.min(MAX_ZOOM, Math.max(MIN_ROOM_ZOOM, Math.log2(READABLE_PX / h)));
 }
-
-// How tight the zoomed-all-the-way-out overview sits. 1.0 = the entire 320x421
-// canvas is visible, which leaves wide empty margins because the drawn campus
-// only occupies the middle of it. Above 1.0 the canvas is cropped so the campus
-// itself fills the panel.
 const OVERVIEW_SCALE = 1.25;
 
 const map = L.map('map', {
   crs: L.CRS.Simple,
   minZoom: ZOOM_FLOOR,
   maxZoom: MAX_ZOOM,
-  zoomSnap: 0,      // continuous, so fitBounds fills the panel exactly
-  zoomDelta: 0.5,   // but the +/- buttons still move in readable steps
+  zoomSnap: 0,      
+  zoomDelta: 0.5,  
   wheelPxPerZoomLevel: 120,
   maxBounds: bounds,
   maxBoundsViscosity: 1.0,
@@ -90,10 +62,6 @@ L.imageOverlay('assets/groundFloor_layer.svg', bounds).addTo(map);
 
 const CAMPUS_CENTER = toLeafletCoords([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
 
-// The zoom at which the campus overview sits, and the point past which zooming
-// out is pointless. Derived from the live panel size rather than hard-coded, so
-// it holds on any kiosk resolution. L.CRS.Simple puts one map unit per pixel at
-// zoom 0, so the zoom for a given scale factor is just its base-2 logarithm.
 function overviewZoom() {
   const size = map.getSize();
   const usableX = Math.max(1, size.x - FIT_PADDING * 2);
@@ -106,8 +74,6 @@ function autoCenterCampus(animate = true) {
   map.setView(CAMPUS_CENTER, overviewZoom(), { animate: animate });
 }
 
-// Drop the limit to the floor before raising it, so a shrinking window can
-// relax it again instead of staying pinned at the widest value it ever had.
 function clampZoomOut() {
   map.setMinZoom(ZOOM_FLOOR);
   map.setMinZoom(overviewZoom());
@@ -130,11 +96,20 @@ setTimeout(() => {
 const searchInput = document.getElementById('search-input');
 const clearSearchBtn = document.getElementById('clear-search-btn');
 const suggestionList = document.getElementById('search-suggestions');
-const categoryDropdown = document.getElementById('category-dropdown');
+const categoryListEl = document.getElementById('category-list');
+const panelBody = document.querySelector('.panel-body');
 
 const tutorialView = document.getElementById('tutorial-view');
+const categoryView = document.getElementById('category-view');
 const detailView = document.getElementById('detail-view');
+const categoryViewTitle = document.getElementById('category-view-title');
+const categoryViewCount = document.getElementById('category-view-count');
+const categoryResults = document.getElementById('category-results');
+const backFromCategoryBtn = document.getElementById('back-from-category-btn');
 const backToTutorialBtn = document.getElementById('back-to-tutorial-btn');
+
+// Which category button is pressed. 'ALL' means no filter.
+let activeCategory = 'ALL';
 const recenterRoomBtn = document.getElementById('recenter-room-btn');
 const getDirectionsBtn = document.getElementById('get-directions-btn');
 const setKioskBtn = document.getElementById('set-kiosk-btn');
@@ -155,7 +130,7 @@ const markerLayer = L.layerGroup().addTo(map);
 // 6. KIOSK POSITIONING (PERSISTENT STATE)
 // ==========================================
 
-const DEFAULT_KIOSK_COORDS = [196.1, 334.2]; // Administration Building lobby
+const DEFAULT_KIOSK_COORDS = [196.1, 334.2];
 
 function readStoredKioskCoords() {
   try {
@@ -193,27 +168,57 @@ function renderKioskMarker() {
 renderKioskMarker();
 
 // ==========================================
-// 7. CATEGORY DROPDOWN
+// 7. CATEGORY BUTTONS
 // ==========================================
 
 const categoryCounts = {};
-LOCATIONS.forEach(l => { categoryCounts[l.category] = (categoryCounts[l.category] || 0) + 1; });
+LOCATIONS.forEach(l => (l.categories || []).forEach(id => {
+  categoryCounts[id] = (categoryCounts[id] || 0) + 1;
+}));
 
-categoryDropdown.innerHTML = '';
+const countFor = id => (id === 'ALL' ? LOCATIONS.length : (categoryCounts[id] || 0));
+
+const categoryButtons = new Map();  
+
 CATEGORIES.forEach(cat => {
-  const opt = document.createElement('option');
-  opt.value = cat.id;
-  opt.textContent = cat.id === 'ALL'
-    ? `${cat.name} (${LOCATIONS.length})`
-    : `${cat.name} (${categoryCounts[cat.id] || 0})`;
-  categoryDropdown.appendChild(opt);
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'cat-btn';
+  btn.dataset.category = cat.id;
+  btn.setAttribute('aria-pressed', 'false');
+
+  const swatch = document.createElement('span');
+  swatch.className = 'cat-swatch';
+  swatch.style.background = cat.id === 'ALL' ? 'var(--text-muted)' : getCategoryColor(cat.id);
+
+  const label = document.createElement('span');
+  label.className = 'cat-label';
+  label.textContent = cat.name;
+
+  const count = document.createElement('span');
+  count.className = 'cat-count';
+  count.textContent = countFor(cat.id);
+
+  btn.append(swatch, label, count);
+  btn.addEventListener('click', () => selectCategory(cat.id));
+  categoryListEl.appendChild(btn);
+  categoryButtons.set(cat.id, btn);
 });
+
+function paintCategoryButtons() {
+  categoryButtons.forEach((btn, id) => {
+    const on = id === activeCategory;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    const color = id === 'ALL' ? 'var(--primary-strong)' : getCategoryColor(id);
+    btn.style.borderColor = on ? color : '';
+    btn.style.background = on ? (id === 'ALL' ? 'var(--surface-hover)' : color + '14') : '';
+  });
+}
 
 // ==========================================
 // 8. MARKERS
 // ==========================================
-// 254 pins is a lot for one screen, so they render as small category-coloured
-// dots when zoomed out and grow into full pins once the map is zoomed in.
 
 function pinSvg(color) {
   return '<svg viewBox="0 0 24 32" width="24" height="32" aria-hidden="true">' +
@@ -242,7 +247,7 @@ const markerFor = new Map();   // location id -> L.Marker
 
 LOCATIONS.forEach(loc => {
   const marker = L.marker(toLeafletCoords(loc.coords), {
-    icon: iconFor(loc.category, bigPins),
+    icon: iconFor(primaryCategory(loc), bigPins),
     title: loc.acronym ? `${loc.name} (${loc.acronym})` : loc.name,
     riseOnHover: true
   });
@@ -255,7 +260,7 @@ let visibleIds = new Set(LOCATIONS.map(l => l.id));
 function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
   const q = searchQuery.trim().toLowerCase();
   const matches = LOCATIONS.filter(loc => {
-    if (selectedCategory !== 'ALL' && loc.category !== selectedCategory) return false;
+    if (!inCategory(loc, selectedCategory)) return false;
     if (!q) return true;
     return loc.name.toLowerCase().includes(q) ||
            loc.acronym.toLowerCase().includes(q) ||
@@ -274,7 +279,7 @@ map.on('zoomend', () => {
   if (want === bigPins) return;
   bigPins = want;
   LOCATIONS.forEach(loc => {
-    if (visibleIds.has(loc.id)) markerFor.get(loc.id).setIcon(iconFor(loc.category, bigPins));
+    if (visibleIds.has(loc.id)) markerFor.get(loc.id).setIcon(iconFor(primaryCategory(loc), bigPins));
   });
 });
 
@@ -286,10 +291,27 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   activeSelectedLocation = loc;
   clearActiveRoute();
 
-  const pinColor = getCategoryColor(loc.category);
-  detailBadge.textContent = getCategoryName(loc.category);
-  detailBadge.style.background = pinColor + '1A';
-  detailBadge.style.color = pinColor;
+  const cats = loc.categories || [];
+  detailBadge.innerHTML = '';
+  detailBadge.removeAttribute('style');
+  if (!cats.length) {
+    const chip = document.createElement('span');
+    chip.className = 'cat-chip';
+    chip.textContent = 'Uncategorised';
+    chip.style.background = UNCATEGORISED_COLOR + '1A';
+    chip.style.color = UNCATEGORISED_COLOR;
+    detailBadge.appendChild(chip);
+  } else {
+    cats.forEach(id => {
+      const color = getCategoryColor(id);
+      const chip = document.createElement('span');
+      chip.className = 'cat-chip';
+      chip.textContent = getCategoryName(id);
+      chip.style.background = color + '1A';
+      chip.style.color = color;
+      detailBadge.appendChild(chip);
+    });
+  }
 
   detailTitle.textContent = loc.name;
   detailBuilding.textContent = loc.acronym
@@ -299,17 +321,91 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   detailHours.textContent = loc.hours;
   detailDesc.textContent = loc.description;
 
-  tutorialView.classList.add('hidden');
-  detailView.classList.remove('hidden');
+  // Coming from a category listing, "back" should return to that listing.
+  backToTutorialBtn.textContent = activeCategory === 'ALL'
+    ? '← Back to Kiosk Guide'
+    : '← Back to ' + getCategoryName(activeCategory);
 
+  showPanel(detailView);
   map.flyTo(toLeafletCoords(loc.coords), flyZoom, { animate: true, duration: 0.8 });
+}
+
+// Only one of the three left-panel views is visible at a time.
+function showPanel(view) {
+  [tutorialView, categoryView, detailView].forEach(v => v.classList.toggle('hidden', v !== view));
+  panelBody.scrollTop = 0;
 }
 
 function showTutorialView() {
   activeSelectedLocation = null;
   clearActiveRoute();
-  detailView.classList.add('hidden');
-  tutorialView.classList.remove('hidden');
+  showPanel(activeCategory === 'ALL' ? tutorialView : categoryView);
+}
+
+function selectCategory(id) {
+  activeCategory = (id === activeCategory && id !== 'ALL') ? 'ALL' : id;
+  paintCategoryButtons();
+
+  activeSelectedLocation = null;
+  clearActiveRoute();
+  searchInput.value = '';
+  closeSuggestions();
+
+  const shown = renderMarkers(activeCategory, '');
+
+  if (activeCategory === 'ALL') {
+    showPanel(tutorialView);
+    autoCenterCampus(true);
+    return;
+  }
+
+  categoryViewTitle.textContent = getCategoryName(activeCategory);
+  categoryViewCount.textContent = shown.length === 1 ? '1 place' : shown.length + ' places';
+
+  categoryResults.innerHTML = '';
+  if (!shown.length) {
+    const li = document.createElement('li');
+    li.className = 'result-empty';
+    li.textContent = 'Nothing is filed under this category yet.';
+    categoryResults.appendChild(li);
+  } else {
+    shown.slice().sort((a, b) => a.name.localeCompare(b.name)).forEach(loc => {
+      const li = document.createElement('li');
+      li.className = 'result-item';
+      li.tabIndex = 0;
+
+      const swatch = document.createElement('span');
+      swatch.className = 'result-swatch';
+      swatch.style.background = locationColor(loc);
+
+      const text = document.createElement('span');
+      text.className = 'result-text';
+      const name = document.createElement('strong');
+      name.textContent = loc.name;
+      const sub = document.createElement('small');
+      sub.textContent = loc.acronym && !loc.name.includes(loc.acronym)
+        ? loc.acronym + ' · ' + loc.building
+        : loc.building;
+      text.append(name, sub);
+
+      li.append(swatch, text);
+      li.addEventListener('click', () => showLocationDetails(loc));
+      li.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showLocationDetails(loc); }
+      });
+      categoryResults.appendChild(li);
+    });
+  }
+
+  showPanel(categoryView);
+
+  // Frame the pins that are left, so the category is visible at a glance.
+  if (shown.length) {
+    const group = L.featureGroup(shown.map(l => markerFor.get(l.id)));
+    map.fitBounds(group.getBounds(), {
+      padding: [80, 80], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 0.8
+    });
+  }
 }
 
 // ==========================================
@@ -342,7 +438,7 @@ function searchLocations(query, category = 'ALL', limit = Infinity) {
   if (!q) return [];
   const scored = [];
   for (const loc of LOCATIONS) {
-    if (category !== 'ALL' && loc.category !== category) continue;
+    if (!inCategory(loc, category)) continue;
     const s = scoreMatch(loc, q);
     if (s >= 0) scored.push({ loc, s });
   }
@@ -369,7 +465,7 @@ function highlight(text, q) {
 
 function renderSuggestions(query) {
   const q = query.trim().toLowerCase();
-  suggestions = q ? searchLocations(query, categoryDropdown.value, MAX_SUGGESTIONS) : [];
+  suggestions = q ? searchLocations(query, activeCategory, MAX_SUGGESTIONS) : [];
   activeSuggestion = -1;
 
   if (!suggestions.length) {
@@ -384,7 +480,7 @@ function renderSuggestions(query) {
   }
 
   suggestionList.innerHTML = suggestions.map((loc, i) => {
-    const color = getCategoryColor(loc.category);
+    const color = locationColor(loc);
     const sub = loc.acronym && !loc.name.includes(loc.acronym)
       ? highlight(loc.acronym, q) + ' · ' + escapeHtml(loc.building)
       : escapeHtml(loc.building);
@@ -422,7 +518,7 @@ function chooseSuggestion(index) {
   if (!loc) return;
   searchInput.value = loc.name;
   closeSuggestions();
-  renderMarkers(categoryDropdown.value, '');
+  renderMarkers(activeCategory, '');
   showLocationDetails(loc);
 }
 
@@ -582,6 +678,7 @@ function drawRoute(destination) {
 // ==========================================
 
 backToTutorialBtn.addEventListener('click', showTutorialView);
+backFromCategoryBtn.addEventListener('click', () => selectCategory('ALL'));
 
 recenterRoomBtn.addEventListener('click', () => {
   if (activeSelectedLocation) {
@@ -631,7 +728,7 @@ map.on('click', (e) => {
 // --- search ---
 searchInput.addEventListener('input', (e) => {
   renderSuggestions(e.target.value);
-  renderMarkers(categoryDropdown.value, e.target.value);
+  renderMarkers(activeCategory, e.target.value);
 });
 
 searchInput.addEventListener('focus', () => {
@@ -673,13 +770,8 @@ document.addEventListener('click', (e) => {
 clearSearchBtn.addEventListener('click', () => {
   searchInput.value = '';
   closeSuggestions();
-  renderMarkers(categoryDropdown.value, '');
+  renderMarkers(activeCategory, '');
   searchInput.focus();
-});
-
-categoryDropdown.addEventListener('change', (e) => {
-  renderMarkers(e.target.value, searchInput.value);
-  if (searchInput.value.trim()) renderSuggestions(searchInput.value);
 });
 
 // Map Controls
@@ -703,4 +795,5 @@ document.querySelectorAll('.floor-btn').forEach(btn => {
 // ==========================================
 
 renderMarkers();
+paintCategoryButtons();
 console.log('SLSU kiosk ready:', LOCATIONS.length, 'locations. No walking network defined.');
