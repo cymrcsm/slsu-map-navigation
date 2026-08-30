@@ -12,6 +12,10 @@ const MAP_WIDTH = 320;
 const MAP_HEIGHT = 421;
 const toLeaflet = xy => [MAP_HEIGHT - xy[1], xy[0]];
 
+// How far (map units ≈ metres) an endpoint may sit off the walking network
+// before we stop drawing a connector to it. Matches OFFPATH_LIMIT in js/app.js.
+const OFFPATH_LIMIT = 1;
+
 // --- GPS georeferencing --------------------------------------------------
 // Fill this with 3+ surveyed control points to turn on the live "you are here"
 // dot. Each entry maps a real-world coordinate to a point on the campus map
@@ -64,9 +68,10 @@ if (!dest) {
 document.getElementById('dest-name').textContent = dest.name;
 document.getElementById('dest-sub').textContent =
   dest.acronym ? dest.building + ' · ' + dest.acronym : dest.building;
+const center = dest.building === dest.name ? 'SLSU Main Campus' : dest.building;
 document.getElementById('dest-meta').innerHTML =
   '<div><strong>Floor:</strong> ' + esc(dest.floor) + '</div>' +
-  '<div><strong>Hours:</strong> ' + esc(dest.hours || '—') + '</div>' +
+  '<div><strong>Building / Center:</strong> ' + esc(center) + '</div>' +
   (dest.description ? '<div>' + esc(dest.description) + '</div>' : '');
 
 function esc(s) {
@@ -79,25 +84,61 @@ L.marker(toLeaflet(dest.coords), {
 }).addTo(map).bindTooltip(dest.name, { permanent: false, direction: 'top' });
 
 let routeGroup = L.layerGroup().addTo(map);
+
+// Waypoints along the drawn network, plus short connector hops at the ends -
+// but only when an end is actually close to the network. Same rule as the kiosk.
 function drawStaticRoute(origin) {
   routeGroup.clearLayers();
   if (!origin) return null;
+
   const path = WalkRouting.findPath(origin, dest.coords);
-  const line = path.length
-    ? [origin].concat(path, [dest.coords])
-    : [origin, dest.coords];
-  const poly = L.polyline(line.map(toLeaflet), {
-    weight: 5, opacity: .9, color: path.length ? '#4E6B7C' : '#C2503A', dashArray: path.length ? null : '6 8'
-  }).addTo(routeGroup);
-  const metres = Math.round(WalkRouting.lengthUnits(line));
-  return { poly, metres, reachable: !!path.length };
+  if (!path.length) {
+    const poly = L.polyline([origin, dest.coords].map(toLeaflet), {
+      weight: 4, opacity: .8, color: '#C2503A', dashArray: '6 8'
+    }).addTo(routeGroup);
+    return { poly, metres: Math.round(WalkRouting.dist(origin, dest.coords)), reachable: false, endGap: 0 };
+  }
+
+  const startGap = WalkRouting.dist(origin, path[0]);
+  const endGap = WalkRouting.dist(path[path.length - 1], dest.coords);
+
+  L.polyline(path.map(toLeaflet), { weight: 5, opacity: .9, color: '#4E6B7C' }).addTo(routeGroup);
+
+  [[origin, path[0], startGap],
+   [path[path.length - 1], dest.coords, endGap]].forEach(hop => {
+    if (hop[2] > 0.4 && hop[2] <= OFFPATH_LIMIT) {
+      L.polyline([hop[0], hop[1]].map(toLeaflet), {
+        weight: 4, opacity: .85, color: '#4E6B7C', dashArray: '4 6'
+      }).addTo(routeGroup);
+    }
+  });
+
+  const walked = [];
+  if (startGap <= OFFPATH_LIMIT) walked.push(origin);
+  path.forEach(p => walked.push(p));
+  if (endGap <= OFFPATH_LIMIT) walked.push(dest.coords);
+
+  return {
+    poly: L.featureGroup(routeGroup.getLayers()),
+    metres: Math.round(WalkRouting.lengthUnits(walked)),
+    reachable: true,
+    endGap
+  };
+}
+
+function routeNote(r, tail) {
+  if (!r.reachable) {
+    return 'About ' + r.metres + ' m away — no drawn path connects it, follow the dashed line.';
+  }
+  let s = 'About ' + r.metres + ' m ' + tail;
+  if (r.endGap > OFFPATH_LIMIT) s += ', ending ' + Math.round(r.endGap) + ' m from the nearest walkway';
+  return s + '.';
 }
 
 let staticRoute = drawStaticRoute(kioskFrom);
 if (staticRoute) {
   map.fitBounds(staticRoute.poly.getBounds(), { padding: [50, 50], maxZoom: 4 });
-  setStatus('About ' + staticRoute.metres + ' m on foot from the kiosk.' +
-    (staticRoute.reachable ? '' : ' (straight-line estimate)'));
+  setStatus(routeNote(staticRoute, 'on foot from the kiosk'), !staticRoute.reachable);
 } else {
   map.setView(toLeaflet(dest.coords), 3);
 }
@@ -116,7 +157,7 @@ function startGps() {
     return;
   }
   if (!affine) {
-    setStatus(staticRoute ? staticRoute.metres + ' m on foot. (Live GPS not calibrated for this campus yet.)'
+    setStatus(staticRoute ? routeNote(staticRoute, 'on foot from the kiosk') + ' (Live GPS not calibrated for this campus yet.)'
                           : 'Live GPS not calibrated for this campus yet.', true);
     return;
   }
@@ -145,9 +186,11 @@ function onFix(pos) {
   const r = drawStaticRoute(xy);            // re-route from the live position
   if (r) {
     staticRoute = r;
-    const left = r.metres;
-    setStatus(left <= 12 ? 'You have arrived. Open the floor plan for indoor directions.'
-                         : 'About ' + left + ' m to go.' + (r.reachable ? '' : ' (straight-line)'));
+    if (r.reachable && r.metres <= 12) {
+      setStatus('You have arrived. Open the floor plan for indoor directions.');
+    } else {
+      setStatus(routeNote(r, 'to go'), !r.reachable);
+    }
   }
 }
 
