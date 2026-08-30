@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SLSU Campus — Walking Directions</title>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
+  <style>
+    :root { --ink:#333; --paper:#FEFDF9; --accent:#4E6B7C; --danger:#C2503A; }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { height:100%; font-family:-apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:#778E81; }
+    #map { position:absolute; inset:0; }
+
+    .sheet {
+      position:absolute; left:0; right:0; bottom:0; z-index:1000;
+      background:var(--paper); border-radius:16px 16px 0 0;
+      box-shadow:0 -4px 20px rgba(0,0,0,.18);
+      padding:14px 16px calc(14px + env(safe-area-inset-bottom));
+      max-height:46vh; overflow-y:auto;
+    }
+    .sheet h1 { font-size:1.15rem; line-height:1.25; }
+    .sheet .sub { color:#6b6257; font-size:.9rem; margin-top:2px; }
+    .sheet .meta { margin-top:10px; font-size:.9rem; }
+    .sheet .meta div { padding:3px 0; }
+    .sheet .meta strong { color:#5b524a; font-weight:600; }
+    .status {
+      margin-top:10px; font-size:.85rem; padding:8px 10px; border-radius:8px;
+      background:#EEF2F0; color:#3f5a52;
+    }
+    .status.warn { background:#FBECE8; color:#8a3a2b; }
+
+    .recenter {
+      position:absolute; right:12px; z-index:1000;
+      bottom:calc(46vh + 12px);
+      width:44px; height:44px; border-radius:50%; border:none;
+      background:var(--paper); box-shadow:0 2px 8px rgba(0,0,0,.25);
+      font-size:1.2rem;
+    }
+
+    .me-dot { width:18px; height:18px; border-radius:50%; background:#2E7DD1; border:3px solid #fff; box-shadow:0 0 0 1px rgba(0,0,0,.25); }
+    .dest-pin { font-size:26px; line-height:1; filter:drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <button class="recenter" id="recenter-btn" aria-label="Recentre">◎</button>
+
+  <section class="sheet">
+    <h1 id="dest-name">Loading…</h1>
+    <p class="sub" id="dest-sub"></p>
+    <div class="meta" id="dest-meta"></div>
+    <div class="status" id="status">Preparing your route…</div>
+  </section>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="js/campus-data.js"></script>
+  <script src="js/walkpaths.js"></script>
+  <script src="js/routing.js"></script>
+  <script src="js/mobile.js"></script>
+</body>
+</html>

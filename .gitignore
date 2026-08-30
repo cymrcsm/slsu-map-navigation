@@ -1,11 +1,16 @@
 # Node dependencies
 node_modules/
 
-# Database files (if generated dynamically by npm run db:init)
+# Transient SQLite artifacts (WAL/SHM + any ad-hoc copies)
 *.sqlite
-*.db
-*.fig
+*.db-wal
+*.db-shm
 
 # OS files
 .DS_Store
 Thumbs.db
+
+# NOTE: db/slsu_directory.db and SLSU-campus-map.fig are intentionally committed.
+# The .db is a build artifact of `npm run db:init` (source: public/js/campus-data.js)
+# but is checked in so a fresh clone runs `npm start` without a build step.
+# Regenerate it with `npm run db:init` after editing campus-data.js.

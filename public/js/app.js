@@ -530,114 +530,14 @@ function clearActiveRoute() {
   activeRouteLayers = [];
 }
 
-function routeLengthUnits(points) {
-  let total = 0;
-  for (let i = 1; i < points.length; i++) {
-    total += Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]);
-  }
-  return total;
-}
-
-// The walking network, from js/walkpaths.js: the black lines drawn on the map.
-// Everything off those lines is a barrier, so a route travels along them and
-// only steps off at the very start and the very end.
-const NET = (() => {
-  const nodes = WALK_PATHS.nodes;
-  const adj = nodes.map(() => []);
-  WALK_PATHS.edges.forEach(([a, b]) => {
-    const w = Math.hypot(nodes[a][0] - nodes[b][0], nodes[a][1] - nodes[b][1]);
-    adj[a].push({ n: b, w });
-    adj[b].push({ n: a, w });
-  });
-  return { nodes: nodes, edges: WALK_PATHS.edges, adj: adj };
-})();
-
-// Closest point anywhere on the network to an arbitrary map position, together
-// with the edge it landed on so the router can splice into it.
-function projectOntoNetwork(pt) {
-  let best = null;
-  for (let e = 0; e < NET.edges.length; e++) {
-    const a = NET.edges[e][0], b = NET.edges[e][1];
-    const x1 = NET.nodes[a][0], y1 = NET.nodes[a][1];
-    const x2 = NET.nodes[b][0], y2 = NET.nodes[b][1];
-    const dx = x2 - x1, dy = y2 - y1;
-    const len2 = dx * dx + dy * dy;
-    let t = len2 ? ((pt[0] - x1) * dx + (pt[1] - y1) * dy) / len2 : 0;
-    t = t < 0 ? 0 : t > 1 ? 1 : t;
-    const cx = x1 + t * dx, cy = y1 + t * dy;
-    const d = Math.hypot(pt[0] - cx, pt[1] - cy);
-    if (!best || d < best.d) best = { d: d, e: e, a: a, b: b, p: [cx, cy] };
-  }
-  return best;
-}
-
-const dist2d = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]);
-
-/**
- * Waypoints from one map position to another, following the drawn paths.
- * The two endpoints are not included - drawRoute() adds them - but the points
- * where the route joins and leaves the network are.
- */
-function findWalkingPath(fromCoords, toCoords) {
-  const s = projectOntoNetwork(fromCoords);
-  const g = projectOntoNetwork(toCoords);
-  if (!s || !g) return [];
-  if (s.e === g.e) return [s.p, g.p];        // both on the same segment
-
-  // Splice the two projections in as temporary nodes so the search can start
-  // and finish partway along a segment rather than only at a drawn corner.
-  const N = NET.nodes.length, S = N, G = N + 1;
-  const adj = NET.adj.map(list => list.slice());
-  adj.push([], []);
-  const pos = i => (i === S ? s.p : i === G ? g.p : NET.nodes[i]);
-  const link = (i, j) => {
-    const w = dist2d(pos(i), pos(j));
-    adj[i].push({ n: j, w: w });
-    adj[j].push({ n: i, w: w });
-  };
-  link(S, s.a); link(S, s.b);
-  link(G, g.a); link(G, g.b);
-
-  // A* over a few hundred nodes, so a linear scan for the next node is faster
-  // than maintaining a heap and much easier to read.
-  const total = N + 2;
-  const gScore = new Float64Array(total).fill(Infinity);
-  const fScore = new Float64Array(total).fill(Infinity);
-  const from = new Int32Array(total).fill(-1);
-  const closed = new Uint8Array(total);
-  const open = new Set([S]);
-
-  gScore[S] = 0;
-  fScore[S] = dist2d(s.p, g.p);
-
-  while (open.size) {
-    let cur = -1, bestF = Infinity;
-    for (const n of open) if (fScore[n] < bestF) { bestF = fScore[n]; cur = n; }
-    if (cur === G) break;
-    open.delete(cur);
-    closed[cur] = 1;
-    for (const nb of adj[cur]) {
-      if (closed[nb.n]) continue;
-      const tentative = gScore[cur] + nb.w;
-      if (tentative < gScore[nb.n]) {
-        from[nb.n] = cur;
-        gScore[nb.n] = tentative;
-        fScore[nb.n] = tentative + dist2d(pos(nb.n), g.p);
-        open.add(nb.n);
-      }
-    }
-  }
-
-  if (from[G] === -1) return [];
-  const out = [];
-  for (let c = G; c !== -1; c = from[c]) out.push(pos(c));
-  return out.reverse();
-}
+// The walking router (network build + projection + A*) lives in js/routing.js so
+// the phone hand-off page can share it. `dist2d` is kept as a local alias.
+const dist2d = WalkRouting.dist;
 
 function drawRoute(destination) {
   clearActiveRoute();
 
-  const path = findWalkingPath(kioskCoords, destination.coords);
+  const path = WalkRouting.findPath(kioskCoords, destination.coords);
 
   if (!path.length) {
     inspector.innerText = '🧭 ' + destination.name + ' — no drawn path reaches it';
@@ -651,6 +551,8 @@ function drawRoute(destination) {
   const startGap = dist2d(kioskCoords, path[0]);
   const endGap = dist2d(path[path.length - 1], destination.coords);
 
+  // The short steps onto the path at the start and off it at the end. Only drawn
+  // when the endpoint is close enough to the network to be a real walk.
   [[kioskCoords, path[0], startGap],
    [path[path.length - 1], destination.coords, endGap]].forEach(hop => {
     if (hop[2] > 0.4 && hop[2] <= OFFPATH_LIMIT) {
@@ -665,7 +567,9 @@ function drawRoute(destination) {
   path.forEach(p => walked.push(p));
   if (endGap <= OFFPATH_LIMIT) walked.push(destination.coords);
 
-  const metres = Math.round(routeLengthUnits(walked));
+  // The map is ~320 units wide and the campus road loop is about 250 m across,
+  // which puts roughly one metre in one map unit.
+  const metres = Math.round(WalkRouting.lengthUnits(walked));
   let note = '🧭 ' + destination.name + ' — about ' + metres + ' m on foot';
   if (endGap > OFFPATH_LIMIT) {
     note += ', ending ' + Math.round(endGap) + ' m away at the nearest walkway';
@@ -700,6 +604,69 @@ recenterRoomBtn.addEventListener('click', () => {
 
 getDirectionsBtn.addEventListener('click', () => {
   if (activeSelectedLocation) drawRoute(activeSelectedLocation);
+});
+
+// --- phone hand-off (QR) ---
+// The kiosk asks the server where a phone should reach it, then encodes
+//   <publicUrl>/go/<slug>?from=<x>,<y>
+// so the phone opens a walking copy of this map with the same origin and pin.
+let kioskConfig = { publicUrl: '', wifiSsid: 'SLSU-Kiosk-Map' };
+fetch('api/config')
+  .then(r => r.json())
+  .then(cfg => {
+    kioskConfig = cfg;
+    const wifi = document.getElementById('qr-wifi-name');
+    if (wifi && cfg.wifiSsid) wifi.textContent = cfg.wifiSsid;
+  })
+  .catch(() => { /* offline dev / no server: button stays disabled below */ });
+
+const sendToPhoneBtn = document.getElementById('send-to-phone-btn');
+const qrOverlay = document.getElementById('qr-overlay');
+const qrCodeBox = document.getElementById('qr-code');
+
+// Prefer the phone-reachable address the server reports (the Wi-Fi AP IP);
+// fall back to this page's own origin when it is a real http(s) server.
+function handoffBase() {
+  if (kioskConfig.publicUrl) return kioskConfig.publicUrl.replace(/\/+$/, '');
+  if (location.protocol === 'http:' || location.protocol === 'https:') return location.origin;
+  return '';
+}
+
+function handoffUrl(loc) {
+  const from = kioskCoords[0] + ',' + kioskCoords[1];
+  return handoffBase() + '/go/' + encodeURIComponent(loc.id) + '?from=' + encodeURIComponent(from);
+}
+
+function openHandoff() {
+  if (!activeSelectedLocation) return;
+  const base = handoffBase();
+  const url = handoffUrl(activeSelectedLocation);
+
+  document.getElementById('qr-dest-name').textContent = activeSelectedLocation.name;
+  document.getElementById('qr-url').textContent = base
+    ? url
+    : 'Run the kiosk with “npm start” — the QR needs the local server.';
+
+  qrCodeBox.innerHTML = '';
+  if (base && typeof qrcode === 'function') {
+    const qr = qrcode(0, 'M');           // type 0 = auto-size, ECC level M
+    qr.addData(url);
+    qr.make();
+    qrCodeBox.innerHTML = qr.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+  }
+
+  qrOverlay.classList.remove('hidden');
+}
+
+function closeHandoff() {
+  qrOverlay.classList.add('hidden');
+}
+
+sendToPhoneBtn.addEventListener('click', openHandoff);
+document.getElementById('qr-close-btn').addEventListener('click', closeHandoff);
+qrOverlay.addEventListener('click', e => { if (e.target === qrOverlay) closeHandoff(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !qrOverlay.classList.contains('hidden')) closeHandoff();
 });
 
 setKioskBtn.addEventListener('click', () => {
@@ -792,9 +759,12 @@ document.getElementById('recenter-map-btn').addEventListener('click', () => {
   showTutorialView();
 });
 
-// Floor Button Toggles (2F / 3F layers are wired up separately)
+// Floor button toggles. Only the ground floor has a map layer today, so the 2F/3F
+// buttons are disabled in the markup; this handler keeps the active-state styling
+// working if/when upper-floor layers are added.
 document.querySelectorAll('.floor-btn').forEach(btn => {
   btn.addEventListener('click', () => {
+    if (btn.disabled) return;
     document.querySelectorAll('.floor-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   });
@@ -806,4 +776,7 @@ document.querySelectorAll('.floor-btn').forEach(btn => {
 
 renderMarkers();
 paintCategoryButtons();
-console.log('SLSU kiosk ready:', LOCATIONS.length, 'locations. No walking network defined.');
+console.log(
+  'SLSU kiosk ready:', LOCATIONS.length, 'locations,',
+  WalkRouting.nodeCount, 'walk-path nodes /', WalkRouting.edgeCount, 'edges.'
+);
