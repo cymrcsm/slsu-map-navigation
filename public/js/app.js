@@ -38,6 +38,7 @@ const PIN_ZOOM = 2.4;
 const MAX_ZOOM = 6.5;
 const READABLE_PX = 15;
 const MIN_ROOM_ZOOM = 3;  
+const OFFPATH_LIMIT = 1;
 
 function readableZoom(loc) {
   const h = loc && loc.textH > 0 ? loc.textH : 0.75;
@@ -119,7 +120,7 @@ const detailBadge = document.getElementById('detail-badge');
 const detailTitle = document.getElementById('detail-title');
 const detailBuilding = document.getElementById('detail-building');
 const detailFloor = document.getElementById('detail-floor');
-const detailHours = document.getElementById('detail-hours');
+const detailCenter = document.getElementById('detail-center');
 const detailDesc = document.getElementById('detail-desc');
 
 let activeSelectedLocation = null;
@@ -314,11 +315,9 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   }
 
   detailTitle.textContent = loc.name;
-  detailBuilding.textContent = loc.acronym
-    ? `${loc.building} · ${loc.acronym}`
-    : loc.building;
+  detailBuilding.textContent = loc.acronym || '';
   detailFloor.textContent = loc.floor;
-  detailHours.textContent = loc.hours;
+  detailCenter.textContent = loc.building === loc.name ? 'SLSU Main Campus' : loc.building;
   detailDesc.textContent = loc.description;
 
   // Coming from a category listing, "back" should return to that listing.
@@ -641,34 +640,45 @@ function drawRoute(destination) {
   const path = findWalkingPath(kioskCoords, destination.coords);
 
   if (!path.length) {
-    // Nothing on the network reaches it: show the direct line and say so.
-    activeRouteLayers.push(L.polyline([kioskCoords, destination.coords].map(toLeafletCoords), {
-      weight: 5, opacity: 0.95, className: 'route-line', lineCap: 'round', lineJoin: 'round'
-    }).addTo(map));
-    inspector.innerText = '🧭 ' + destination.name + ' — direct line, no path network reaches it';
-  } else {
-    // The stretch that runs along the drawn walk paths.
-    activeRouteLayers.push(L.polyline(path.map(toLeafletCoords), {
-      weight: 5, opacity: 0.95, className: 'route-line', lineCap: 'round', lineJoin: 'round'
-    }).addTo(map));
-
-    // The short steps onto the path at the start and off it at the end. Drawn
-    // lighter, because those are the only parts not on a drawn path.
-    [[kioskCoords, path[0]], [path[path.length - 1], destination.coords]].forEach(hop => {
-      if (dist2d(hop[0], hop[1]) > 0.4) {
-        activeRouteLayers.push(L.polyline(hop.map(toLeafletCoords), {
-          weight: 4, opacity: 0.9, className: 'route-connector', lineCap: 'round'
-        }).addTo(map));
-      }
-    });
-
-    // The map is 320 units wide and the campus road loop is about 250 m across,
-    // which puts roughly one metre in one map unit.
-    const metres = Math.round(routeLengthUnits([kioskCoords].concat(path, [destination.coords])));
-    inspector.innerText = '🧭 ' + destination.name + ' — about ' + metres + ' m on foot';
+    inspector.innerText = '🧭 ' + destination.name + ' — no drawn path reaches it';
+    return;
   }
 
-  map.fitBounds(L.featureGroup(activeRouteLayers).getBounds(), {
+  activeRouteLayers.push(L.polyline(path.map(toLeafletCoords), {
+    weight: 5, opacity: 0.95, className: 'route-line', lineCap: 'round', lineJoin: 'round'
+  }).addTo(map));
+
+  const startGap = dist2d(kioskCoords, path[0]);
+  const endGap = dist2d(path[path.length - 1], destination.coords);
+
+  [[kioskCoords, path[0], startGap],
+   [path[path.length - 1], destination.coords, endGap]].forEach(hop => {
+    if (hop[2] > 0.4 && hop[2] <= OFFPATH_LIMIT) {
+      activeRouteLayers.push(L.polyline([hop[0], hop[1]].map(toLeafletCoords), {
+        weight: 4, opacity: 0.9, className: 'route-connector', lineCap: 'round'
+      }).addTo(map));
+    }
+  });
+
+  const walked = [];
+  if (startGap <= OFFPATH_LIMIT) walked.push(kioskCoords);
+  path.forEach(p => walked.push(p));
+  if (endGap <= OFFPATH_LIMIT) walked.push(destination.coords);
+
+  const metres = Math.round(routeLengthUnits(walked));
+  let note = '🧭 ' + destination.name + ' — about ' + metres + ' m on foot';
+  if (endGap > OFFPATH_LIMIT) {
+    note += ', ending ' + Math.round(endGap) + ' m away at the nearest walkway';
+  }
+  if (startGap > OFFPATH_LIMIT) {
+    note += ' (kiosk is ' + Math.round(startGap) + ' m off the walkways)';
+  }
+  inspector.innerText = note;
+
+  const b = L.featureGroup(activeRouteLayers).getBounds()
+    .extend(toLeafletCoords(kioskCoords))
+    .extend(toLeafletCoords(destination.coords));
+  map.fitBounds(b, {
     padding: [70, 70], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 1
   });
 }

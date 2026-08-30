@@ -155,7 +155,6 @@ body, html {
 .cat-btn.active {
   border-width: 2px;
   padding: 8px 10px;
-  box-shadow: var(--card-shadow);
 }
 
 .cat-swatch {
@@ -546,7 +545,15 @@ body, html {
 }
 
 .row-icon {
-  font-size: 16px;
+  color: var(--primary-color);
+  display: flex;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.row-icon .icon {
+  width: 17px;
+  height: 17px;
 }
 
 .detail-row strong {

@@ -103,7 +103,7 @@ const LOCATIONS = [
    327
   ],
   "textH": 0.68,
-  "description": "Office of a recognised student organisation or council."
+  "description": "Office of a recognised student organization."
  },
  {
   "id": "archives-center",
@@ -573,7 +573,7 @@ const LOCATIONS = [
   "id": "chemistry-lab",
   "name": "Chemistry Lab",
   "acronym": "CL",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "laboratories"
   ],
@@ -1244,6 +1244,27 @@ const LOCATIONS = [
   "description": "Campus food outlet or commercial stall."
  },
  {
+  "id": "engineering-building",
+  "name": "Engineering Building",
+  "acronym": "EB",
+  "building": "Engineering Building",
+  "categories": [
+   "academic-departments",
+   "faculty-rooms",
+   "classrooms",
+   "laboratories",
+   "student-orgs"
+  ],
+  "floor": "Ground Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   92.5,
+   255.6
+  ],
+  "textH": 1.24,
+  "description": "Department or college office overseeing academic programs and faculty."
+ },
+ {
   "id": "faculty-of-criminal-justice-building",
   "name": "Faculty of Criminal Justice Building",
   "acronym": "FCJB",
@@ -1768,7 +1789,7 @@ const LOCATIONS = [
   "id": "hydraulics-lab",
   "name": "Hydraulics Lab",
   "acronym": "HL",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "laboratories"
   ],
@@ -2033,7 +2054,7 @@ const LOCATIONS = [
   "id": "innovation-assets-management-and-transfer-unit",
   "name": "Innovation Assets Management and Transfer Unit",
   "acronym": "IAMTU",
-  "building": "SLSU Main Campus",
+  "building": "Research, Innovation and Extension Services (RIES) Building",
   "categories": [
    "admin-offices",
    "auxiliary-services"
@@ -2046,6 +2067,27 @@ const LOCATIONS = [
   ],
   "textH": 0.56,
   "description": "Administrative office handling university operations and student transactions."
+ },
+ {
+  "id": "institute-of-arts-and-sciences-building",
+  "name": "Institute of Arts and Sciences Building",
+  "acronym": "IASB",
+  "building": "Institute of Arts and Sciences Building",
+  "categories": [
+   "academic-departments",
+   "faculty-rooms",
+   "classrooms",
+   "laboratories",
+   "student-orgs"
+  ],
+  "floor": "Ground Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   215.5,
+   264.2
+  ],
+  "textH": 1.24,
+  "description": "Department or college office overseeing academic programs and faculty."
  },
  {
   "id": "interrogation-room",
@@ -2510,7 +2552,7 @@ const LOCATIONS = [
   "id": "machineries",
   "name": "Machineries",
   "acronym": "",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "laboratories"
   ],
@@ -2561,7 +2603,7 @@ const LOCATIONS = [
   "id": "mecha-1",
   "name": "Mecha 1",
   "acronym": "MECHA1",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "laboratories"
   ],
@@ -2578,7 +2620,7 @@ const LOCATIONS = [
   "id": "mecha-2",
   "name": "Mecha 2",
   "acronym": "MECHA2",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "laboratories"
   ],
@@ -2864,7 +2906,7 @@ const LOCATIONS = [
   "id": "office-of-the-engineering-student-organization",
   "name": "Office of the Engineering Student Organization",
   "acronym": "OESO",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "student-orgs",
    "health-services",
@@ -2901,7 +2943,7 @@ const LOCATIONS = [
   "id": "office-of-the-pice-slsu-student-chapter",
   "name": "Office of the PICE SLSU Student Chapter",
   "acronym": "OPSSC",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "student-orgs",
    "health-services",
@@ -2955,7 +2997,7 @@ const LOCATIONS = [
   "id": "office-of-the-vice-president",
   "name": "Office of the Vice President",
   "acronym": "OVP",
-  "building": "SLSU Main Campus",
+  "building": "Research, Innovation and Extension Services (RIES) Building",
   "categories": [
    "admin-offices",
    "academic-departments",
@@ -3540,7 +3582,7 @@ const LOCATIONS = [
   "id": "physics-lab",
   "name": "Physics Lab",
   "acronym": "PL",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "laboratories"
   ],
@@ -3740,10 +3782,28 @@ const LOCATIONS = [
   "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
+  "id": "research-innovation-and-extension-services-building",
+  "name": "Research, Innovation and Extension Services (RIES) Building",
+  "acronym": "RIESB",
+  "building": "Research, Innovation and Extension Services (RIES) Building",
+  "categories": [
+   "admin-offices",
+   "auxiliary-services"
+  ],
+  "floor": "Ground Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   166.5,
+   235.5
+  ],
+  "textH": 1.24,
+  "description": "Administrative office handling university operations and student transactions."
+ },
+ {
   "id": "ries-ethics-and-review-services-ries-managemen",
   "name": "RIES Ethics and Review Services RIES Management Information Office RIES Communication Office RIES Knowledge Management Office",
   "acronym": "RIES",
-  "building": "SLSU Main Campus",
+  "building": "Research, Innovation and Extension Services (RIES) Building",
   "categories": [
    "admin-offices",
    "auxiliary-services"
@@ -3778,7 +3838,7 @@ const LOCATIONS = [
   "id": "room-e-101",
   "name": "Room E-101",
   "acronym": "RE",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "classrooms"
   ],
@@ -3795,7 +3855,7 @@ const LOCATIONS = [
   "id": "room-e-102",
   "name": "Room E-102",
   "acronym": "RE",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "classrooms"
   ],
@@ -3812,7 +3872,7 @@ const LOCATIONS = [
   "id": "room-e-103",
   "name": "Room E-103",
   "acronym": "RE",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "classrooms"
   ],
@@ -3829,7 +3889,7 @@ const LOCATIONS = [
   "id": "room-e-104",
   "name": "Room E-104",
   "acronym": "RE",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "classrooms"
   ],
