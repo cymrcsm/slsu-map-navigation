@@ -613,6 +613,111 @@ body, html {
   border-color: var(--map-stone-deep);
 }
 
+.danger-btn {
+  background: var(--surface-card);
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+}
+
+.danger-btn:hover {
+  background: var(--danger-color);
+  color: var(--map-paper);
+}
+
+#add-location-btn.active-placement {
+  background: var(--accent-color);
+  color: var(--map-ink);
+}
+
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.fld {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fld > span {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.fld input,
+.fld select {
+  width: 100%;
+  padding: 9px 11px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text-dark);
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.fld input:focus,
+.fld select:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+.fld input.invalid {
+  border-color: var(--danger-color);
+}
+
+.form-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 2px 0 0;
+}
+
+.form-hint.set {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.auth-row.hidden {
+  display: none;
+}
+
+.auth-row {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px;
+  border: 1px dashed var(--map-stone-deep);
+  border-radius: 10px;
+  background: var(--surface-hover);
+}
+
+.auth-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.auth-actions .action-btn {
+  padding: 9px;
+  font-size: 12px;
+}
+
+.form-msg {
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.form-msg.ok { color: var(--primary-color); font-weight: 600; }
+.form-msg.err { color: var(--danger-color); font-weight: 600; }
+
+.detail-actions .danger-btn { margin-top: 2px; }
+
 .map-container {
   flex: 1;
   height: 100vh;
@@ -678,6 +783,26 @@ body, html {
   background: var(--primary-strong);
   color: var(--map-paper);
 }
+
+#basemap-btn.active-basemap {
+  background: var(--primary-color);
+  color: var(--map-paper);
+}
+
+#basemap-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+  margin: 0 0 52px 8px !important;
+  background: rgba(254, 253, 249, 0.9);
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+
+.leaflet-control-attribution a { color: var(--primary-color); }
 
 #set-kiosk-btn.active-placement {
   background: var(--danger-color) !important;

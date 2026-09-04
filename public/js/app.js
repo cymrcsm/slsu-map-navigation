@@ -1,12 +1,12 @@
-const MAP_WIDTH = 320;
-const MAP_HEIGHT = 421;
+const MAP_WIDTH = FRAME.width;
+const MAP_HEIGHT = FRAME.height;
 
 function toLeafletCoords(xyCoords) {
-  return [MAP_HEIGHT - xyCoords[1], xyCoords[0]];
+  return svgToLatLng(xyCoords);
 }
 
 function fromLeafletCoords(latlng) {
-  return [latlng.lng, MAP_HEIGHT - latlng.lat];
+  return latLngToSvg(latlng);
 }
 
 const UNCATEGORISED_COLOR = '#7C736A';
@@ -26,40 +26,154 @@ const locationColor = loc => getCategoryColor(primaryCategory(loc));
 const inCategory = (loc, id) =>
   id === 'ALL' || (loc.categories && loc.categories.indexOf(id) !== -1);
 
+// campus-data.js is generated and never written to at runtime, so locations
+// added or removed from the kiosk are kept as a layer on top of it, in this
+// browser. PLACES is that combined view and is what the whole UI reads.
+const CUSTOM_KEY = 'kiosk_custom_locations';
+const REMOVED_KEY = 'kiosk_removed_locations';
+const ADMIN_CODE = '@dmin123';
+
+function readStoredList(key) {
+  try {
+    const v = JSON.parse(localStorage.getItem(key));
+    return Array.isArray(v) ? v : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+const MOVED_KEY = 'kiosk_moved_locations';
+
+function readStoredMap(key) {
+  try {
+    const v = JSON.parse(localStorage.getItem(key));
+    return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+  } catch (err) {
+    return {};
+  }
+}
+
+let customPlaces = readStoredList(CUSTOM_KEY);
+let removedIds = readStoredList(REMOVED_KEY);
+let movedCoords = readStoredMap(MOVED_KEY);
+
+function buildPlaces() {
+  const gone = new Set(removedIds);
+  const base = LOCATIONS.filter(l => !gone.has(l.id));
+  // Written onto the same objects rather than copies, so markers and the open
+  // detail panel keep pointing at the entry they already hold.
+  base.forEach(l => {
+    const m = movedCoords[l.id];
+    if (Array.isArray(m) && m.length === 2) l.coords = m.slice();
+  });
+  return base.concat(customPlaces);
+}
+
+let PLACES = buildPlaces();
+
+function persistPlaces() {
+  try {
+    localStorage.setItem(CUSTOM_KEY, JSON.stringify(customPlaces));
+    localStorage.setItem(REMOVED_KEY, JSON.stringify(removedIds));
+    localStorage.setItem(MOVED_KEY, JSON.stringify(movedCoords));
+    return true;
+  } catch (err) {
+    return false;      // private browsing: the session still works, it just will not survive a reload
+  }
+}
+
 // ==========================================
 // 4. LEAFLET MAP INITIALIZATION
 // ==========================================
 
-const bounds = [[0, 0], [MAP_HEIGHT, MAP_WIDTH]];
-const ZOOM_FLOOR = 0.5;   
-const ROUTE_MAX_ZOOM = 4; 
-const FIT_PADDING = 16;   
-const PIN_ZOOM = 2.4;    
-const MAX_ZOOM = 6.5;
+const ZOOM_FLOOR = 0.5 + GEO_ZOOM_SHIFT;
+const ROUTE_MAX_ZOOM = 4 + GEO_ZOOM_SHIFT;
+const FIT_PADDING = 16;
+const PIN_ZOOM = 2.4 + GEO_ZOOM_SHIFT;
+const MAX_ZOOM = 6.5 + GEO_ZOOM_SHIFT;
 const READABLE_PX = 15;
-const MIN_ROOM_ZOOM = 3;  
+const MIN_ROOM_ZOOM = 3 + GEO_ZOOM_SHIFT;
 const OFFPATH_LIMIT = 1;
+
+// The drawing is opaque, so it would hide the street map completely. Easing it
+// back while the basemap is on lets the surrounding roads read through.
+const OVERLAY_OPACITY_OVER_BASEMAP = 0.85;
 
 function readableZoom(loc) {
   const h = loc && loc.textH > 0 ? loc.textH : 0.75;
-  return Math.min(MAX_ZOOM, Math.max(MIN_ROOM_ZOOM, Math.log2(READABLE_PX / h)));
+  return Math.min(MAX_ZOOM,
+    Math.max(MIN_ROOM_ZOOM, Math.log2(READABLE_PX / h) + GEO_ZOOM_SHIFT));
 }
 const OVERVIEW_SCALE = 1.25;
 
 const map = L.map('map', {
-  crs: L.CRS.Simple,
   minZoom: ZOOM_FLOOR,
   maxZoom: MAX_ZOOM,
-  zoomSnap: 0,      
-  zoomDelta: 0.5,  
+  zoomSnap: 0,
+  zoomDelta: 0.5,
   wheelPxPerZoomLevel: 120,
-  maxBounds: bounds,
   maxBoundsViscosity: 1.0,
   zoomControl: false,
   attributionControl: false
 });
 
-L.imageOverlay('assets/groundFloor_layer.svg', bounds).addTo(map);
+// A layer cannot be added before the map has a centre, so seed the view here
+// and let autoCenterCampus() refine it once the panes exist.
+map.setView(svgToLatLng([MAP_WIDTH / 2, MAP_HEIGHT / 2]), 18, { animate: false });
+
+// OpenStreetMap requires visible credit wherever its tiles are shown.
+L.control.attribution({ position: 'bottomleft', prefix: false }).addTo(map);
+
+const basemapBtn = document.getElementById('basemap-btn');
+
+const basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxNativeZoom: 19,
+  maxZoom: MAX_ZOOM,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
+
+const campusOverlay = new GeoImageOverlay('assets/groundFloor_layer.svg', {
+  canvasWidth: MAP_WIDTH,
+  canvasHeight: MAP_HEIGHT,
+  bearingDeg: GEOREF.bearingDeg,
+  className: 'campus-overlay'
+});
+
+const bounds = campusOverlay.getBounds();
+map.setMaxBounds(bounds.pad(0.25));
+
+let basemapVisible = false;
+let basemapUsable = true;
+let tilesSeen = 0;
+let tileFailures = 0;
+
+function applyBasemap(on) {
+  basemapVisible = on;
+  if (on) { basemap.addTo(map); } else if (map.hasLayer(basemap)) { map.removeLayer(basemap); }
+  campusOverlay.setOpacity(on ? OVERLAY_OPACITY_OVER_BASEMAP : 1);
+  if (basemapBtn) {
+    basemapBtn.classList.toggle('active-basemap', on);
+    basemapBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+}
+
+// Nothing has ever loaded and a screenful of tiles has failed: there is no
+// network, so retire the basemap rather than leave grey holes under the map.
+basemap.on('tileload', () => { tilesSeen++; });
+basemap.on('tileerror', () => {
+  tileFailures++;
+  if (tilesSeen === 0 && tileFailures >= 6 && basemapUsable) {
+    basemapUsable = false;
+    applyBasemap(false);
+    if (basemapBtn) {
+      basemapBtn.disabled = true;
+      basemapBtn.title = 'Street map unavailable offline';
+    }
+  }
+});
+
+campusOverlay.addTo(map);
+applyBasemap(true);
 
 const CAMPUS_CENTER = toLeafletCoords([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
 
@@ -68,7 +182,7 @@ function overviewZoom() {
   const usableX = Math.max(1, size.x - FIT_PADDING * 2);
   const usableY = Math.max(1, size.y - FIT_PADDING * 2);
   const scale = Math.min(usableX / MAP_WIDTH, usableY / MAP_HEIGHT) * OVERVIEW_SCALE;
-  return Math.max(ZOOM_FLOOR, Math.log2(scale));
+  return Math.max(ZOOM_FLOOR, Math.log2(scale) + GEO_ZOOM_SHIFT);
 }
 
 function autoCenterCampus(animate = true) {
@@ -121,7 +235,7 @@ const detailTitle = document.getElementById('detail-title');
 const detailBuilding = document.getElementById('detail-building');
 const detailFloor = document.getElementById('detail-floor');
 const detailCenter = document.getElementById('detail-center');
-const detailDesc = document.getElementById('detail-desc');
+const detailCoords = document.getElementById('detail-coords');
 
 let activeSelectedLocation = null;
 let activeRouteLayers = [];
@@ -172,12 +286,17 @@ renderKioskMarker();
 // 7. CATEGORY BUTTONS
 // ==========================================
 
-const categoryCounts = {};
-LOCATIONS.forEach(l => (l.categories || []).forEach(id => {
-  categoryCounts[id] = (categoryCounts[id] || 0) + 1;
-}));
+let categoryCounts = {};
 
-const countFor = id => (id === 'ALL' ? LOCATIONS.length : (categoryCounts[id] || 0));
+function recountCategories() {
+  categoryCounts = {};
+  PLACES.forEach(l => (l.categories || []).forEach(id => {
+    categoryCounts[id] = (categoryCounts[id] || 0) + 1;
+  }));
+}
+recountCategories();
+
+const countFor = id => (id === 'ALL' ? PLACES.length : (categoryCounts[id] || 0));
 
 const categoryButtons = new Map();  
 
@@ -246,21 +365,26 @@ function iconFor(category, big) {
 let bigPins = map.getZoom() >= PIN_ZOOM;
 const markerFor = new Map();   // location id -> L.Marker
 
-LOCATIONS.forEach(loc => {
+function createMarker(loc) {
   const marker = L.marker(toLeafletCoords(loc.coords), {
     icon: iconFor(primaryCategory(loc), bigPins),
     title: loc.acronym ? `${loc.name} (${loc.acronym})` : loc.name,
     riseOnHover: true
   });
-  marker.on('click', () => showLocationDetails(loc));
+  marker.on('click', () => {
+    showLocationDetails(PLACES.find(p => p.id === loc.id) || loc);
+  });
   markerFor.set(loc.id, marker);
-});
+  return marker;
+}
 
-let visibleIds = new Set(LOCATIONS.map(l => l.id));
+PLACES.forEach(createMarker);
+
+let visibleIds = new Set(PLACES.map(l => l.id));
 
 function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
   const q = searchQuery.trim().toLowerCase();
-  const matches = LOCATIONS.filter(loc => {
+  const matches = PLACES.filter(loc => {
     if (!inCategory(loc, selectedCategory)) return false;
     if (!q) return true;
     return loc.name.toLowerCase().includes(q) ||
@@ -279,7 +403,7 @@ map.on('zoomend', () => {
   const want = map.getZoom() >= PIN_ZOOM;
   if (want === bigPins) return;
   bigPins = want;
-  LOCATIONS.forEach(loc => {
+  PLACES.forEach(loc => {
     if (visibleIds.has(loc.id)) markerFor.get(loc.id).setIcon(iconFor(primaryCategory(loc), bigPins));
   });
 });
@@ -318,7 +442,10 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   detailBuilding.textContent = loc.acronym || '';
   detailFloor.textContent = loc.floor;
   detailCenter.textContent = loc.building === loc.name ? 'SLSU Main Campus' : loc.building;
-  detailDesc.textContent = loc.description;
+  const ll = svgToLatLng(loc.coords);
+  detailCoords.textContent = ll[0].toFixed(6) + ', ' + ll[1].toFixed(6);
+  resetRemovePrompt();
+  resetMovePrompt();
 
   // Coming from a category listing, "back" should return to that listing.
   backToTutorialBtn.textContent = activeCategory === 'ALL'
@@ -331,7 +458,7 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
 
 // Only one of the three left-panel views is visible at a time.
 function showPanel(view) {
-  [tutorialView, categoryView, detailView].forEach(v => v.classList.toggle('hidden', v !== view));
+  [tutorialView, categoryView, detailView, addView].forEach(v => v.classList.toggle('hidden', v !== view));
   panelBody.scrollTop = 0;
 }
 
@@ -436,7 +563,7 @@ function searchLocations(query, category = 'ALL', limit = Infinity) {
   const q = query.trim().toLowerCase();
   if (!q) return [];
   const scored = [];
-  for (const loc of LOCATIONS) {
+  for (const loc of PLACES) {
     if (!inCategory(loc, category)) continue;
     const s = scoreMatch(loc, q);
     if (s >= 0) scored.push({ loc, s });
@@ -665,13 +792,13 @@ function drawRoute(destination) {
   path.forEach(p => walked.push(p));
   if (endGap <= OFFPATH_LIMIT) walked.push(destination.coords);
 
-  const metres = Math.round(routeLengthUnits(walked));
+  const metres = Math.round(routeLengthUnits(walked) * GEOREF.metresPerUnit);
   let note = '🧭 ' + destination.name + ' — about ' + metres + ' m on foot';
   if (endGap > OFFPATH_LIMIT) {
-    note += ', ending ' + Math.round(endGap) + ' m away at the nearest walkway';
+    note += ', ending ' + Math.round(endGap * GEOREF.metresPerUnit) + ' m away at the nearest walkway';
   }
   if (startGap > OFFPATH_LIMIT) {
-    note += ' (kiosk is ' + Math.round(startGap) + ' m off the walkways)';
+    note += ' (kiosk is ' + Math.round(startGap * GEOREF.metresPerUnit) + ' m off the walkways)';
   }
   inspector.innerText = note;
 
@@ -697,6 +824,13 @@ recenterRoomBtn.addEventListener('click', () => {
     map.flyTo(toLeafletCoords(activeSelectedLocation.coords), z, { animate: true });
   }
 });
+
+if (basemapBtn) {
+  basemapBtn.addEventListener('click', () => {
+    if (!basemapUsable) return;
+    applyBasemap(!basemapVisible);
+  });
+}
 
 getDirectionsBtn.addEventListener('click', () => {
   if (activeSelectedLocation) drawRoute(activeSelectedLocation);
@@ -728,6 +862,30 @@ map.on('click', (e) => {
     setKioskBtn.classList.remove('active-placement');
     inspector.innerText = `✔ Kiosk position updated to: [${x}, ${y}]`;
     if (activeRouteLayers.length && activeSelectedLocation) drawRoute(activeSelectedLocation);
+    return;
+  }
+
+  if (isMovingSpot) {
+    pendingMove = [x, y];
+    isMovingSpot = false;
+    moveLocationBtn.classList.remove('active-placement');
+    moveAuth.classList.remove('hidden');
+    moveCode.value = '';
+    moveCode.focus();
+    const mll = svgToLatLng(pendingMove);
+    say(moveMsg, 'New spot ' + mll[0].toFixed(6) + ', ' + mll[1].toFixed(6) +
+                 ' - enter the code to save it.');
+    inspector.innerText = `New position picked: [${x}, ${y}]`;
+    return;
+  }
+
+  if (isPickingSpot) {
+    pendingSpot = [x, y];
+    isPickingSpot = false;
+    pickSpotBtn.classList.remove('active-placement');
+    addLocationBtn.classList.remove('active-placement');
+    showPendingSpot();
+    inspector.innerText = `✔ New location spot set to: [${x}, ${y}]`;
     return;
   }
 
@@ -806,4 +964,314 @@ document.querySelectorAll('.floor-btn').forEach(btn => {
 
 renderMarkers();
 paintCategoryButtons();
-console.log('SLSU kiosk ready:', LOCATIONS.length, 'locations. No walking network defined.');
+console.log('SLSU kiosk ready:', PLACES.length, 'locations. No walking network defined.');
+
+// ==========================================
+// 14. ADD AND REMOVE PINNED LOCATIONS
+// ==========================================
+
+const addView = document.getElementById('add-view');
+const addLocationBtn = document.getElementById('add-location-btn');
+const backFromAddBtn = document.getElementById('back-from-add-btn');
+const addName = document.getElementById('add-name');
+const addFloor = document.getElementById('add-floor');
+const addBuilding = document.getElementById('add-building');
+const buildingOptions = document.getElementById('building-options');
+const pickSpotBtn = document.getElementById('pick-spot-btn');
+const addCoordsEl = document.getElementById('add-coords');
+const addSubmitBtn = document.getElementById('add-submit-btn');
+const addAuth = document.getElementById('add-auth');
+const addCode = document.getElementById('add-code');
+const addConfirmBtn = document.getElementById('add-confirm-btn');
+const addCancelBtn = document.getElementById('add-cancel-btn');
+const addMsg = document.getElementById('add-msg');
+
+const removeLocationBtn = document.getElementById('remove-location-btn');
+const removeAuth = document.getElementById('remove-auth');
+const removeCode = document.getElementById('remove-code');
+const removeConfirmBtn = document.getElementById('remove-confirm-btn');
+const removeCancelBtn = document.getElementById('remove-cancel-btn');
+const removeMsg = document.getElementById('remove-msg');
+
+let isPickingSpot = false;
+let pendingSpot = null;
+
+function say(el, text, kind) {
+  el.textContent = text;
+  el.className = 'form-msg' + (kind ? ' ' + kind : '');
+}
+
+function refreshCategoryCounts() {
+  recountCategories();
+  categoryButtons.forEach((btn, id) => {
+    const c = btn.querySelector('.cat-count');
+    if (c) c.textContent = countFor(id);
+  });
+}
+
+function refreshBuildingOptions() {
+  const names = [...new Set(PLACES.map(l => l.building).filter(Boolean))].sort();
+  buildingOptions.innerHTML = '';
+  names.forEach(n => {
+    const o = document.createElement('option');
+    o.value = n;
+    buildingOptions.appendChild(o);
+  });
+}
+refreshBuildingOptions();
+
+function showPendingSpot() {
+  if (!pendingSpot) {
+    addCoordsEl.textContent = 'No spot chosen yet';
+    addCoordsEl.className = 'form-hint';
+    return;
+  }
+  const ll = svgToLatLng(pendingSpot);
+  addCoordsEl.textContent = 'Chosen: ' + ll[0].toFixed(6) + ', ' + ll[1].toFixed(6);
+  addCoordsEl.className = 'form-hint set';
+}
+
+function stopPicking() {
+  isPickingSpot = false;
+  pickSpotBtn.classList.remove('active-placement');
+  addLocationBtn.classList.remove('active-placement');
+}
+
+function resetAddForm() {
+  addName.value = '';
+  addFloor.selectedIndex = 0;
+  addBuilding.value = '';
+  addName.classList.remove('invalid');
+  pendingSpot = null;
+  showPendingSpot();
+  addAuth.classList.add('hidden');
+  addCode.value = '';
+  say(addMsg, '');
+  stopPicking();
+}
+
+function resetRemovePrompt() {
+  if (!removeAuth) return;
+  removeAuth.classList.add('hidden');
+  removeCode.value = '';
+  say(removeMsg, '');
+}
+
+// Placing a pin needs the map, so arming the picker also opens the form view.
+addLocationBtn.addEventListener('click', () => {
+  if (addView.classList.contains('hidden')) {
+    resetAddForm();
+    refreshBuildingOptions();
+    showPanel(addView);
+    addName.focus();
+  } else {
+    showTutorialView();
+  }
+});
+
+backFromAddBtn.addEventListener('click', () => {
+  stopPicking();
+  showTutorialView();
+});
+
+pickSpotBtn.addEventListener('click', () => {
+  isPickingSpot = !isPickingSpot;
+  if (isSettingKioskLocation) {
+    isSettingKioskLocation = false;
+    setKioskBtn.classList.remove('active-placement');
+  }
+  if (isMovingSpot) { isMovingSpot = false; moveLocationBtn.classList.remove('active-placement'); }
+  pickSpotBtn.classList.toggle('active-placement', isPickingSpot);
+  addLocationBtn.classList.toggle('active-placement', isPickingSpot);
+  inspector.innerText = isPickingSpot
+    ? '📍 Click anywhere on the map to place the new location.'
+    : 'Click map to log coordinates';
+});
+
+function slugFor(name) {
+  const base = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'location';
+  let slug = base, n = 2;
+  const taken = new Set(PLACES.map(l => l.id));
+  while (taken.has(slug)) slug = base + '-' + n++;
+  return slug;
+}
+
+function validateAdd() {
+  const name = addName.value.trim();
+  addName.classList.toggle('invalid', !name);
+  if (!name) { say(addMsg, 'Give the location a name.', 'err'); addName.focus(); return null; }
+  if (!pendingSpot) { say(addMsg, 'Pick the spot on the map first.', 'err'); return null; }
+  return {
+    id: slugFor(name),
+    name: name,
+    acronym: '',
+    building: addBuilding.value.trim() || 'SLSU Main Campus',
+    categories: [],
+    floor: addFloor.value,
+    hours: '',
+    coords: pendingSpot.slice(),
+    description: '',
+    custom: true
+  };
+}
+
+addSubmitBtn.addEventListener('click', () => {
+  if (!validateAdd()) return;
+  say(addMsg, '');
+  addAuth.classList.remove('hidden');
+  addCode.value = '';
+  addCode.focus();
+});
+
+addCancelBtn.addEventListener('click', () => {
+  addAuth.classList.add('hidden');
+  addCode.value = '';
+  say(addMsg, '');
+});
+
+addConfirmBtn.addEventListener('click', () => {
+  if (addCode.value !== ADMIN_CODE) {
+    say(addMsg, 'Wrong authorization code.', 'err');
+    addCode.value = '';
+    addCode.focus();
+    return;
+  }
+  const place = validateAdd();
+  if (!place) { addAuth.classList.add('hidden'); return; }
+
+  customPlaces.push(place);
+  PLACES = buildPlaces();
+  createMarker(place);
+  const stored = persistPlaces();
+  refreshCategoryCounts();
+  refreshBuildingOptions();
+  renderMarkers(activeCategory, searchInput.value);
+
+  resetAddForm();
+  showLocationDetails(place);
+  inspector.innerText = '✔ Added "' + place.name + '"' +
+    (stored ? '' : ' (could not be saved for next time)');
+});
+
+addCode.addEventListener('keydown', e => { if (e.key === 'Enter') addConfirmBtn.click(); });
+
+removeLocationBtn.addEventListener('click', () => {
+  if (!activeSelectedLocation) return;
+  removeAuth.classList.remove('hidden');
+  removeCode.value = '';
+  removeCode.focus();
+  say(removeMsg, 'Removing "' + activeSelectedLocation.name + '".');
+});
+
+removeCancelBtn.addEventListener('click', resetRemovePrompt);
+
+removeConfirmBtn.addEventListener('click', () => {
+  const loc = activeSelectedLocation;
+  if (!loc) return;
+  if (removeCode.value !== ADMIN_CODE) {
+    say(removeMsg, 'Wrong authorization code.', 'err');
+    removeCode.value = '';
+    removeCode.focus();
+    return;
+  }
+
+  if (customPlaces.some(p => p.id === loc.id)) {
+    customPlaces = customPlaces.filter(p => p.id !== loc.id);
+  } else if (removedIds.indexOf(loc.id) === -1) {
+    removedIds.push(loc.id);
+  }
+  PLACES = buildPlaces();
+
+  const marker = markerFor.get(loc.id);
+  if (marker) { markerLayer.removeLayer(marker); markerFor.delete(loc.id); }
+  persistPlaces();
+  refreshCategoryCounts();
+  refreshBuildingOptions();
+  renderMarkers(activeCategory, searchInput.value);
+
+  resetRemovePrompt();
+  showTutorialView();
+  inspector.innerText = '✔ Removed "' + loc.name + '"';
+});
+
+removeCode.addEventListener('keydown', e => { if (e.key === 'Enter') removeConfirmBtn.click(); });
+
+// ==========================================
+// 15. MOVE A PINNED LOCATION
+// ==========================================
+
+const moveLocationBtn = document.getElementById('move-location-btn');
+const moveAuth = document.getElementById('move-auth');
+const moveCode = document.getElementById('move-code');
+const moveConfirmBtn = document.getElementById('move-confirm-btn');
+const moveCancelBtn = document.getElementById('move-cancel-btn');
+const moveMsg = document.getElementById('move-msg');
+
+let isMovingSpot = false;
+let pendingMove = null;
+
+function resetMovePrompt() {
+  if (!moveAuth) return;
+  isMovingSpot = false;
+  pendingMove = null;
+  moveAuth.classList.add('hidden');
+  moveCode.value = '';
+  moveLocationBtn.classList.remove('active-placement');
+  say(moveMsg, '');
+}
+
+moveLocationBtn.addEventListener('click', () => {
+  if (!activeSelectedLocation) return;
+  if (isMovingSpot) { resetMovePrompt(); inspector.innerText = 'Click map to log coordinates'; return; }
+
+  if (isSettingKioskLocation) {
+    isSettingKioskLocation = false;
+    setKioskBtn.classList.remove('active-placement');
+  }
+  stopPicking();
+
+  isMovingSpot = true;
+  pendingMove = null;
+  moveAuth.classList.add('hidden');
+  moveLocationBtn.classList.add('active-placement');
+  say(moveMsg, 'Click the map to place "' + activeSelectedLocation.name + '".');
+  inspector.innerText = '📍 Click anywhere on the map to move "' + activeSelectedLocation.name + '".';
+});
+
+moveCancelBtn.addEventListener('click', () => {
+  resetMovePrompt();
+  inspector.innerText = 'Click map to log coordinates';
+});
+
+moveConfirmBtn.addEventListener('click', () => {
+  const loc = activeSelectedLocation;
+  if (!loc || !pendingMove) return;
+  if (moveCode.value !== ADMIN_CODE) {
+    say(moveMsg, 'Wrong authorization code.', 'err');
+    moveCode.value = '';
+    moveCode.focus();
+    return;
+  }
+
+  const xy = pendingMove.slice();
+  const custom = customPlaces.find(p => p.id === loc.id);
+  if (custom) custom.coords = xy.slice();
+  else movedCoords[loc.id] = xy.slice();
+
+  PLACES = buildPlaces();
+  const current = PLACES.find(p => p.id === loc.id);
+  if (current) current.coords = xy.slice();
+
+  const marker = markerFor.get(loc.id);
+  if (marker) marker.setLatLng(toLeafletCoords(xy));
+  const stored = persistPlaces();
+  renderMarkers(activeCategory, searchInput.value);
+
+  resetMovePrompt();
+  showLocationDetails(current || loc, map.getZoom());
+  if (activeRouteLayers.length) drawRoute(current || loc);
+  inspector.innerText = '✔ Moved "' + loc.name + '" to [' + xy[0] + ', ' + xy[1] + ']' +
+    (stored ? '' : ' (could not be saved for next time)');
+});
+
+moveCode.addEventListener('keydown', e => { if (e.key === 'Enter') moveConfirmBtn.click(); });

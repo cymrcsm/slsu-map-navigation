@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>SLSU Campus Navigation Kiosk</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -115,8 +115,8 @@
             <div class="detail-row">
               <span class="row-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 17.75C12.4142 17.75 12.75 17.4142 12.75 17V11C12.75 10.5858 12.4142 10.25 12 10.25C11.5858 10.25 11.25 10.5858 11.25 11V17C11.25 17.4142 11.5858 17.75 12 17.75Z" fill="currentColor"></path><path d="M12 7C12.5523 7 13 7.44772 13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12ZM12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 6.89137 17.1086 2.75 12 2.75Z" fill="currentColor"></path></svg></span>
               <div>
-                <strong>Description &amp; Services</strong>
-                <p id="detail-desc">Details and services provided.</p>
+                <strong>OpenStreetMap Coordinates</strong>
+                <p id="detail-coords">&mdash;</p>
               </div>
             </div>
           </div>
@@ -124,6 +124,79 @@
           <div class="detail-actions">
             <button id="get-directions-btn" class="action-btn directions-btn">🧭 Ask for Directions</button>
             <button id="recenter-room-btn" class="action-btn secondary-btn">Focus on Map</button>
+            <button id="move-location-btn" class="action-btn secondary-btn">Change position</button>
+
+            <div id="move-auth" class="auth-row hidden">
+              <label class="fld"><span>Authorization code</span>
+                <input type="password" id="move-code" placeholder="Required to move" autocomplete="off">
+              </label>
+              <div class="auth-actions">
+                <button type="button" id="move-confirm-btn" class="action-btn directions-btn">Confirm</button>
+                <button type="button" id="move-cancel-btn" class="action-btn secondary-btn">Cancel</button>
+              </div>
+            </div>
+            <p id="move-msg" class="form-msg"></p>
+
+            <button id="remove-location-btn" class="action-btn danger-btn">Remove this location</button>
+
+            <div id="remove-auth" class="auth-row hidden">
+              <label class="fld"><span>Authorization code</span>
+                <input type="password" id="remove-code" placeholder="Required to remove" autocomplete="off">
+              </label>
+              <div class="auth-actions">
+                <button type="button" id="remove-confirm-btn" class="action-btn danger-btn">Confirm</button>
+                <button type="button" id="remove-cancel-btn" class="action-btn secondary-btn">Cancel</button>
+              </div>
+            </div>
+            <p id="remove-msg" class="form-msg"></p>
+          </div>
+        </div>
+
+        <!-- 4. ADD VIEW: CREATE A NEW PINNED LOCATION -->
+        <div id="add-view" class="info-view hidden">
+          <button id="back-from-add-btn" class="back-btn">&larr; Back</button>
+          <div class="panel-section-label">Add Location</div>
+          <div class="category-view-header">
+            <h3>New pinned location</h3>
+            <p>Fill in the details, pick its spot on the map, then save.</p>
+          </div>
+
+          <div class="add-form">
+            <label class="fld"><span>Name</span>
+              <input type="text" id="add-name" placeholder="e.g. Registrar Annex" autocomplete="off">
+            </label>
+
+            <label class="fld"><span>Floor level</span>
+              <select id="add-floor">
+                <option>Ground Floor</option>
+                <option>2nd Floor</option>
+                <option>3rd Floor</option>
+              </select>
+            </label>
+
+            <label class="fld"><span>Building / Center</span>
+              <input type="text" id="add-building" list="building-options" placeholder="SLSU Main Campus" autocomplete="off">
+              <datalist id="building-options"></datalist>
+            </label>
+
+            <div class="fld">
+              <span>Location on map</span>
+              <button type="button" id="pick-spot-btn" class="action-btn secondary-btn">Click map to set location</button>
+              <p id="add-coords" class="form-hint">No spot chosen yet</p>
+            </div>
+
+            <button type="button" id="add-submit-btn" class="action-btn directions-btn">Add New Location</button>
+
+            <div id="add-auth" class="auth-row hidden">
+              <label class="fld"><span>Authorization code</span>
+                <input type="password" id="add-code" placeholder="Required to add" autocomplete="off">
+              </label>
+              <div class="auth-actions">
+                <button type="button" id="add-confirm-btn" class="action-btn directions-btn">Confirm</button>
+                <button type="button" id="add-cancel-btn" class="action-btn secondary-btn">Cancel</button>
+              </div>
+            </div>
+            <p id="add-msg" class="form-msg"></p>
           </div>
         </div>
 
@@ -135,8 +208,20 @@
 
       <div class="map-controls">
         <div class="ctrl-group">
+          <button id="add-location-btn" class="ctrl-btn" title="Add a pinned location" aria-label="Add a pinned location" aria-pressed="false">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.25" stroke="currentColor" stroke-width="1.5"/><path d="M12 7.75V16.25M7.75 12H16.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="ctrl-group">
           <button id="set-kiosk-btn" class="ctrl-btn" title="Set Current Kiosk Position" aria-label="Set current kiosk position">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><line x1="12" y1="21.6666" x2="12" y2="16.3333" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/><path d="M 19 16.3333 c -0.1187 -0.932 -0.424 -2.3467 -1.292 -3.8333 -0.4467 -0.7653 -0.9373 -1.3707 -1.3747 -1.8333 V 5 c 0 -1.4733 -1.1933 -2.6667 -2.6667 -2.6667 h -3.3333 c -1.4733 0 -2.6667 1.1933 -2.6667 2.6667 v 5.6667 c -0.4387 0.4627 -0.9293 1.068 -1.3747 1.8333 -0.8667 1.4867 -1.1733 2.9013 -1.292 3.8333 H 19 Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/></svg>
+          </button>
+        </div>
+
+        <div class="ctrl-group">
+          <button id="basemap-btn" class="ctrl-btn" title="Toggle street map" aria-label="Toggle street map" aria-pressed="true">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.25" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="4.1" ry="9.25" stroke="currentColor" stroke-width="1.5"/><path d="M3.1 8.9h17.8M3.1 15.1h17.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </button>
         </div>
 
@@ -173,7 +258,9 @@
 
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="js/georef.js"></script>
+  <script src="js/geo-overlay.js"></script>
   <script src="js/campus-data.js"></script>
   <script src="js/walkpaths.js"></script>
   <script src="js/app.js"></script>

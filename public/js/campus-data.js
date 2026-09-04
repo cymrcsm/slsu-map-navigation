@@ -99,8 +99,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   107.5,
-   327
+   92.8,
+   438.6
   ],
   "textH": 0.68,
   "description": "Office of a recognised student organization."
@@ -116,8 +116,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   188,
-   340.4
+   204.7,
+   459.1
   ],
   "textH": 0.75,
   "description": "Records, storage and supply area maintained by the university."
@@ -134,8 +134,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   103.4,
-   342.6
+   84.2,
+   459.3
   ],
   "textH": 0.73,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -152,8 +152,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   115.5,
-   342.6
+   100,
+   459.4
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -170,8 +170,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   115.5,
-   340
+   100,
+   457.4
   ],
   "textH": 0.73,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -188,8 +188,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   121.4,
-   342.6
+   108.1,
+   459.4
   ],
   "textH": 0.74,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -205,8 +205,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   134.3,
-   228.9
+   144.6,
+   339.4
   ],
   "textH": 0.58,
   "description": "Campus food outlet or commercial stall."
@@ -222,8 +222,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   189,
-   245
+   202.4,
+   351.9
   ],
   "textH": 0.7,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -239,8 +239,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   196,
-   245
+   211.4,
+   351.9
   ],
   "textH": 0.7,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -256,8 +256,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   204,
-   245
+   220.1,
+   351.9
   ],
   "textH": 0.7,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -273,8 +273,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   211.4,
-   245
+   229.1,
+   351.9
   ],
   "textH": 0.7,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -290,8 +290,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   211.4,
-   283.4
+   229.6,
+   390
   ],
   "textH": 0.7,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -307,8 +307,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   205,
-   283.4
+   221.8,
+   390
   ],
   "textH": 0.7,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -324,8 +324,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   194,
-   283.4
+   208.7,
+   390
   ],
   "textH": 0.7,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -341,8 +341,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   188,
-   283.4
+   201.4,
+   390.2
   ],
   "textH": 0.7,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -358,8 +358,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   87,
-   121
+   88.4,
+   145.8
   ],
   "textH": 1.16,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -376,8 +376,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   138.7,
-   239
+   152.5,
+   351.6
   ],
   "textH": 0.73,
   "description": "Auxiliary unit or community service provided by the university."
@@ -394,8 +394,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   61,
-   158.5
+   43.7,
+   209.1
   ],
   "textH": 0.71,
   "description": "Security post, campus gate or military training headquarters."
@@ -411,8 +411,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   144.4,
-   157.8
+   148.1,
+   204.3
   ],
   "textH": 0.76,
   "description": "Sports ground or recreation facility open to students and staff."
@@ -428,8 +428,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   115.8,
-   153.6
+   119.7,
+   199.3
   ],
   "textH": 1.05,
   "description": "Sports ground or recreation facility open to students and staff."
@@ -446,8 +446,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   199.2,
-   307.4
+   215.3,
+   411.2
   ],
   "textH": 0.85,
   "description": "Administrative office handling university operations and student transactions."
@@ -463,8 +463,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   148.8,
-   185.5
+   144.7,
+   261.5
   ],
   "textH": 3.74,
   "description": "Sports ground or recreation facility open to students and staff."
@@ -480,8 +480,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   210.9,
-   308.6
+   230,
+   412.5
   ],
   "textH": 0.62,
   "description": "Administrative office handling university operations and student transactions."
@@ -497,8 +497,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   57.5,
-   211.5
+   46.7,
+   298
   ],
   "textH": 0.73,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -514,8 +514,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   57.5,
-   207.5
+   46.3,
+   291.6
   ],
   "textH": 0.73,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -531,8 +531,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   57.5,
-   203.5
+   46,
+   285.3
   ],
   "textH": 0.73,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -548,8 +548,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   57.5,
-   199.5
+   45.8,
+   278.9
   ],
   "textH": 0.73,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -563,8 +563,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   128.5,
-   379.8
+   111.7,
+   503.3
   ],
   "textH": 1.06,
   "description": "Campus location."
@@ -580,8 +580,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   88.6,
-   270
+   80.2,
+   379.2
   ],
   "textH": 0.93,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -600,8 +600,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   55.5,
-   182
+   40.5,
+   246.8
   ],
   "textH": 0.83,
   "description": "Office of a recognised student organisation or council."
@@ -617,8 +617,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   135.8,
-   228.9
+   147.1,
+   339.4
   ],
   "textH": 0.7,
   "description": "Campus food outlet or commercial stall."
@@ -634,8 +634,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   134,
-   122
+   169.8,
+   473.4
   ],
   "textH": 1.18,
   "description": "Comfort room and hygiene facility."
@@ -651,8 +651,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   133.8,
-   86
+   243.6,
+   391.5
   ],
   "textH": 1.18,
   "description": "Comfort room and hygiene facility."
@@ -668,8 +668,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   56.8,
-   195.5
+   44.3,
+   272.6
   ],
   "textH": 0.95,
   "description": "Comfort room and hygiene facility."
@@ -685,8 +685,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   54.5,
-   220
+   42.4,
+   311.4
   ],
   "textH": 0.95,
   "description": "Comfort room and hygiene facility."
@@ -702,8 +702,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   234,
-   188.3
+   243.7,
+   350.5
   ],
   "textH": 0.88,
   "description": "Comfort room and hygiene facility."
@@ -719,8 +719,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   155,
-   229.5
+   142.1,
+   351.6
   ],
   "textH": 0.32,
   "description": "Comfort room and hygiene facility."
@@ -736,8 +736,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   222.5,
-   243.5
+   172.3,
+   342.3
   ],
   "textH": 0.73,
   "description": "Comfort room and hygiene facility."
@@ -753,8 +753,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   222.3,
-   284.6
+   258.7,
+   277.4
   ],
   "textH": 0.73,
   "description": "Comfort room and hygiene facility."
@@ -770,8 +770,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   85.5,
-   277
+   75.7,
+   389.1
   ],
   "textH": 0.67,
   "description": "Comfort room and hygiene facility."
@@ -787,8 +787,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   82.6,
-   340.3
+   65.4,
+   449.9
   ],
   "textH": 0.99,
   "description": "Comfort room and hygiene facility."
@@ -804,8 +804,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   163.4,
-   357.6
+   135.6,
+   126
   ],
   "textH": 0.33,
   "description": "Comfort room and hygiene facility."
@@ -821,8 +821,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   132.2,
-   238.7
+   131.5,
+   161.4
   ],
   "textH": 0.37,
   "description": "Comfort room and hygiene facility."
@@ -840,8 +840,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   61,
-   163.5
+   43.8,
+   215.5
   ],
   "textH": 0.98,
   "description": "Administrative office handling university operations and student transactions."
@@ -857,8 +857,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   188.5,
-   341
+   205.3,
+   459.6
   ],
   "textH": 0.68,
   "description": "Administrative office handling university operations and student transactions."
@@ -874,8 +874,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   218,
-   320.1
+   239.5,
+   426
   ],
   "textH": 0.92,
   "description": "Administrative office handling university operations and student transactions."
@@ -891,8 +891,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   138,
-   381
+   122,
+   503.8
   ],
   "textH": 0.74,
   "description": "Administrative office handling university operations and student transactions."
@@ -908,8 +908,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   145.7,
-   282
+   147.4,
+   385.7
   ],
   "textH": 0.76,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -925,8 +925,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   148.3,
-   283
+   150,
+   386.2
   ],
   "textH": 0.77,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -943,8 +943,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   60,
-   203.7
+   48.6,
+   286.2
   ],
   "textH": 1.24,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -960,8 +960,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   103,
-   326.6
+   87.4,
+   438.6
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -977,8 +977,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   101.5,
-   325
+   86.6,
+   437
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -994,8 +994,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   110.5,
-   327
+   96.6,
+   438.6
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1011,8 +1011,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   112.1,
-   326
+   98.5,
+   437.9
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1028,8 +1028,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   143.5,
-   380
+   130.5,
+   505.9
   ],
   "textH": 0.65,
   "description": "Administrative office handling university operations and student transactions."
@@ -1045,8 +1045,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   148.5,
-   380
+   137.5,
+   505.9
   ],
   "textH": 0.71,
   "description": "Administrative office handling university operations and student transactions."
@@ -1062,8 +1062,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   162,
-   314
+   168.9,
+   424.8
   ],
   "textH": 0.72,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -1080,8 +1080,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   60,
-   186.4
+   45,
+   253.8
   ],
   "textH": 0.87,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -1098,8 +1098,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   232.6,
-   171
+   256.3,
+   258
   ],
   "textH": 0.71,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -1117,8 +1117,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   155.7,
-   311.1
+   158.1,
+   425
   ],
   "textH": 0.83,
   "description": "Faculty workspace for preparation and student consultation."
@@ -1135,8 +1135,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   61,
-   168.5
+   43.6,
+   221.6
   ],
   "textH": 0.86,
   "description": "Administrative office handling university operations and student transactions."
@@ -1152,8 +1152,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   96.5,
-   327
+   79,
+   438.6
   ],
   "textH": 0.76,
   "description": "Faculty workspace for preparation and student consultation."
@@ -1169,8 +1169,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   205.9,
-   360.9
+   212.9,
+   486.3
   ],
   "textH": 0.81,
   "description": "Campus food outlet or commercial stall."
@@ -1186,8 +1186,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   200.5,
-   351.1
+   204.5,
+   479.5
   ],
   "textH": 0.55,
   "description": "Campus food outlet or commercial stall."
@@ -1203,8 +1203,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   107,
-   304.2
+   91.4,
+   411.7
   ],
   "textH": 0.38,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1220,8 +1220,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   202.9,
-   362.6
+   215.3,
+   483.8
   ],
   "textH": 0.93,
   "description": "Campus food outlet or commercial stall."
@@ -1237,8 +1237,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   208.9,
-   359
+   210.5,
+   488.9
   ],
   "textH": 0.93,
   "description": "Campus food outlet or commercial stall."
@@ -1258,8 +1258,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   92.5,
-   255.6
+   83.4,
+   360.2
   ],
   "textH": 1.24,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -1279,8 +1279,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   60,
-   182.2
+   48.1,
+   248.4
   ],
   "textH": 0.99,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -1294,8 +1294,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   65.8,
-   305.5
+   62.7,
+   428.3
   ],
   "textH": 1.16,
   "description": "Campus location."
@@ -1313,8 +1313,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   134.8,
-   141.5
+   138.3,
+   183.9
   ],
   "textH": 0.86,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -1330,8 +1330,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   232.5,
-   176.7
+   134,
+   427.8
   ],
   "textH": 0.94,
   "description": "Faculty workspace for preparation and student consultation."
@@ -1347,8 +1347,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   140.5,
-   317
+   256.3,
+   265
   ],
   "textH": 0.71,
   "description": "Faculty workspace for preparation and student consultation."
@@ -1362,8 +1362,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   128.5,
-   233.5
+   135.5,
+   346.2
   ],
   "textH": 0.42,
   "description": "Campus location."
@@ -1379,8 +1379,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   195.6,
-   357.9
+   192.1,
+   486.4
   ],
   "textH": 1.12,
   "description": "Campus food outlet or commercial stall."
@@ -1396,8 +1396,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   81.3,
-   123.7
+   83.1,
+   147.4
   ],
   "textH": 1,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1413,8 +1413,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   82.2,
-   117.7
+   83.4,
+   142.3
   ],
   "textH": 1.03,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1430,8 +1430,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   85,
-   100.2
+   84.5,
+   128.4
   ],
   "textH": 1.03,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1447,8 +1447,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   86,
-   92.3
+   85,
+   121.6
   ],
   "textH": 1.03,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1465,8 +1465,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   95.3,
-   112.4
+   93.8,
+   137.2
   ],
   "textH": 1.15,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -1480,8 +1480,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   190.5,
-   367.5
+   198.6,
+   495.2
   ],
   "textH": 0.75,
   "description": "Campus location."
@@ -1497,8 +1497,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   136,
-   233.5
+   148,
+   345.7
   ],
   "textH": 0.5,
   "description": "Campus food outlet or commercial stall."
@@ -1514,8 +1514,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   123.4,
-   326.5
+   113.6,
+   438.6
   ],
   "textH": 0.76,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -1532,8 +1532,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   202.5,
-   342.1
+   220.5,
+   460.3
   ],
   "textH": 0.66,
   "description": "Administrative office handling university operations and student transactions."
@@ -1549,8 +1549,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   199,
-   48.5
+   229.9,
+   70.1
   ],
   "textH": 1.05,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1566,8 +1566,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   227.6,
-   48.5
+   256.5,
+   70.1
   ],
   "textH": 1.05,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1584,8 +1584,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   221.6,
-   47.4
+   251.6,
+   70
   ],
   "textH": 0.79,
   "description": "Administrative office handling university operations and student transactions."
@@ -1604,8 +1604,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   144.5,
-   153
+   149.4,
+   195.6
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1621,8 +1621,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   252.3,
-   127
+   266,
+   437.6
   ],
   "textH": 0.84,
   "description": "Security post, campus gate or military training headquarters."
@@ -1638,8 +1638,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   47.7,
-   274.3
+   282.8,
+   179.4
   ],
   "textH": 0.84,
   "description": "Security post, campus gate or military training headquarters."
@@ -1655,8 +1655,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   240.3,
-   329.1
+   48.5,
+   396.9
   ],
   "textH": 0.57,
   "description": "Security post, campus gate or military training headquarters."
@@ -1672,8 +1672,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   117.4,
-   379.5
+   104.9,
+   503.6
   ],
   "textH": 0.33,
   "description": "Comfort room and hygiene facility."
@@ -1692,8 +1692,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   215.5,
-   103
+   237.7,
+   161
   ],
   "textH": 1.42,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -1709,8 +1709,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   152,
-   358.6
+   149.3,
+   475.4
   ],
   "textH": 0.47,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1726,8 +1726,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   155.5,
-   358.6
+   155.7,
+   475.4
   ],
   "textH": 0.47,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1743,8 +1743,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   159,
-   358.6
+   161.9,
+   475.4
   ],
   "textH": 0.47,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1762,8 +1762,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   148.9,
-   357.1
+   144.1,
+   473.5
   ],
   "textH": 0.56,
   "description": "Office of a recognised student organisation or council."
@@ -1779,8 +1779,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   188.5,
-   320.2
+   202.5,
+   426.3
   ],
   "textH": 1,
   "description": "Administrative office handling university operations and student transactions."
@@ -1796,8 +1796,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   77.2,
-   257.5
+   64.1,
+   363.2
   ],
   "textH": 0.7,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -1814,8 +1814,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   218.5,
-   257
+   237.8,
+   378.1
   ],
   "textH": 1.1,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1832,8 +1832,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   218.5,
-   271.4
+   237.8,
+   378.1
   ],
   "textH": 0.97,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -1849,8 +1849,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   155,
-   316.5
+   157.5,
+   427.8
   ],
   "textH": 0.58,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1866,8 +1866,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   159,
-   316.5
+   163.8,
+   427.8
   ],
   "textH": 0.61,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1883,8 +1883,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   162,
-   316.5
+   170.3,
+   427.8
   ],
   "textH": 0.62,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1900,8 +1900,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   232.6,
-   182.3
+   256,
+   271.7
   ],
   "textH": 0.72,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1917,8 +1917,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   140,
-   314
+   132.9,
+   424.5
   ],
   "textH": 0.61,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -1934,8 +1934,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   144,
-   314
+   138.9,
+   424.5
   ],
   "textH": 0.63,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -1951,8 +1951,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   148,
-   314
+   145.4,
+   424.5
   ],
   "textH": 0.63,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -1969,8 +1969,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   63,
-   289.5
+   57.3,
+   413
   ],
   "textH": 0.75,
   "description": "Administrative office handling university operations and student transactions."
@@ -1984,8 +1984,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   92,
-   308.4
+   69.7,
+   417
   ],
   "textH": 1.16,
   "description": "Campus location."
@@ -1999,8 +1999,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   94.5,
-   326.1
+   75.7,
+   437.9
   ],
   "textH": 1.16,
   "description": "Campus location."
@@ -2014,8 +2014,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   99.5,
-   341
+   78.6,
+   458.5
   ],
   "textH": 1.16,
   "description": "Campus location."
@@ -2029,8 +2029,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   105.6,
-   357.6
+   80.3,
+   476.6
   ],
   "textH": 1.16,
   "description": "Campus location."
@@ -2044,8 +2044,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   164.5,
-   379.2
+   159.1,
+   504.4
   ],
   "textH": 1.16,
   "description": "Campus location."
@@ -2062,8 +2062,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   162.6,
-   231
+   179.8,
+   344.6
   ],
   "textH": 0.56,
   "description": "Administrative office handling university operations and student transactions."
@@ -2083,8 +2083,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   215.5,
-   264.2
+   235,
+   371.2
   ],
   "textH": 1.24,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -2100,8 +2100,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   53.5,
-   178
+   39.8,
+   242.4
   ],
   "textH": 0.69,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -2117,8 +2117,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   130,
-   308.5
+   109.5,
+   417.2
   ],
   "textH": 0.71,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2134,8 +2134,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   98.5,
-   325
+   80.5,
+   437.2
   ],
   "textH": 0.71,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2151,8 +2151,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   114.3,
-   305.5
+   101.6,
+   413.7
   ],
   "textH": 0.73,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2168,8 +2168,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   99.6,
-   310.5
+   81.4,
+   419.6
   ],
   "textH": 0.74,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2185,8 +2185,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   93,
-   308.6
+   73.6,
+   417.1
   ],
   "textH": 0.74,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2202,8 +2202,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   125.5,
-   340
+   114.4,
+   458
   ],
   "textH": 0.73,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2219,8 +2219,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   120.5,
-   340
+   107.9,
+   458
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2236,8 +2236,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   107.5,
-   340
+   92,
+   458.1
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2253,8 +2253,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   104.5,
-   340
+   85.6,
+   458.1
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2268,8 +2268,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   134.8,
-   357.5
+   121,
+   476.6
   ],
   "textH": 0.73,
   "description": "Campus location."
@@ -2285,8 +2285,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   121,
-   353.2
+   101.8,
+   470.7
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2302,8 +2302,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   121,
-   360.8
+   102.5,
+   481.3
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2319,8 +2319,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   107.2,
-   357.5
+   82.5,
+   476.6
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2336,8 +2336,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   175.4,
-   381.4
+   173.8,
+   508.2
   ],
   "textH": 0.73,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2353,8 +2353,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   170.4,
-   381.4
+   167,
+   508.2
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2370,8 +2370,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   165,
-   381.4
+   159.4,
+   508.2
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2387,8 +2387,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   160,
-   381.4
+   152.5,
+   508.2
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2404,8 +2404,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   155,
-   381.4
+   144.4,
+   508.2
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2421,8 +2421,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   136,
-   231.4
+   148,
+   343.2
   ],
   "textH": 0.62,
   "description": "Campus food outlet or commercial stall."
@@ -2438,8 +2438,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   204.5,
-   351.1
+   208.4,
+   479.5
   ],
   "textH": 0.68,
   "description": "Campus food outlet or commercial stall."
@@ -2455,8 +2455,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   136,
-   235.5
+   147.9,
+   348.4
   ],
   "textH": 0.68,
   "description": "Campus food outlet or commercial stall."
@@ -2472,8 +2472,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   129.4,
-   228.9
+   137.7,
+   339.4
   ],
   "textH": 0.57,
   "description": "Campus food outlet or commercial stall."
@@ -2489,8 +2489,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   147.7,
-   235
+   164.2,
+   348.3
   ],
   "textH": 0.32,
   "description": "Campus food outlet or commercial stall."
@@ -2506,8 +2506,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   110,
-   325
+   94.3,
+   437.1
   ],
   "textH": 0.73,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -2525,8 +2525,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   240.9,
-   336.4
+   267.1,
+   447
   ],
   "textH": 0.68,
   "description": "Administrative office handling university operations and student transactions."
@@ -2542,8 +2542,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 6:00 PM (Mon - Fri)",
   "coords": [
-   223.3,
-   222.4
+   229.2,
+   324.4
   ],
   "textH": 1.47,
   "description": "Library and information resource centre."
@@ -2559,8 +2559,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   77.2,
-   267.5
+   64.7,
+   376.9
   ],
   "textH": 0.4,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -2576,8 +2576,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   238.8,
-   326.4
+   264.7,
+   434.5
   ],
   "textH": 0.7,
   "description": "Security post, campus gate or military training headquarters."
@@ -2593,8 +2593,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   131.1,
-   228.9
+   139.3,
+   339.4
   ],
   "textH": 0.57,
   "description": "Campus food outlet or commercial stall."
@@ -2610,8 +2610,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   113,
-   278
+   104.6,
+   387.6
   ],
   "textH": 0.75,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -2627,8 +2627,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   121,
-   278
+   115,
+   387.6
   ],
   "textH": 0.75,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -2646,8 +2646,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   112,
-   236.8
+   109.1,
+   349.9
   ],
   "textH": 0.76,
   "description": "Administrative office handling university operations and student transactions."
@@ -2663,8 +2663,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   104.4,
-   66.3
+   102.6,
+   73.9
   ],
   "textH": 1.05,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -2680,8 +2680,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   106.3,
-   51.4
+   104.8,
+   59.1
   ],
   "textH": 1.05,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -2697,8 +2697,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   160,
-   283
+   172.4,
+   386.2
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2714,8 +2714,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   155,
-   283
+   164.2,
+   386.2
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2731,8 +2731,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   150,
-   283
+   156.3,
+   386.2
   ],
   "textH": 0.75,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2751,8 +2751,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   172.4,
-   108.7
+   182.5,
+   146.4
   ],
   "textH": 2.12,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2769,8 +2769,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   198.5,
-   283.4
+   215.5,
+   390
   ],
   "textH": 0.71,
   "description": "Medical, health or student welfare service point."
@@ -2787,8 +2787,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   156.4,
-   281.2
+   161.9,
+   384.2
   ],
   "textH": 1.35,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -2807,8 +2807,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   61,
-   153.5
+   43.8,
+   203.1
   ],
   "textH": 0.71,
   "description": "Administrative office handling university operations and student transactions."
@@ -2824,8 +2824,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   49.5,
-   178
+   34.5,
+   242.3
   ],
   "textH": 0.68,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -2843,8 +2843,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   64.4,
-   302.5
+   59,
+   420
   ],
   "textH": 0.92,
   "description": "Administrative office handling university operations and student transactions."
@@ -2860,8 +2860,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   65.7,
-   313.6
+   61.3,
+   429.3
   ],
   "textH": 0.89,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -2877,8 +2877,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   197,
-   342.1
+   214.4,
+   460.3
   ],
   "textH": 0.55,
   "description": "Administrative office handling university operations and student transactions."
@@ -2896,8 +2896,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   211.5,
-   47.3
+   241.5,
+   70
   ],
   "textH": 0.67,
   "description": "Administrative office handling university operations and student transactions."
@@ -2915,8 +2915,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   88.5,
-   280.4
+   79.2,
+   393.6
   ],
   "textH": 0.53,
   "description": "Office of a recognised student organisation or council."
@@ -2933,8 +2933,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   111.3,
-   318.7
+   96.6,
+   427.6
   ],
   "textH": 0.61,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -2952,8 +2952,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   88,
-   235.5
+   77.9,
+   332.3
   ],
   "textH": 0.66,
   "description": "Office of a recognised student organisation or council."
@@ -2969,8 +2969,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   217,
-   327.5
+   237.5,
+   436.1
   ],
   "textH": 0.78,
   "description": "Administrative office handling university operations and student transactions."
@@ -2987,8 +2987,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   65,
-   308.6
+   60.2,
+   424.8
   ],
   "textH": 0.86,
   "description": "Administrative office handling university operations and student transactions."
@@ -3006,8 +3006,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   154,
-   239.5
+   170.4,
+   354.5
   ],
   "textH": 0.33,
   "description": "Administrative office handling university operations and student transactions."
@@ -3023,8 +3023,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   196.5,
-   320.1
+   212.5,
+   426.1
   ],
   "textH": 0.73,
   "description": "Administrative office handling university operations and student transactions."
@@ -3053,8 +3053,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   118.6,
-   146.4
+   123.1,
+   189.6
   ],
   "textH": 0.87,
   "description": "Campus location."
@@ -3068,8 +3068,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   82.3,
-   171.6
+   135.5,
+   407.4
   ],
   "textH": 2.76,
   "description": "Campus location."
@@ -3083,8 +3083,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   80.5,
-   215
+   183.9,
+   464.4
   ],
   "textH": 0.69,
   "description": "Campus location."
@@ -3098,8 +3098,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   163,
-   367.6
+   154.3,
+   495.8
   ],
   "textH": 0.69,
   "description": "Campus location."
@@ -3113,8 +3113,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   167.8,
-   319.5
+   63.3,
+   222.6
   ],
   "textH": 0.57,
   "description": "Campus location."
@@ -3128,8 +3128,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   142.5,
-   302.7
+   197,
+   480.3
   ],
   "textH": 0.69,
   "description": "Campus location."
@@ -3143,8 +3143,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   192,
-   352.5
+   63.6,
+   336.3
   ],
   "textH": 0.87,
   "description": "Campus location."
@@ -3158,8 +3158,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   77.5,
-   237.5
+   62.5,
+   318.3
   ],
   "textH": 0.73,
   "description": "Campus location."
@@ -3190,8 +3190,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   170,
-   230
+   266.8,
+   422.2
   ],
   "textH": 0.75,
   "description": "Parking bay or transit waiting area."
@@ -3207,8 +3207,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   160.2,
-   257.5
+   266.6,
+   413.5
   ],
   "textH": 0.75,
   "description": "Parking bay or transit waiting area."
@@ -3224,8 +3224,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   152,
-   277.3
+   160.1,
+   383
   ],
   "textH": 0.75,
   "description": "Parking bay or transit waiting area."
@@ -3241,8 +3241,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   133.2,
-   279.4
+   142.9,
+   440.3
   ],
   "textH": 0.75,
   "description": "Parking bay or transit waiting area."
@@ -3258,8 +3258,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   136.3,
-   254.4
+   161.9,
+   440.4
   ],
   "textH": 0.75,
   "description": "Parking bay or transit waiting area."
@@ -3275,8 +3275,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   148,
-   346.4
+   148.1,
+   462.4
   ],
   "textH": 0.75,
   "description": "Parking bay or transit waiting area."
@@ -3292,8 +3292,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   162.2,
-   346.4
+   176.2,
+   462.7
   ],
   "textH": 0.75,
   "description": "Parking bay or transit waiting area."
@@ -3309,8 +3309,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   162.2,
-   330.3
+   147.1,
+   362.7
   ],
   "textH": 0.75,
   "description": "Parking bay or transit waiting area."
@@ -3326,8 +3326,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   143.2,
-   330.3
+   184.7,
+   335.5
   ],
   "textH": 0.75,
   "description": "Parking bay or transit waiting area."
@@ -3343,8 +3343,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   239.4,
-   315
+   176.1,
+   364
   ],
   "textH": 0.81,
   "description": "Parking bay or transit waiting area."
@@ -3360,8 +3360,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   239.4,
-   305.9
+   125.4,
+   388.3
   ],
   "textH": 0.81,
   "description": "Parking bay or transit waiting area."
@@ -3377,8 +3377,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   179,
-   239.3
+   119.6,
+   418.7
   ],
   "textH": 0.38,
   "description": "Parking bay or transit waiting area."
@@ -3394,8 +3394,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   83.6,
-   281.8
+   130.4,
+   413.8
   ],
   "textH": 0.19,
   "description": "Parking bay or transit waiting area."
@@ -3411,8 +3411,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   77.5,
-   275.5
+   192.8,
+   348
   ],
   "textH": 0.19,
   "description": "Parking bay or transit waiting area."
@@ -3428,8 +3428,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   133,
-   309.4
+   259.7,
+   443.6
   ],
   "textH": 0.38,
   "description": "Parking bay or transit waiting area."
@@ -3445,8 +3445,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   141.4,
-   305.6
+   257.2,
+   449.8
   ],
   "textH": 0.38,
   "description": "Parking bay or transit waiting area."
@@ -3462,8 +3462,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   234.8,
-   344.7
+   251.5,
+   455.8
   ],
   "textH": 0.98,
   "description": "Parking bay or transit waiting area."
@@ -3479,8 +3479,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   231.8,
-   352.7
+   245.7,
+   462
   ],
   "textH": 0.98,
   "description": "Parking bay or transit waiting area."
@@ -3496,8 +3496,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   228.8,
-   360.7
+   73.4,
+   396.9
   ],
   "textH": 0.98,
   "description": "Parking bay or transit waiting area."
@@ -3513,8 +3513,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   236.6,
-   336.4
+   65.7,
+   386.6
   ],
   "textH": 0.38,
   "description": "Parking bay or transit waiting area."
@@ -3531,8 +3531,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   60,
-   178.2
+   45.1,
+   242
   ],
   "textH": 0.43,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -3552,8 +3552,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   143.7,
-   139.4
+   148,
+   181.1
   ],
   "textH": 0.92,
   "description": "Department or college office overseeing academic programs and faculty."
@@ -3572,8 +3572,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   66.6,
-   144.6
+   48.3,
+   185.6
   ],
   "textH": 1.13,
   "description": "Administrative office handling university operations and student transactions."
@@ -3589,8 +3589,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   88.6,
-   265
+   79.9,
+   372.2
   ],
   "textH": 1,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -3609,8 +3609,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   120.8,
-   232.5
+   123.5,
+   343.6
   ],
   "textH": 0.79,
   "description": "Administrative office handling university operations and student transactions."
@@ -3626,8 +3626,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   130.5,
-   381
+   114.5,
+   503.8
   ],
   "textH": 0.66,
   "description": "Campus food outlet or commercial stall."
@@ -3643,8 +3643,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   58.2,
-   258.8
+   52.2,
+   364.9
   ],
   "textH": 0.96,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -3660,8 +3660,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   58.4,
-   252.4
+   51.8,
+   356.8
   ],
   "textH": 0.93,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -3675,8 +3675,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   193.7,
-   341.1
+   217.8,
+   459.6
   ],
   "textH": 0.82,
   "description": "Campus location."
@@ -3692,8 +3692,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   239.5,
-   142
+   271.1,
+   198.7
   ],
   "textH": 0.79,
   "description": "Auxiliary unit or community service provided by the university."
@@ -3709,8 +3709,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   90.8,
-   91.6
+   87.8,
+   119.6
   ],
   "textH": 1.07,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -3726,8 +3726,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   189.6,
-   337
+   206.4,
+   455
   ],
   "textH": 0.72,
   "description": "Administrative office handling university operations and student transactions."
@@ -3743,8 +3743,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   220.6,
-   312
+   242,
+   417.6
   ],
   "textH": 0.66,
   "description": "Administrative office handling university operations and student transactions."
@@ -3758,8 +3758,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   107,
-   59
+   104.8,
+   66.4
   ],
   "textH": 2.09,
   "description": "Campus location."
@@ -3775,8 +3775,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   60,
-   240.5
+   53.5,
+   341.2
   ],
   "textH": 1.26,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -3793,8 +3793,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   166.5,
-   235.5
+   183.8,
+   349.7
   ],
   "textH": 1.24,
   "description": "Administrative office handling university operations and student transactions."
@@ -3811,8 +3811,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   161,
-   236.3
+   179.5,
+   350.5
   ],
   "textH": 0.58,
   "description": "Administrative office handling university operations and student transactions."
@@ -3828,8 +3828,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   255.4,
-   127.5
+   287.5,
+   179.5
   ],
   "textH": 1.05,
   "description": "Security post, campus gate or military training headquarters."
@@ -3845,8 +3845,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   88.6,
-   242.5
+   78.3,
+   341.4
   ],
   "textH": 0.87,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -3862,8 +3862,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   88.6,
-   248.5
+   78.8,
+   349.8
   ],
   "textH": 0.87,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -3879,8 +3879,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   88.6,
-   255
+   79.2,
+   358.7
   ],
   "textH": 0.87,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -3896,8 +3896,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   88.6,
-   260
+   79.5,
+   365.4
   ],
   "textH": 0.87,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -3913,8 +3913,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   58.8,
-   228.4
+   49.6,
+   325.7
   ],
   "textH": 0.71,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -3930,8 +3930,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   58.6,
-   234.5
+   50.2,
+   333.6
   ],
   "textH": 0.71,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -3947,8 +3947,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   58.6,
-   240.5
+   50.7,
+   341.3
   ],
   "textH": 0.72,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -3964,8 +3964,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   58.4,
-   246.6
+   51.1,
+   349.1
   ],
   "textH": 0.72,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -3982,7 +3982,7 @@ const LOCATIONS = [
   "hours": "Open during campus hours",
   "coords": [
    45.7,
-   277
+   397.8
   ],
   "textH": 1.57,
   "description": "Security post, campus gate or military training headquarters."
@@ -3998,8 +3998,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   171.5,
-   157.5
+   175.3,
+   204.6
   ],
   "textH": 0.88,
   "description": "Sports ground or recreation facility open to students and staff."
@@ -4013,8 +4013,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   64.5,
-   292.8
+   58.5,
+   411
   ],
   "textH": 1.47,
   "description": "Campus location."
@@ -4030,8 +4030,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   148,
-   317
+   145.3,
+   427.8
   ],
   "textH": 0.73,
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
@@ -4047,8 +4047,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   49.5,
-   182
+   34.5,
+   246.7
   ],
   "textH": 0.86,
   "description": "Records, storage and supply area maintained by the university."
@@ -4064,8 +4064,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   234.2,
-   165.2
+   236.5,
+   350.4
   ],
   "textH": 0.91,
   "description": "Records, storage and supply area maintained by the university."
@@ -4081,8 +4081,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   217.5,
-   242.4
+   259.2,
+   252
   ],
   "textH": 0.85,
   "description": "Records, storage and supply area maintained by the university."
@@ -4098,8 +4098,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   166.3,
-   284.5
+   179.8,
+   388.6
   ],
   "textH": 0.38,
   "description": "Records, storage and supply area maintained by the university."
@@ -4115,8 +4115,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   90,
-   108.5
+   88.6,
+   135.6
   ],
   "textH": 1.26,
   "description": "Records, storage and supply area maintained by the university."
@@ -4132,8 +4132,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   146.4,
-   230
+   162.9,
+   343.3
   ],
   "textH": 0.32,
   "description": "Records, storage and supply area maintained by the university."
@@ -4149,8 +4149,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   158.5,
-   230
+   175.4,
+   344.7
   ],
   "textH": 0.56,
   "description": "Records, storage and supply area maintained by the university."
@@ -4168,8 +4168,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   169,
-   51.5
+   199,
+   63.4
   ],
   "textH": 0.97,
   "description": "Medical, health or student welfare service point."
@@ -4187,8 +4187,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   138,
-   49.2
+   153.4,
+   59.4
   ],
   "textH": 1.07,
   "description": "Medical, health or student welfare service point."
@@ -4204,8 +4204,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   207.1,
-   327.5
+   224.3,
+   439.3
   ],
   "textH": 0.88,
   "description": "Records, storage and supply area maintained by the university."
@@ -4239,8 +4239,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
   "coords": [
-   186.5,
-   378.6
+   187.5,
+   509
   ],
   "textH": 0.93,
   "description": "Administrative office handling university operations and student transactions."
@@ -4256,8 +4256,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   234.5,
-   154
+   261.6,
+   229.2
   ],
   "textH": 0.75,
   "description": "Sports ground or recreation facility open to students and staff."
@@ -4271,8 +4271,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   86.8,
-   84.4
+   83.9,
+   136
   ],
   "textH": 0.99,
   "description": "Campus location."
@@ -4286,8 +4286,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   83,
-   109.3
+   85.5,
+   114.8
   ],
   "textH": 0.99,
   "description": "Campus location."
@@ -4301,8 +4301,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   123.3,
-   106.6
+   235.5,
+   66.2
   ],
   "textH": 0.79,
   "description": "Campus location."
@@ -4316,25 +4316,10 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   205.5,
-   43
+   117.4,
+   144.4
   ],
   "textH": 0.88,
-  "description": "Campus location."
- },
- {
-  "id": "toilet-area-5",
-  "name": "Toilet Area",
-  "acronym": "TA",
-  "building": "Administration Building",
-  "categories": [],
-  "floor": "Ground Floor",
-  "hours": "Open during campus hours",
-  "coords": [
-   190,
-   345
-  ],
-  "textH": 0.5,
   "description": "Campus location."
  },
  {
@@ -4348,8 +4333,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   132.5,
-   228.9
+   141.8,
+   339.4
   ],
   "textH": 0.57,
   "description": "Campus food outlet or commercial stall."
@@ -4365,8 +4350,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   131,
-   157.2
+   134.7,
+   201.9
   ],
   "textH": 0.98,
   "description": "Sports ground or recreation facility open to students and staff."
@@ -4382,8 +4367,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open daily, 6:00 AM - 8:00 PM",
   "coords": [
-   158,
-   157.2
+   161.7,
+   201.9
   ],
   "textH": 0.98,
   "description": "Sports ground or recreation facility open to students and staff."
@@ -4399,8 +4384,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   233.2,
-   314.6
+   255.5,
+   420.1
   ],
   "textH": 0.4,
   "description": "Parking bay or transit waiting area."
@@ -4416,8 +4401,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   233.2,
-   308.5
+   255.5,
+   413.1
   ],
   "textH": 0.4,
   "description": "Parking bay or transit waiting area."
@@ -4433,8 +4418,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   224.3,
-   315.4
+   213.7,
+   409.5
   ],
   "textH": 0.4,
   "description": "Parking bay or transit waiting area."
@@ -4450,8 +4435,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   224.3,
-   309.4
+   229.4,
+   410.8
   ],
   "textH": 0.4,
   "description": "Parking bay or transit waiting area."
@@ -4467,8 +4452,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   208.4,
-   306.6
+   234.8,
+   409.5
   ],
   "textH": 0.37,
   "description": "Parking bay or transit waiting area."
@@ -4484,8 +4469,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   214.6,
-   305.6
+   224.9,
+   414.1
   ],
   "textH": 0.37,
   "description": "Parking bay or transit waiting area."
@@ -4501,8 +4486,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
   "coords": [
-   197.5,
-   304.8
+   244.9,
+   421
   ],
   "textH": 0.37,
   "description": "Parking bay or transit waiting area."
@@ -4518,8 +4503,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   136.1,
-   229.3
+   148,
+   340.6
   ],
   "textH": 0.61,
   "description": "Campus food outlet or commercial stall."
@@ -4535,8 +4520,8 @@ const LOCATIONS = [
   "floor": "Ground Floor",
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
-   200.1,
-   364.3
+   208.3,
+   491
   ],
   "textH": 0.95,
   "description": "Campus food outlet or commercial stall."
