@@ -124,6 +124,47 @@
           <div class="detail-actions">
             <button id="get-directions-btn" class="action-btn directions-btn">🧭 Ask for Directions</button>
             <button id="recenter-room-btn" class="action-btn secondary-btn">Focus on Map</button>
+            <button id="edit-location-btn" class="action-btn secondary-btn">Edit details</button>
+
+            <div id="edit-panel" class="edit-panel hidden">
+              <label class="fld"><span>Name</span>
+                <input type="text" id="edit-name" autocomplete="off">
+              </label>
+              <label class="fld"><span>Acronym</span>
+                <input type="text" id="edit-acronym" placeholder="optional" autocomplete="off">
+              </label>
+              <label class="fld"><span>Floor level</span>
+                <select id="edit-floor">
+                  <option>Ground Floor</option>
+                  <option>2nd Floor</option>
+                  <option>3rd Floor</option>
+                </select>
+              </label>
+              <label class="fld"><span>Building / Center</span>
+                <input type="text" id="edit-building" list="building-options" autocomplete="off">
+              </label>
+              <div class="fld">
+                <span>OpenStreetMap coordinates</span>
+                <div class="coord-pair">
+                  <input type="number" id="edit-lat" step="0.000001" placeholder="Latitude">
+                  <input type="number" id="edit-lng" step="0.000001" placeholder="Longitude">
+                </div>
+              </div>
+
+              <button type="button" id="edit-submit-btn" class="action-btn directions-btn">Save changes</button>
+
+              <div id="edit-auth" class="auth-row hidden">
+                <label class="fld"><span>Authorization code</span>
+                  <input type="password" id="edit-code" placeholder="Required to edit" autocomplete="off">
+                </label>
+                <div class="auth-actions">
+                  <button type="button" id="edit-confirm-btn" class="action-btn directions-btn">Confirm</button>
+                  <button type="button" id="edit-cancel-btn" class="action-btn secondary-btn">Cancel</button>
+                </div>
+              </div>
+              <p id="edit-msg" class="form-msg"></p>
+            </div>
+
             <button id="move-location-btn" class="action-btn secondary-btn">Change position</button>
 
             <div id="move-auth" class="auth-row hidden">

@@ -12,7 +12,7 @@
   --map-sand:       #F4E7A5;
   --map-taupe:      #A08F7C;
 
-  --bg-color: var(--map-ground);
+  --bg-color: #FEFDF9;
   --text-color: #4A554E;
   --text-dark: var(--map-ink);
   --text-muted: #7C6F60;
@@ -683,8 +683,29 @@ body, html {
   font-weight: 600;
 }
 
-.auth-row.hidden {
+.auth-row.hidden,
+.edit-panel.hidden {
   display: none;
+}
+
+.edit-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 13px;
+  margin-bottom: 2px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--surface-hover);
+}
+
+.coord-pair {
+  display: flex;
+  gap: 8px;
+}
+
+.coord-pair input {
+  min-width: 0;
 }
 
 .auth-row {

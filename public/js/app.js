@@ -53,9 +53,14 @@ function readStoredMap(key) {
   }
 }
 
+const EDITED_KEY = 'kiosk_edited_locations';
+
 let customPlaces = readStoredList(CUSTOM_KEY);
 let removedIds = readStoredList(REMOVED_KEY);
 let movedCoords = readStoredMap(MOVED_KEY);
+let editedFields = readStoredMap(EDITED_KEY);
+
+const EDITABLE = ['name', 'acronym', 'floor', 'building'];
 
 function buildPlaces() {
   const gone = new Set(removedIds);
@@ -63,6 +68,8 @@ function buildPlaces() {
   // Written onto the same objects rather than copies, so markers and the open
   // detail panel keep pointing at the entry they already hold.
   base.forEach(l => {
+    const e = editedFields[l.id];
+    if (e) EDITABLE.forEach(k => { if (typeof e[k] === 'string') l[k] = e[k]; });
     const m = movedCoords[l.id];
     if (Array.isArray(m) && m.length === 2) l.coords = m.slice();
   });
@@ -76,6 +83,7 @@ function persistPlaces() {
     localStorage.setItem(CUSTOM_KEY, JSON.stringify(customPlaces));
     localStorage.setItem(REMOVED_KEY, JSON.stringify(removedIds));
     localStorage.setItem(MOVED_KEY, JSON.stringify(movedCoords));
+    localStorage.setItem(EDITED_KEY, JSON.stringify(editedFields));
     return true;
   } catch (err) {
     return false;      // private browsing: the session still works, it just will not survive a reload
@@ -446,6 +454,7 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   detailCoords.textContent = ll[0].toFixed(6) + ', ' + ll[1].toFixed(6);
   resetRemovePrompt();
   resetMovePrompt();
+  resetEditPanel();
 
   // Coming from a category listing, "back" should return to that listing.
   backToTutorialBtn.textContent = activeCategory === 'ALL'
@@ -1275,3 +1284,152 @@ moveConfirmBtn.addEventListener('click', () => {
 });
 
 moveCode.addEventListener('keydown', e => { if (e.key === 'Enter') moveConfirmBtn.click(); });
+
+// ==========================================
+// 16. EDIT A PINNED LOCATION
+// ==========================================
+
+const editLocationBtn = document.getElementById('edit-location-btn');
+const editPanel = document.getElementById('edit-panel');
+const editName = document.getElementById('edit-name');
+const editAcronym = document.getElementById('edit-acronym');
+const editFloor = document.getElementById('edit-floor');
+const editBuilding = document.getElementById('edit-building');
+const editLat = document.getElementById('edit-lat');
+const editLng = document.getElementById('edit-lng');
+const editSubmitBtn = document.getElementById('edit-submit-btn');
+const editAuth = document.getElementById('edit-auth');
+const editCode = document.getElementById('edit-code');
+const editConfirmBtn = document.getElementById('edit-confirm-btn');
+const editCancelBtn = document.getElementById('edit-cancel-btn');
+const editMsg = document.getElementById('edit-msg');
+
+function resetEditPanel() {
+  if (!editPanel) return;
+  editPanel.classList.add('hidden');
+  editAuth.classList.add('hidden');
+  editCode.value = '';
+  editName.classList.remove('invalid');
+  editLat.classList.remove('invalid');
+  editLng.classList.remove('invalid');
+  say(editMsg, '');
+}
+
+// A floor recorded in the data that is not one of the three presets would be
+// silently rewritten by the select, so it is added as an option instead.
+function fillEditForm(loc) {
+  editName.value = loc.name || '';
+  editAcronym.value = loc.acronym || '';
+  editBuilding.value = loc.building || '';
+
+  const floors = [].slice.call(editFloor.options).map(o => o.value);
+  if (loc.floor && floors.indexOf(loc.floor) === -1) {
+    const o = document.createElement('option');
+    o.value = o.textContent = loc.floor;
+    editFloor.appendChild(o);
+  }
+  editFloor.value = loc.floor || 'Ground Floor';
+
+  const ll = svgToLatLng(loc.coords);
+  editLat.value = ll[0].toFixed(6);
+  editLng.value = ll[1].toFixed(6);
+}
+
+editLocationBtn.addEventListener('click', () => {
+  if (!activeSelectedLocation) return;
+  if (!editPanel.classList.contains('hidden')) { resetEditPanel(); return; }
+  resetEditPanel();
+  refreshBuildingOptions();
+  fillEditForm(activeSelectedLocation);
+  editPanel.classList.remove('hidden');
+  editName.focus();
+});
+
+function readEditForm() {
+  const name = editName.value.trim();
+  const lat = parseFloat(editLat.value);
+  const lng = parseFloat(editLng.value);
+  editName.classList.toggle('invalid', !name);
+  editLat.classList.toggle('invalid', !isFinite(lat));
+  editLng.classList.toggle('invalid', !isFinite(lng));
+
+  if (!name) { say(editMsg, 'The name cannot be empty.', 'err'); editName.focus(); return null; }
+  if (!isFinite(lat) || !isFinite(lng)) {
+    say(editMsg, 'Latitude and longitude must both be numbers.', 'err');
+    return null;
+  }
+
+  const xy = latLngToSvg(L.latLng(lat, lng));
+  const x = Math.round(xy[0] * 10) / 10;
+  const y = Math.round(xy[1] * 10) / 10;
+  if (x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT) {
+    say(editMsg, 'Those coordinates fall outside the campus map.', 'err');
+    return null;
+  }
+
+  return {
+    name: name,
+    acronym: editAcronym.value.trim(),
+    floor: editFloor.value,
+    building: editBuilding.value.trim() || 'SLSU Main Campus',
+    coords: [x, y]
+  };
+}
+
+editSubmitBtn.addEventListener('click', () => {
+  if (!readEditForm()) return;
+  say(editMsg, '');
+  editAuth.classList.remove('hidden');
+  editCode.value = '';
+  editCode.focus();
+});
+
+editCancelBtn.addEventListener('click', () => {
+  editAuth.classList.add('hidden');
+  editCode.value = '';
+  say(editMsg, '');
+});
+
+editConfirmBtn.addEventListener('click', () => {
+  const loc = activeSelectedLocation;
+  if (!loc) return;
+  if (editCode.value !== ADMIN_CODE) {
+    say(editMsg, 'Wrong authorization code.', 'err');
+    editCode.value = '';
+    editCode.focus();
+    return;
+  }
+  const next = readEditForm();
+  if (!next) { editAuth.classList.add('hidden'); return; }
+
+  const custom = customPlaces.find(p => p.id === loc.id);
+  if (custom) {
+    EDITABLE.forEach(k => { custom[k] = next[k]; });
+    custom.coords = next.coords.slice();
+  } else {
+    const store = editedFields[loc.id] || (editedFields[loc.id] = {});
+    EDITABLE.forEach(k => { store[k] = next[k]; });
+    movedCoords[loc.id] = next.coords.slice();
+  }
+
+  PLACES = buildPlaces();
+  const current = PLACES.find(p => p.id === loc.id) || loc;
+
+  // Rebuilt rather than nudged: the hover title is fixed at construction, so a
+  // renamed pin would otherwise keep announcing its old name.
+  const old = markerFor.get(loc.id);
+  if (old) { markerLayer.removeLayer(old); markerFor.delete(loc.id); }
+  createMarker(current);
+
+  const stored = persistPlaces();
+  refreshBuildingOptions();
+  renderMarkers(activeCategory, searchInput.value);
+
+  resetEditPanel();
+  showLocationDetails(current, map.getZoom());
+  if (activeRouteLayers.length) drawRoute(current);
+  inspector.innerText = '✔ Updated "' + current.name + '"' +
+    (stored ? '' : ' (could not be saved for next time)');
+});
+
+editCode.addEventListener('keydown', e => { if (e.key === 'Enter') editConfirmBtn.click(); });
