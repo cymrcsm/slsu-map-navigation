@@ -29,36 +29,37 @@ const inCategory = (loc, id) =>
 // campus-data.js is generated and never written to at runtime, so locations
 // added or removed from the kiosk are kept as a layer on top of it, in this
 // browser. PLACES is that combined view and is what the whole UI reads.
-const CUSTOM_KEY = 'kiosk_custom_locations';
-const REMOVED_KEY = 'kiosk_removed_locations';
-const ADMIN_CODE = '@dmin123';
+// Locations added, edited or hidden through the kiosk are held by the server,
+// not by this browser. The authorization code is checked there and is never
+// sent to the page, so a tampered client cannot change the map: the worst it
+// can do is lie to itself until the next reload.
+const API = {
+  overrides: 'api/overrides',
+  locations: 'api/locations'
+};
 
-function readStoredList(key) {
+async function adminFetch(method, url, code, body) {
+  const headers = { 'X-Admin-Code': code };
+  if (body) headers['Content-Type'] = 'application/json';
+  let res;
   try {
-    const v = JSON.parse(localStorage.getItem(key));
-    return Array.isArray(v) ? v : [];
+    res = await fetch(url, {
+      method: method,
+      headers: headers,
+      body: body ? JSON.stringify(body) : undefined
+    });
   } catch (err) {
-    return [];
+    throw new Error('Cannot reach the server.');
   }
+  let data = null;
+  try { data = await res.json(); } catch (err) { data = null; }
+  if (!res.ok) throw new Error((data && data.error) || 'Server refused (' + res.status + ').');
+  return data;
 }
 
-const MOVED_KEY = 'kiosk_moved_locations';
-
-function readStoredMap(key) {
-  try {
-    const v = JSON.parse(localStorage.getItem(key));
-    return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
-  } catch (err) {
-    return {};
-  }
-}
-
-const EDITED_KEY = 'kiosk_edited_locations';
-
-let customPlaces = readStoredList(CUSTOM_KEY);
-let removedIds = readStoredList(REMOVED_KEY);
-let movedCoords = readStoredMap(MOVED_KEY);
-let editedFields = readStoredMap(EDITED_KEY);
+let customPlaces = [];
+let removedIds = [];
+let editedFields = {};
 
 const EDITABLE = ['name', 'acronym', 'floor', 'building'];
 
@@ -69,25 +70,50 @@ function buildPlaces() {
   // detail panel keep pointing at the entry they already hold.
   base.forEach(l => {
     const e = editedFields[l.id];
-    if (e) EDITABLE.forEach(k => { if (typeof e[k] === 'string') l[k] = e[k]; });
-    const m = movedCoords[l.id];
-    if (Array.isArray(m) && m.length === 2) l.coords = m.slice();
+    if (e) {
+      EDITABLE.forEach(k => { if (typeof e[k] === 'string') l[k] = e[k]; });
+      if (Array.isArray(e.categories)) l.categories = e.categories.slice();
+      if (Array.isArray(e.coords) && e.coords.length === 2) l.coords = e.coords.slice();
+    }
   });
   return base.concat(customPlaces);
 }
 
 let PLACES = buildPlaces();
 
-function persistPlaces() {
+// The server is the only copy that matters, so after any change the whole
+// override set is pulled back rather than patched by hand. One extra request
+// per admin action, in exchange for the page never drifting from the truth.
+async function loadOverrides() {
+  let data;
   try {
-    localStorage.setItem(CUSTOM_KEY, JSON.stringify(customPlaces));
-    localStorage.setItem(REMOVED_KEY, JSON.stringify(removedIds));
-    localStorage.setItem(MOVED_KEY, JSON.stringify(movedCoords));
-    localStorage.setItem(EDITED_KEY, JSON.stringify(editedFields));
-    return true;
+    const res = await fetch(API.overrides, { cache: 'no-store' });
+    if (!res.ok) return false;
+    data = await res.json();
   } catch (err) {
-    return false;      // private browsing: the session still works, it just will not survive a reload
+    return false;
   }
+  customPlaces = Array.isArray(data.custom) ? data.custom : [];
+  removedIds = Array.isArray(data.removed) ? data.removed : [];
+  editedFields = (data.edited && typeof data.edited === 'object') ? data.edited : {};
+  return true;
+}
+
+function rebuildAllMarkers() {
+  markerLayer.clearLayers();
+  markerFor.clear();
+  PLACES.forEach(createMarker);
+}
+
+async function syncWithServer() {
+  const ok = await loadOverrides();
+  PLACES = buildPlaces();
+  rebuildAllMarkers();
+  recountCategories();
+  if (typeof refreshCategoryCounts === 'function') refreshCategoryCounts();
+  if (typeof refreshBuildingOptions === 'function') refreshBuildingOptions();
+  renderMarkers(activeCategory, searchInput ? searchInput.value : '');
+  return ok;
 }
 
 // ==========================================
@@ -1138,28 +1164,27 @@ addCancelBtn.addEventListener('click', () => {
   say(addMsg, '');
 });
 
-addConfirmBtn.addEventListener('click', () => {
-  if (addCode.value !== ADMIN_CODE) {
-    say(addMsg, 'Wrong authorization code.', 'err');
-    addCode.value = '';
-    addCode.focus();
-    return;
-  }
+addConfirmBtn.addEventListener('click', async () => {
   const place = validateAdd();
   if (!place) { addAuth.classList.add('hidden'); return; }
 
-  customPlaces.push(place);
-  PLACES = buildPlaces();
-  createMarker(place);
-  const stored = persistPlaces();
-  refreshCategoryCounts();
-  refreshBuildingOptions();
-  renderMarkers(activeCategory, searchInput.value);
+  addConfirmBtn.disabled = true;
+  try {
+    await adminFetch('POST', API.locations, addCode.value, place);
+  } catch (err) {
+    say(addMsg, err.message, 'err');
+    addCode.value = '';
+    addCode.focus();
+    return;
+  } finally {
+    addConfirmBtn.disabled = false;
+  }
 
+  await syncWithServer();
   resetAddForm();
-  showLocationDetails(place);
-  inspector.innerText = '✔ Added "' + place.name + '"' +
-    (stored ? '' : ' (could not be saved for next time)');
+  const saved = PLACES.find(p => p.id === place.id);
+  if (saved) showLocationDetails(saved);
+  inspector.innerText = '✔ Added "' + place.name + '"';
 });
 
 addCode.addEventListener('keydown', e => { if (e.key === 'Enter') addConfirmBtn.click(); });
@@ -1174,30 +1199,23 @@ removeLocationBtn.addEventListener('click', () => {
 
 removeCancelBtn.addEventListener('click', resetRemovePrompt);
 
-removeConfirmBtn.addEventListener('click', () => {
+removeConfirmBtn.addEventListener('click', async () => {
   const loc = activeSelectedLocation;
   if (!loc) return;
-  if (removeCode.value !== ADMIN_CODE) {
-    say(removeMsg, 'Wrong authorization code.', 'err');
+
+  removeConfirmBtn.disabled = true;
+  try {
+    await adminFetch('DELETE', API.locations + '/' + encodeURIComponent(loc.id), removeCode.value);
+  } catch (err) {
+    say(removeMsg, err.message, 'err');
     removeCode.value = '';
     removeCode.focus();
     return;
+  } finally {
+    removeConfirmBtn.disabled = false;
   }
 
-  if (customPlaces.some(p => p.id === loc.id)) {
-    customPlaces = customPlaces.filter(p => p.id !== loc.id);
-  } else if (removedIds.indexOf(loc.id) === -1) {
-    removedIds.push(loc.id);
-  }
-  PLACES = buildPlaces();
-
-  const marker = markerFor.get(loc.id);
-  if (marker) { markerLayer.removeLayer(marker); markerFor.delete(loc.id); }
-  persistPlaces();
-  refreshCategoryCounts();
-  refreshBuildingOptions();
-  renderMarkers(activeCategory, searchInput.value);
-
+  await syncWithServer();
   resetRemovePrompt();
   showTutorialView();
   inspector.innerText = '✔ Removed "' + loc.name + '"';
@@ -1252,35 +1270,30 @@ moveCancelBtn.addEventListener('click', () => {
   inspector.innerText = 'Click map to log coordinates';
 });
 
-moveConfirmBtn.addEventListener('click', () => {
+moveConfirmBtn.addEventListener('click', async () => {
   const loc = activeSelectedLocation;
   if (!loc || !pendingMove) return;
-  if (moveCode.value !== ADMIN_CODE) {
-    say(moveMsg, 'Wrong authorization code.', 'err');
+
+  const xy = pendingMove.slice();
+  moveConfirmBtn.disabled = true;
+  try {
+    await adminFetch('PATCH', API.locations + '/' + encodeURIComponent(loc.id),
+                     moveCode.value, { coords: xy });
+  } catch (err) {
+    say(moveMsg, err.message, 'err');
     moveCode.value = '';
     moveCode.focus();
     return;
+  } finally {
+    moveConfirmBtn.disabled = false;
   }
 
-  const xy = pendingMove.slice();
-  const custom = customPlaces.find(p => p.id === loc.id);
-  if (custom) custom.coords = xy.slice();
-  else movedCoords[loc.id] = xy.slice();
-
-  PLACES = buildPlaces();
-  const current = PLACES.find(p => p.id === loc.id);
-  if (current) current.coords = xy.slice();
-
-  const marker = markerFor.get(loc.id);
-  if (marker) marker.setLatLng(toLeafletCoords(xy));
-  const stored = persistPlaces();
-  renderMarkers(activeCategory, searchInput.value);
-
+  await syncWithServer();
+  const current = PLACES.find(p => p.id === loc.id) || loc;
   resetMovePrompt();
-  showLocationDetails(current || loc, map.getZoom());
-  if (activeRouteLayers.length) drawRoute(current || loc);
-  inspector.innerText = '✔ Moved "' + loc.name + '" to [' + xy[0] + ', ' + xy[1] + ']' +
-    (stored ? '' : ' (could not be saved for next time)');
+  showLocationDetails(current, map.getZoom());
+  if (activeRouteLayers.length) drawRoute(current);
+  inspector.innerText = '✔ Moved "' + loc.name + '" to [' + xy[0] + ', ' + xy[1] + ']';
 });
 
 moveCode.addEventListener('keydown', e => { if (e.key === 'Enter') moveConfirmBtn.click(); });
@@ -1295,6 +1308,7 @@ const editName = document.getElementById('edit-name');
 const editAcronym = document.getElementById('edit-acronym');
 const editFloor = document.getElementById('edit-floor');
 const editBuilding = document.getElementById('edit-building');
+const editCategories = document.getElementById('edit-categories');
 const editLat = document.getElementById('edit-lat');
 const editLng = document.getElementById('edit-lng');
 const editSubmitBtn = document.getElementById('edit-submit-btn');
@@ -1333,6 +1347,47 @@ function fillEditForm(loc) {
   const ll = svgToLatLng(loc.coords);
   editLat.value = ll[0].toFixed(6);
   editLng.value = ll[1].toFixed(6);
+
+  const on = new Set(loc.categories || []);
+  editCatBoxes().forEach(box => { box.checked = on.has(box.value); });
+}
+
+// Every category except the ALL pseudo-entry, built once and reused.
+function buildCategoryChecklist() {
+  editCategories.innerHTML = '';
+  CATEGORIES.filter(c => c.id !== 'ALL').forEach(cat => {
+    const label = document.createElement('label');
+    label.className = 'cat-check';
+
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.value = cat.id;
+
+    const swatch = document.createElement('span');
+    swatch.className = 'cat-swatch';
+    swatch.style.background = getCategoryColor(cat.id);
+
+    const text = document.createElement('span');
+    text.textContent = cat.name;
+
+    label.append(box, swatch, text);
+    editCategories.appendChild(label);
+  });
+}
+
+function editCatBoxes() {
+  return [].slice.call(editCategories.querySelectorAll('input[type="checkbox"]'));
+}
+
+// The first category decides the pin colour, so the existing order is kept and
+// anything newly ticked is appended rather than reshuffling the whole list.
+function readCategories(previous) {
+  const ticked = new Set(editCatBoxes().filter(b => b.checked).map(b => b.value));
+  const kept = (previous || []).filter(id => ticked.has(id));
+  const added = editCatBoxes()
+    .filter(b => b.checked && kept.indexOf(b.value) === -1)
+    .map(b => b.value);
+  return kept.concat(added);
 }
 
 editLocationBtn.addEventListener('click', () => {
@@ -1372,6 +1427,7 @@ function readEditForm() {
     acronym: editAcronym.value.trim(),
     floor: editFloor.value,
     building: editBuilding.value.trim() || 'SLSU Main Campus',
+    categories: readCategories(activeSelectedLocation && activeSelectedLocation.categories),
     coords: [x, y]
   };
 }
@@ -1390,46 +1446,40 @@ editCancelBtn.addEventListener('click', () => {
   say(editMsg, '');
 });
 
-editConfirmBtn.addEventListener('click', () => {
+editConfirmBtn.addEventListener('click', async () => {
   const loc = activeSelectedLocation;
   if (!loc) return;
-  if (editCode.value !== ADMIN_CODE) {
-    say(editMsg, 'Wrong authorization code.', 'err');
-    editCode.value = '';
-    editCode.focus();
-    return;
-  }
   const next = readEditForm();
   if (!next) { editAuth.classList.add('hidden'); return; }
 
-  const custom = customPlaces.find(p => p.id === loc.id);
-  if (custom) {
-    EDITABLE.forEach(k => { custom[k] = next[k]; });
-    custom.coords = next.coords.slice();
-  } else {
-    const store = editedFields[loc.id] || (editedFields[loc.id] = {});
-    EDITABLE.forEach(k => { store[k] = next[k]; });
-    movedCoords[loc.id] = next.coords.slice();
+  editConfirmBtn.disabled = true;
+  try {
+    await adminFetch('PATCH', API.locations + '/' + encodeURIComponent(loc.id),
+                     editCode.value, next);
+  } catch (err) {
+    say(editMsg, err.message, 'err');
+    editCode.value = '';
+    editCode.focus();
+    return;
+  } finally {
+    editConfirmBtn.disabled = false;
   }
 
-  PLACES = buildPlaces();
+  await syncWithServer();
   const current = PLACES.find(p => p.id === loc.id) || loc;
-
-  // Rebuilt rather than nudged: the hover title is fixed at construction, so a
-  // renamed pin would otherwise keep announcing its old name.
-  const old = markerFor.get(loc.id);
-  if (old) { markerLayer.removeLayer(old); markerFor.delete(loc.id); }
-  createMarker(current);
-
-  const stored = persistPlaces();
-  refreshBuildingOptions();
-  renderMarkers(activeCategory, searchInput.value);
-
   resetEditPanel();
   showLocationDetails(current, map.getZoom());
   if (activeRouteLayers.length) drawRoute(current);
-  inspector.innerText = '✔ Updated "' + current.name + '"' +
-    (stored ? '' : ' (could not be saved for next time)');
+  inspector.innerText = '✔ Updated "' + current.name + '"';
 });
 
 editCode.addEventListener('keydown', e => { if (e.key === 'Enter') editConfirmBtn.click(); });
+
+buildCategoryChecklist();
+
+// The map draws from campus-data.js first so it is on screen immediately, then
+// the server's changes are layered on. If the server is unreachable the kiosk
+// still works; it just shows the published map and refuses admin actions.
+syncWithServer().then(ok => {
+  if (!ok) console.warn('Kiosk: no server overrides loaded; showing the published map only.');
+});
