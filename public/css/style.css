@@ -1076,6 +1076,22 @@ body, html {
   line-height: 1.6;
   color: var(--text-color);
 }
+.qr-hint {
+  margin-top: 12px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--accent-strong);
+  background: var(--gold-wash);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.qr-hint code {
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
 .qr-url {
   margin-top: 12px;
   font-family: monospace;

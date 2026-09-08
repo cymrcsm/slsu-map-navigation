@@ -44,6 +44,11 @@
       ? url
       : 'Run the kiosk with “npm start” — the QR needs the local server.';
 
+    // A phone over plain http:// gets the map + route but not the moving GPS dot
+    // (browsers block geolocation outside a secure context).
+    const hint = document.getElementById('qr-hint');
+    if (hint) hint.hidden = !(b && url.startsWith('http://'));
+
     codeBox.innerHTML = '';
     if (b && typeof qrcode === 'function') {
       const qr = qrcode(0, 'M');
