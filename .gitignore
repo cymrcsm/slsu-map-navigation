@@ -12,3 +12,6 @@ certs/
 # OS files
 .DS_Store
 Thumbs.db
+
+# thesis proposal PDF — kept locally, not committed (decide later)
+docs/*.pdf
