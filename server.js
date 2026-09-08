@@ -39,15 +39,23 @@ try {
 } catch (err) { /* no certs: HTTP only */ }
 const HTTPS_PORT = Number(process.env.HTTPS_PORT || (Number(PORT) + 443));
 
-// KIOSK_HOSTNAME is the trusted name the phone's local DNS resolves to the kiosk
-// (see docs/KIOSK-DEPLOY.md). When set, the QR points at https://<hostname>,
+// The trusted name the phone resolves to the kiosk (see docs/KIOSK-DEPLOY.md).
+// tools/install-cert.mjs writes certs/hostname from the cert, so `npm start`
+// picks it up with no env var; KIOSK_HOSTNAME overrides it.
+function certHostname() {
+  try { return fs.readFileSync(path.join(CERT_DIR, 'hostname'), 'utf8').trim() || null; }
+  catch (err) { return null; }
+}
+const KIOSK_HOSTNAME = process.env.KIOSK_HOSTNAME || certHostname();
+
+// When a cert + hostname are present the QR points at https://<hostname>,
 // dropping the port only when HTTPS is on 443.
 function defaultPublicUrl() {
   if (process.env.KIOSK_PUBLIC_URL) return process.env.KIOSK_PUBLIC_URL;
-  if (process.env.KIOSK_HOSTNAME && tlsOptions) {
+  if (KIOSK_HOSTNAME && tlsOptions) {
     return HTTPS_PORT === 443
-      ? `https://${process.env.KIOSK_HOSTNAME}`
-      : `https://${process.env.KIOSK_HOSTNAME}:${HTTPS_PORT}`;
+      ? `https://${KIOSK_HOSTNAME}`
+      : `https://${KIOSK_HOSTNAME}:${HTTPS_PORT}`;
   }
   return detectLanBaseUrl(tlsOptions ? 'https' : 'http', tlsOptions ? HTTPS_PORT : PORT);
 }

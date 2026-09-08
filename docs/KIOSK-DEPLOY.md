@@ -101,15 +101,19 @@ npm run db:init          # builds db/slsu_directory.db from campus-data.js
 
 # install the certificate from Part B (copy the ~/.acme.sh/... folder over first,
 # or run acme.sh on the Pi itself)
-tools/install-cert.sh ~/.acme.sh/slsu-kiosk.duckdns.org_ecc
+npm run install-cert -- ~/.acme.sh/slsu-kiosk.duckdns.org_ecc
 
 # run it as a service on ports 80 / 443
 sudo cp deploy/slsu-kiosk.service /etc/systemd/system/
 sudoedit /etc/systemd/system/slsu-kiosk.service   # set User, WorkingDirectory,
-                                                  # KIOSK_HOSTNAME, KIOSK_ADMIN_CODE
+                                                  # KIOSK_ADMIN_CODE
 sudo systemctl enable --now slsu-kiosk
 sudo systemctl status slsu-kiosk
 ```
+
+(`install-cert` wrote `certs/hostname`, so the QR already uses
+`slsu-kiosk.duckdns.org` — the `KIOSK_HOSTNAME` line in the service file is just a
+belt-and-braces override.)
 
 `journalctl -u slsu-kiosk -f` should show it listening on 80 and 443, and
 `Phone hand-off QR points at: https://slsu-kiosk.duckdns.org`.
@@ -120,8 +124,8 @@ sudo systemctl status slsu-kiosk
 
 Point Chromium in kiosk mode at `http://localhost` (the touchscreen uses plain
 HTTP on the box itself, which is fine). The "📱 Take this on my phone" QR it
-draws will already carry `https://slsu-kiosk.duckdns.org/go/…` because
-`KIOSK_HOSTNAME` is set in the service file.
+draws will already carry `https://slsu-kiosk.duckdns.org/go/…` — `install-cert`
+recorded the hostname from the certificate.
 
 ---
 
@@ -132,7 +136,7 @@ Let's Encrypt certs last 90 days. On any machine with internet, every ~60 days:
 ```bash
 export DuckDNS_Token="…"
 ~/.acme.sh/acme.sh --renew -d slsu-kiosk.duckdns.org --force
-tools/install-cert.sh ~/.acme.sh/slsu-kiosk.duckdns.org_ecc
+npm run install-cert -- ~/.acme.sh/slsu-kiosk.duckdns.org_ecc
 sudo systemctl restart slsu-kiosk
 ```
 

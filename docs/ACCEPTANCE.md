@@ -53,18 +53,24 @@ warning once, then walk outside and watch the dot follow you.
 
 **Full production simulation (trusted cert, no warning, still no Pi):**
 
-Follows `docs/KIOSK-DEPLOY.md` steps 1–2, plus: set the DuckDNS name's IP to this
-laptop's LAN IP, then
+Follows `docs/KIOSK-DEPLOY.md` steps 1–2, plus: **set the DuckDNS name's IP to
+this laptop's LAN IP** (not the auto-filled public one), then
 
 ```
-tools/install-cert.sh ~/.acme.sh/<name>.duckdns.org_ecc
-KIOSK_HOSTNAME=<name>.duckdns.org HTTPS_PORT=3443 npm start
+npm run install-cert -- ~/.acme.sh/<name>.duckdns.org_ecc
+npm start
 ```
 
-Phone on any Wi-Fi with internet → scan QR → `https://<name>.duckdns.org:3443/go/…`
-resolves (public DNS) to the laptop → **no warning** → GPS follow-cam. This is the
-exact server + cert path the Pi will run; only the DNS source differs (public now,
-the kiosk's own dnsmasq later).
+`install-cert` records the hostname from the cert, so `npm start` points the QR
+at `https://<name>.duckdns.org:3443` on its own. Test phones must be on the same
+Wi-Fi as the laptop, and that Wi-Fi needs internet so the phone can resolve the
+name. **Caveat:** some routers / campus networks block public DNS answers that
+point to a private `192.168.x` address ("DNS rebinding protection"). If phones
+can't load the page at all, that's why — fall back to `npm run phone-test`
+(self-signed, one warning tap) until the Pi is running its own DNS.
+
+This is the exact server + cert path the Pi will run; only the DNS source differs
+(public now, the kiosk's own dnsmasq later).
 
 ## When the Pi arrives
 

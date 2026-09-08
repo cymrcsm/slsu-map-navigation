@@ -9,6 +9,7 @@
     "db:init": "node db/init-db.js",
     "phone-test": "node tools/dev-https.mjs",
     "make-cert": "node tools/make-cert.mjs",
+    "install-cert": "node tools/install-cert.mjs",
     "smoke": "node tools/smoke.mjs"
   },
   "dependencies": {
