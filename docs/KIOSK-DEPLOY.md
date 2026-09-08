@@ -156,7 +156,7 @@ On a phone (ideally one iOS + one Android), joined to `SLSU-Kiosk-Map`:
 
 ## If you truly cannot get a domain
 
-`tools/make-cert.sh <ip>` makes a self-signed cert. It works, but every phone
-shows a one-time "not private" warning and iOS Safari may still refuse
+`node tools/make-cert.mjs <ip>` makes a self-signed cert. It works, but every
+phone shows a one-time "not private" warning and iOS Safari may still refuse
 geolocation. Acceptable for the team's own testing; not for walk-up evaluators.
-See `docs/PHONE-HANDOFF.md`.
+See `docs/ACCEPTANCE.md` and `docs/PHONE-HANDOFF.md`.

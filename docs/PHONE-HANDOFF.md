@@ -82,10 +82,11 @@ free DuckDNS name, a real Let's Encrypt cert (issued once over the internet via 
 DNS record, the kiosk never exposed), and the kiosk's own DNS answering that name
 locally. Fully trusted, fully offline at runtime.
 
-`tools/make-cert.sh <ip>` makes a **self-signed** cert instead — fine for the
-team's own testing, but every phone shows a one-time "not private" warning and
-iOS Safari may still refuse geolocation, so it is not suitable for walk-up
-evaluators. `certs/` is git-ignored — never commit the private key.
+`npm run phone-test` (or `node tools/make-cert.mjs <ip>`) makes a **self-signed**
+cert instead — fine for the team's own testing, but every phone shows a one-time
+"not private" warning and iOS Safari may still refuse geolocation, so it is not
+suitable for walk-up evaluators. `certs/` is git-ignored — never commit the
+private key.
 
 ## Configuration
 

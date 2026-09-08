@@ -7,13 +7,15 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "db:init": "node db/init-db.js",
-    "phone-test": "bash tools/dev-https.sh",
+    "phone-test": "node tools/dev-https.mjs",
+    "make-cert": "node tools/make-cert.mjs",
     "smoke": "node tools/smoke.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "qrcode-generator": "^2.0.4",
+    "selfsigned": "^2.4.1",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
