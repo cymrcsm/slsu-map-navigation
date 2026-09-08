@@ -53,21 +53,38 @@ warning once, then walk outside and watch the dot follow you.
 
 **Full production simulation (trusted cert, no warning, still no Pi):**
 
-Follows `docs/KIOSK-DEPLOY.md` steps 1–2, plus: **set the DuckDNS name's IP to
-this laptop's LAN IP** (not the auto-filled public one), then
+Already set up on the dev laptop:
+
+- DuckDNS name `slsu-kiosk.duckdns.org`, A record pointed at the laptop's LAN IP.
+- A real Let's Encrypt cert, issued via DuckDNS DNS-01, installed into `certs/`
+  (`certs/hostname` = `slsu-kiosk.duckdns.org`). Valid ~90 days.
+- acme.sh lives at `C:\Users\JEDPAD~1\acmesh` (it refuses paths with spaces, so
+  not under the normal home folder).
+
+So on that laptop it is just:
 
 ```
-npm run install-cert -- ~/.acme.sh/<name>.duckdns.org_ecc
 npm start
 ```
 
-`install-cert` records the hostname from the cert, so `npm start` points the QR
-at `https://<name>.duckdns.org:3443` on its own. Test phones must be on the same
-Wi-Fi as the laptop, and that Wi-Fi needs internet so the phone can resolve the
-name. **Caveat:** some routers / campus networks block public DNS answers that
-point to a private `192.168.x` address ("DNS rebinding protection"). If phones
-can't load the page at all, that's why — fall back to `npm run phone-test`
-(self-signed, one warning tap) until the Pi is running its own DNS.
+Console shows `Phone hand-off QR points at: https://slsu-kiosk.duckdns.org:3443`.
+Test phones on the **same Wi-Fi as the laptop** (that Wi-Fi needs internet so the
+phone resolves the name) → scan the QR → opens with **no warning** → live GPS.
+
+**Caveat:** some routers / campus networks block public DNS answers that point to
+a private `192.168.x` address ("DNS rebinding protection"). If phones can't load
+the page at all, that is why — fall back to `npm run phone-test` (self-signed,
+one warning tap) until the Pi runs its own DNS.
+
+**Renew** (before the ~90-day expiry, or whenever the laptop IP changes update the
+DuckDNS A record too):
+
+```
+export DuckDNS_Token="<token>"
+C:/Users/JEDPAD~1/acmesh/acme.sh --home C:/Users/JEDPAD~1/acmesh \
+  --config-home C:/Users/JEDPAD~1/acmesh/data --renew -d slsu-kiosk.duckdns.org --force
+npm run install-cert -- C:/Users/JEDPAD~1/acmesh/data/slsu-kiosk.duckdns.org_ecc
+```
 
 This is the exact server + cert path the Pi will run; only the DNS source differs
 (public now, the kiosk's own dnsmasq later).
