@@ -1,0 +1,32 @@
+# /etc/systemd/system/slsu-kiosk.service
+#
+#   sudo cp deploy/slsu-kiosk.service /etc/systemd/system/
+#   sudo systemctl enable --now slsu-kiosk
+#
+# Adjust User, WorkingDirectory and the Environment lines to match the Pi.
+# AmbientCapabilities lets Node bind 80/443 without running as root.
+
+[Unit]
+Description=SLSU Campus Navigation Kiosk
+After=network-online.target dnsmasq.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/thesis-map-navigation
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=3
+
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+Environment=PORT=80
+Environment=HTTPS_PORT=443
+Environment=KIOSK_HOSTNAME=slsu-kiosk.duckdns.org
+Environment=KIOSK_WIFI_SSID=SLSU-Kiosk-Map
+# Set a real one before the evaluation:
+Environment=KIOSK_ADMIN_CODE=change-me
+
+[Install]
+WantedBy=multi-user.target

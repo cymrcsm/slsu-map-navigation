@@ -37,15 +37,35 @@ try {
     cert: fs.readFileSync(path.join(CERT_DIR, 'cert.pem'))
   };
 } catch (err) { /* no certs: HTTP only */ }
-const HTTPS_PORT = process.env.HTTPS_PORT || (Number(PORT) + 443);
+const HTTPS_PORT = Number(process.env.HTTPS_PORT || (Number(PORT) + 443));
 
-const PUBLIC_URL = (process.env.KIOSK_PUBLIC_URL ||
-  detectLanBaseUrl(tlsOptions ? 'https' : 'http', tlsOptions ? HTTPS_PORT : PORT)
-).replace(/\/+$/, '');
+// KIOSK_HOSTNAME is the trusted name the phone's local DNS resolves to the kiosk
+// (see docs/KIOSK-DEPLOY.md). When set, the QR points at https://<hostname>,
+// dropping the port only when HTTPS is on 443.
+function defaultPublicUrl() {
+  if (process.env.KIOSK_PUBLIC_URL) return process.env.KIOSK_PUBLIC_URL;
+  if (process.env.KIOSK_HOSTNAME && tlsOptions) {
+    return HTTPS_PORT === 443
+      ? `https://${process.env.KIOSK_HOSTNAME}`
+      : `https://${process.env.KIOSK_HOSTNAME}:${HTTPS_PORT}`;
+  }
+  return detectLanBaseUrl(tlsOptions ? 'https' : 'http', tlsOptions ? HTTPS_PORT : PORT);
+}
+const PUBLIC_URL = defaultPublicUrl().replace(/\/+$/, '');
 const WIFI_SSID = process.env.KIOSK_WIFI_SSID || 'SLSU-Kiosk-Map';
 
 app.use(cors());
 app.use(express.json());
+
+// OS "is there internet?" probes. The kiosk's dnsmasq points the probe domains
+// at this server (deploy/dnsmasq.conf), and answering them as expected stops the
+// phone showing "Wi-Fi has no internet" when it joins the kiosk network.
+app.get(['/generate_204', '/gen_204'], (req, res) => res.status(204).end());          // Android
+app.get('/ncsi.txt', (req, res) => res.type('text/plain').send('Microsoft NCSI'));     // Windows
+app.get('/connecttest.txt', (req, res) => res.type('text/plain').send('Microsoft Connect Test'));
+app.get(['/hotspot-detect.html', '/library/test/success.html'], (req, res) =>         // Apple
+  res.type('html').send('<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>'));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const route = handler => (req, res) => {
@@ -239,16 +259,15 @@ app.get('*', (req, res) => {
 
 http.createServer(app).listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 SLSU Kiosk Server running on http://localhost:${PORT}`);
+  console.log(`   Phone hand-off QR points at: ${PUBLIC_URL}   (Wi-Fi: ${WIFI_SSID})`);
   if (!tlsOptions) {
-    console.log(`   Phone hand-off: ${PUBLIC_URL}  (Wi-Fi: ${WIFI_SSID})`);
-    console.log('   Live GPS on a phone needs HTTPS — add certs/ (see docs/PHONE-HANDOFF.md).');
+    console.log('   No certs/ — the phone\'s live GPS dot needs HTTPS. See docs/KIOSK-DEPLOY.md.');
   }
 });
 
 if (tlsOptions) {
   https.createServer(tlsOptions, app).listen(HTTPS_PORT, '0.0.0.0', () => {
-    console.log(`🔒 HTTPS on https://localhost:${HTTPS_PORT}`);
-    console.log(`   Phone hand-off: ${PUBLIC_URL}  (Wi-Fi: ${WIFI_SSID})`);
+    console.log(`🔒 HTTPS on port ${HTTPS_PORT}`);
   });
 }
 
