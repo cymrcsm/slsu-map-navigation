@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Map Calibration — SLSU Kiosk</title>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .cal-wrap { display: flex; height: 100vh; }
+    #cal-map { flex: 1; }
+    .cal-panel {
+      width: 350px; flex-shrink: 0; overflow-y: auto;
+      background: var(--surface-card, #FEFDF9);
+      border-left: 1px solid var(--border-subtle, #ddd);
+      padding: 18px; box-sizing: border-box;
+    }
+    .cal-panel h1 { font-size: 16px; margin: 0 0 4px; }
+    .cal-panel p.lede { font-size: 12px; color: #6b6257; margin: 0 0 16px; line-height: 1.5; }
+    .cal-field { margin-bottom: 14px; }
+    .cal-field label { display: block; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .04em; color: #4A554E; margin-bottom: 5px; }
+    .cal-field .row { display: flex; gap: 8px; align-items: center; }
+    .cal-field input[type=range] { flex: 1; min-width: 0; }
+    .cal-field input[type=number] { width: 96px; padding: 4px 6px; font-size: 12px;
+      border: 1px solid #cbc3b8; border-radius: 5px; font-family: ui-monospace, monospace; }
+    .cal-btn { width: 100%; padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer;
+      border: 1px solid #cbc3b8; border-radius: 8px; background: #fff; margin-bottom: 8px; }
+    .cal-btn.primary { background: #65879A; color: #fff; border-color: #65879A; }
+    .cal-btn.armed { background: #C2503A; color: #fff; border-color: #C2503A; }
+    .cal-btn.danger { color: #C2503A; }
+    pre#cal-block { background: #2f2a24; color: #f4efe6; font-size: 11px; line-height: 1.5;
+      padding: 10px; border-radius: 8px; overflow-x: auto; font-family: ui-monospace, monospace; }
+    .cal-note { font-size: 11px; color: #6b6257; line-height: 1.5; margin: 6px 0 14px; }
+    .cal-readout { font-family: ui-monospace, monospace; font-size: 11px; color: #6b6257; }
+    hr { border: 0; border-top: 1px solid #e5ded4; margin: 16px 0; }
+  </style>
+</head>
+<body>
+  <div class="cal-wrap">
+    <div id="cal-map"></div>
+
+    <aside class="cal-panel">
+      <h1>Map calibration</h1>
+      <p class="lede">
+        Line the campus drawing up with the street map underneath, then paste the
+        resulting block into <code>public/js/georef.js</code>.
+      </p>
+
+      <button id="cal-move" class="cal-btn">Move overlay (drag on map)</button>
+
+      <div class="cal-field">
+        <label for="cal-rot">Rotation — degrees clockwise from north</label>
+        <div class="row">
+          <input type="range" id="cal-rot" min="-180" max="180" step="0.1" />
+          <input type="number" id="cal-rot-n" step="0.1" />
+        </div>
+      </div>
+
+      <div class="cal-field">
+        <label for="cal-scale">Scale — metres per drawing unit</label>
+        <div class="row">
+          <input type="range" id="cal-scale" min="0.3" max="3" step="0.001" />
+          <input type="number" id="cal-scale-n" step="0.001" />
+        </div>
+      </div>
+
+      <div class="cal-field">
+        <label for="cal-op">Overlay opacity</label>
+        <div class="row">
+          <input type="range" id="cal-op" min="0.15" max="1" step="0.01" value="0.65" />
+          <span class="cal-readout" id="cal-op-v">0.65</span>
+        </div>
+      </div>
+
+      <hr />
+
+      <button id="cal-save" class="cal-btn primary">Save &amp; preview in kiosk</button>
+      <button id="cal-reset" class="cal-btn danger">Reset to file values</button>
+      <p class="cal-note">
+        Save stores the transform in this browser so the kiosk picks it up
+        immediately. To make it permanent for every browser, paste the block
+        below over <code>GEOREF_DEFAULT</code> in <code>js/georef.js</code>.
+      </p>
+
+      <pre id="cal-block"></pre>
+      <button id="cal-copy" class="cal-btn">Copy block</button>
+
+      <hr />
+      <div class="cal-readout" id="cal-cursor">cursor: —</div>
+      <div class="cal-readout" id="cal-status"></div>
+    </aside>
+  </div>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="js/georef.js"></script>
+  <script src="js/geo-overlay.js"></script>
+  <script src="js/calibrate.js"></script>
+</body>
+</html>
