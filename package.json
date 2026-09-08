@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "db:init": "node db/init-db.js"
+    "db:init": "node db/init-db.js",
+    "phone-test": "bash tools/dev-https.sh",
+    "smoke": "node tools/smoke.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
