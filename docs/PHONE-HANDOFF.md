@@ -68,21 +68,55 @@ npm start
 
 ### On a phone over Wi-Fi (needs HTTPS)
 
-Browsers block `navigator.geolocation` on plain `http://` to a LAN IP. Provide a
-cert and the server also listens on HTTPS:
+Browsers only run `navigator.geolocation` in a **secure context** — `https://` or
+`localhost`. A phone reaching the kiosk over Wi-Fi is neither, so the moving dot
+stays off until the kiosk is served over HTTPS. `mobile.js` detects this
+(`window.isSecureContext`) and says why.
+
+`server.js` starts an HTTPS listener automatically **when `certs/key.pem` and
+`certs/cert.pem` exist** (on `HTTPS_PORT`, default `PORT + 443` = 3443). The cert
+must list, in its Subject Alternative Name, the **exact address the phone types**
+— for a kiosk that is its own Wi-Fi access point that is a fixed IP such as
+`10.42.0.1`.
+
+**Option A — self-signed (fastest; one "not private" tap per phone)**
 
 ```
-mkdir certs
-# self-signed, phone shows a one-time warning:
-openssl req -x509 -newkey rsa:2048 -nodes -keyout certs/key.pem -out certs/cert.pem \
-  -days 825 -subj "/CN=slsu-kiosk" -addext "subjectAltName=IP:<kiosk-LAN-ip>"
-# or, no warning if you install the mkcert CA on the test phones:
-#   mkcert -key-file certs/key.pem -cert-file certs/cert.pem <kiosk-LAN-ip> localhost
-
-KIOSK_PUBLIC_URL="https://<kiosk-LAN-ip>:3443" npm start
+tools/make-cert.sh 10.42.0.1                 # the kiosk's Wi-Fi AP address
+KIOSK_PUBLIC_URL="https://10.42.0.1:3443" npm start
 ```
 
-`certs/` is git-ignored — never commit the private key.
+On the phone: scan the QR → tap **Advanced → Proceed** once (Android/Chrome is
+lenient; iOS Safari sometimes still refuses geolocation on an untrusted cert, so
+test on the real evaluation devices). After that, the moving dot works.
+
+**Option B — mkcert (no warning; install a CA on each test phone once)**
+
+```
+# on any machine with internet, once:
+mkcert -install
+mkcert -cert-file certs/cert.pem -key-file certs/key.pem 10.42.0.1 localhost slsu-kiosk
+
+# copy the CA to each test phone and trust it:
+mkcert -CAROOT        # prints the folder holding rootCA.pem
+#   iOS:     AirDrop/email rootCA.pem → Settings ▸ Profile Downloaded ▸ Install,
+#            then Settings ▸ General ▸ About ▸ Certificate Trust Settings ▸ enable
+#   Android: Settings ▸ Security ▸ Encryption & credentials ▸ Install a certificate ▸ CA
+
+KIOSK_PUBLIC_URL="https://10.42.0.1:3443" npm start
+```
+
+This is the version to demo at the defense — a real trusted TLS connection, still
+fully offline.
+
+**Notes**
+
+- `certs/` is git-ignored — never commit the private key.
+- Run the kiosk's Node process without root: 3443 (not 443) needs no privilege.
+- The kiosk keeps serving plain HTTP too (for `localhost` and the touchscreen);
+  only the phone URL in the QR switches to `https` when a cert is present.
+- If the kiosk is on campus Wi-Fi with DHCP instead of being its own AP, give it
+  a static IP or a DHCP reservation first — the cert is pinned to one address.
 
 ## Configuration
 
