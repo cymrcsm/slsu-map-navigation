@@ -6,6 +6,9 @@ node_modules/
 *.db
 *.fig
 
+# Local TLS certs for testing live GPS on a phone (never commit private keys)
+certs/
+
 # OS files
 .DS_Store
 Thumbs.db

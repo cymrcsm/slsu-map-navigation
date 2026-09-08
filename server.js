@@ -1,5 +1,9 @@
 const express = require('express');
 const path = require('path');
+const os = require('os');
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
 const cors = require('cors');
 const crypto = require('crypto');
 const db = require('./database');
@@ -7,6 +11,38 @@ const overrides = require('./db/overrides');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Base URL a phone on the kiosk's Wi-Fi should use to reach this server. Set
+// KIOSK_PUBLIC_URL in production (e.g. https://10.42.0.1:3443); the auto-detected
+// LAN address is a best-effort fallback for development.
+function detectLanBaseUrl(scheme, port) {
+  const nets = os.networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name] || []) {
+      if (net.family === 'IPv4' && !net.internal) return `${scheme}://${net.address}:${port}`;
+    }
+  }
+  return `${scheme}://localhost:${port}`;
+}
+
+// HTTPS is only needed to test live GPS on a physical phone (browsers block
+// geolocation on plain http to a LAN IP). On a laptop, http://localhost is a
+// secure context already. Drop certs/key.pem + certs/cert.pem to enable it -
+// see docs/PHONE-HANDOFF.md for the one-line mkcert / openssl command.
+const CERT_DIR = path.join(__dirname, 'certs');
+let tlsOptions = null;
+try {
+  tlsOptions = {
+    key: fs.readFileSync(path.join(CERT_DIR, 'key.pem')),
+    cert: fs.readFileSync(path.join(CERT_DIR, 'cert.pem'))
+  };
+} catch (err) { /* no certs: HTTP only */ }
+const HTTPS_PORT = process.env.HTTPS_PORT || (Number(PORT) + 443);
+
+const PUBLIC_URL = (process.env.KIOSK_PUBLIC_URL ||
+  detectLanBaseUrl(tlsOptions ? 'https' : 'http', tlsOptions ? HTTPS_PORT : PORT)
+).replace(/\/+$/, '');
+const WIFI_SSID = process.env.KIOSK_WIFI_SSID || 'SLSU-Kiosk-Map';
 
 app.use(cors());
 app.use(express.json());
@@ -180,13 +216,41 @@ app.get('/api/health', route(async (req, res) => {
   res.json({ status: 'ok', ...(await db.getStats()) });
 }));
 
+// Client config for the phone hand-off QR code (see /go/:slug below).
+app.get('/api/config', (req, res) => {
+  res.json({ publicUrl: PUBLIC_URL, wifiSsid: WIFI_SSID, https: !!tlsOptions });
+});
+
+// Unknown /api/* paths fail as JSON, not as the SPA shell.
+app.all('/api/*', (req, res) => {
+  res.status(404).json({ error: `No such endpoint: ${req.method} ${req.path}` });
+});
+
+// Phone hand-off page. The kiosk QR points here as
+//   /go/<location-slug>?from=<x>,<y>
+// and js/mobile.js reads the slug and the kiosk origin from the URL.
+app.get('/go/:slug', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'mobile.html'));
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+http.createServer(app).listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 SLSU Kiosk Server running on http://localhost:${PORT}`);
+  if (!tlsOptions) {
+    console.log(`   Phone hand-off: ${PUBLIC_URL}  (Wi-Fi: ${WIFI_SSID})`);
+    console.log('   Live GPS on a phone needs HTTPS — add certs/ (see docs/PHONE-HANDOFF.md).');
+  }
 });
+
+if (tlsOptions) {
+  https.createServer(tlsOptions, app).listen(HTTPS_PORT, '0.0.0.0', () => {
+    console.log(`🔒 HTTPS on https://localhost:${HTTPS_PORT}`);
+    console.log(`   Phone hand-off: ${PUBLIC_URL}  (Wi-Fi: ${WIFI_SSID})`);
+  });
+}
 
 process.on('SIGINT', async () => {
   await db.close();

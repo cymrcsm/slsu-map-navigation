@@ -123,6 +123,7 @@
 
           <div class="detail-actions">
             <button id="get-directions-btn" class="action-btn directions-btn">🧭 Ask for Directions</button>
+            <button id="send-to-phone-btn" class="action-btn secondary-btn">📱 Take this on my phone</button>
             <button id="recenter-room-btn" class="action-btn secondary-btn">Focus on Map</button>
             <button id="edit-location-btn" class="action-btn secondary-btn">Edit details</button>
 
@@ -303,11 +304,29 @@
 
   </div>
 
+  <!-- Phone hand-off: QR that opens a walking, GPS-following copy of this map -->
+  <div id="qr-overlay" class="qr-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="qr-title">
+    <div class="qr-card">
+      <button id="qr-close-btn" class="qr-close" aria-label="Close">✕</button>
+      <h3 id="qr-title">Take the directions with you</h3>
+      <p class="qr-dest" id="qr-dest-name">Destination</p>
+      <div id="qr-code" class="qr-code"></div>
+      <ol class="qr-steps">
+        <li>On your phone, join Wi-Fi <strong id="qr-wifi-name">SLSU-Kiosk-Map</strong></li>
+        <li>Open the camera and point it at this code</li>
+        <li>The map opens with your route and follows you as you walk</li>
+      </ol>
+      <p class="qr-url" id="qr-url"></p>
+    </div>
+  </div>
+
   <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="vendor/qrcode/qrcode.js"></script>
   <script src="js/georef.js"></script>
   <script src="js/geo-overlay.js"></script>
   <script src="js/campus-data.js"></script>
   <script src="js/walkpaths.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/handoff.js"></script>
 </body>
 </html>

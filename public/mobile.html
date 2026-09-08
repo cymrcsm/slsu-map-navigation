@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SLSU Campus — Walking Directions</title>
+  <!-- served at /go/<slug>, so resolve every asset from the site root -->
+  <base href="/" />
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
+  <style>
+    :root {
+      --ink:#22312F; --paper:#FEFDF9; --teal:#0F7A87; --teal-deep:#0A5B66;
+      --rufous:#C4622C; --danger:#9E2B22; --me:#1a73e8;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { height:100%; font-family:-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:#aab7ad; }
+    #map { position:absolute; inset:0; background:#aab7ad; }
+    .leaflet-container { background:#aab7ad; }
+
+    .sheet {
+      position:absolute; left:0; right:0; bottom:0; z-index:1000;
+      background:var(--paper); border-radius:18px 18px 0 0;
+      box-shadow:0 -6px 24px rgba(0,0,0,.20);
+      padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+      max-height:42vh; overflow-y:auto;
+    }
+    .sheet h1 { font-size:1.15rem; line-height:1.25; }
+    .sheet .sub { color:#63726A; font-size:.9rem; margin-top:2px; }
+    .sheet .meta { margin-top:10px; font-size:.9rem; }
+    .sheet .meta div { padding:3px 0; }
+    .sheet .meta strong { color:#4b5a54; font-weight:600; }
+    .status {
+      margin-top:11px; font-size:.92rem; font-weight:600; padding:9px 11px;
+      border-radius:9px; background:var(--teal); color:#fff;
+    }
+    .status.warn { background:#FBECE8; color:#8a3a2b; }
+    .status.big  { font-size:1.05rem; }
+
+    .fab {
+      position:absolute; right:12px; z-index:1000;
+      bottom:calc(42vh + 14px);
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .fab button {
+      width:46px; height:46px; border-radius:50%; border:none;
+      background:var(--paper); box-shadow:0 2px 10px rgba(0,0,0,.28);
+      font-size:1.25rem; color:var(--teal-deep); display:grid; place-items:center;
+    }
+    .fab button.on { background:var(--teal); color:#fff; }
+    .fab button[hidden] { display:none; }
+
+    .me-dot {
+      width:20px; height:20px; border-radius:50%;
+      background:var(--me); border:3px solid #fff; box-shadow:0 0 0 1.5px rgba(0,0,0,.25);
+    }
+    .me-arrow {
+      width:0; height:0; border-left:9px solid transparent; border-right:9px solid transparent;
+      border-bottom:20px solid var(--me); filter:drop-shadow(0 1px 1px rgba(0,0,0,.35));
+    }
+    .dest-pin { font-size:30px; line-height:1; filter:drop-shadow(0 2px 3px rgba(0,0,0,.4)); }
+    .kiosk-pin { font-size:20px; line-height:1; opacity:.85; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="fab">
+    <button id="recenter-btn" aria-label="Follow my location" title="Follow my location">◎</button>
+  </div>
+
+  <section class="sheet">
+    <h1 id="dest-name">Loading…</h1>
+    <p class="sub" id="dest-sub"></p>
+    <div class="meta" id="dest-meta"></div>
+    <div class="status" id="status">Preparing your route…</div>
+  </section>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="js/georef.js"></script>
+  <script src="js/geo-overlay.js"></script>
+  <script src="js/campus-data.js"></script>
+  <script src="js/walkpaths.js"></script>
+  <script src="js/routing.js"></script>
+  <script src="js/mobile.js"></script>
+</body>
+</html>
