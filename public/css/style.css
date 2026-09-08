@@ -1,38 +1,48 @@
 /* ==========================================================================
    COLOUR SYSTEM
 
-   Brand — Southern Leyte State University. The university states that the
-   colours of its seal are derived from the kingfisher, locally the
-   "talingkaroy": turquoise back, rufous breast, white throat, with gold from
-   the seal's eight gears.
+   Brand — Southern Leyte State University. The university's official colours
+   are navy blue and white; its seal carries navy, sky blue, white, green and
+   black. Navy leads, sky blue and green support.
 
-   Ground — the OpenStreetMap Carto palette the cached tiles under
-   public/tiles are drawn in, so the panels and the calibrated map read as one
-   surface rather than two. Surfaces stay warm and low-chroma so the map is
-   never fighting the interface; the brand colours carry the controls.
+   Ground — the OpenStreetMap Carto palette the cached tiles under public/tiles
+   are drawn in: warm paper, stone and clay. Those surfaces are left alone, so
+   the panels and the calibrated map read as one warm sheet rather than two.
+   The action colour is drawn from OSM's own clay rather than the seal, because
+   a warm accent is what keeps the interface sitting on the map instead of
+   floating above it.
 
-   Every value here is checked for WCAG AA against --map-paper. The ratio in
-   each comment is the measured contrast — do not lighten these without
-   re-checking, the kiosk is read standing up and it is scored on usability.
+   Every value is checked for WCAG AA against --map-paper. The ratio in each
+   comment is the measured contrast — do not lighten these without re-checking,
+   the kiosk is read standing up and it is scored on usability.
    ========================================================================== */
 :root {
-  /* --- SLSU brand, kingfisher-derived --- */
-  --slsu-teal:        #0F7A87;  /* 4.97:1  primary, safe for body text      */
-  --slsu-teal-deep:   #0A5B66;  /* 7.64:1  headings, pressed states         */
-  --slsu-teal-mid:    #3E8F9A;  /* 3.68:1  borders and UI edges only        */
-  --slsu-rufous:      #C4622C;  /*         pins and the route line          */
-  --slsu-rufous-deep: #9E4A1E;  /* 6.08:1  with white text on it            */
-  --slsu-rufous-dark: #843C15;  /*         pressed                          */
-  --slsu-gold:        #D3A02C;  /* 2.34:1  decorative only, never text      */
+  /* --- SLSU brand --- */
+  --slsu-navy:      #1B3A6B;  /* 11.07:1  official primary                   */
+  --slsu-navy-deep: #12294D;  /* 14.23:1  headings, pressed states           */
+  --slsu-sky:       #3E7CB1;  /*  4.37:1  seal's sky blue - borders, not text*/
+  --slsu-green:     #3F7A4B;  /*  5.04:1  seal's green - confirmations       */
+  --slsu-ink:       #1E2A33;  /* 14.39:1  near-black carrying the navy       */
 
-  /* Translucent tints of the two brand colours. Declared here so the tint and
-     the colour it derives from can never drift apart. */
-  --teal-ring:  rgba(15, 122, 135, 0.22);   /* focus rings                   */
-  --teal-wash:  rgba(15, 122, 135, 0.14);   /* quiet teal fills              */
-  --teal-glow:  rgba(15, 122, 135, 0.75);   /* kiosk marker halo             */
-  --teal-pulse: rgba(15, 122, 135, 0.35);   /* kiosk marker pulse ring       */
-  --gold-wash:  rgba(211, 160, 44, 0.34);   /* search-term highlight         */
-  --slsu-ink:         #22312F;  /* 13.3:1  near-black carrying the teal     */
+  /* Text and edges that sit ON the navy panel rather than on paper. Warm
+     off-white rather than pure white, so the chrome stays on the warm side. */
+  --on-brand:        #EDE7DC;  /*  9.15:1 on navy - labels, panel text        */
+  --on-brand-muted:  #A9B7CD;  /*  5.55:1 on navy - quieter labels, scrollbar */
+  --on-brand-edge:   rgba(237, 231, 220, 0.22);
+
+  /* --- warm action colour, from the OSM clay in the tiles --- */
+  --warm-amber:      #B0691E;  /*         pins and the route line            */
+  --warm-amber-deep: #8F5216;  /*  6.09:1 with white text on it              */
+  --warm-amber-dark: #74410F;  /*         pressed                            */
+
+  /* Translucent tints, declared beside the colours they derive from so the two
+     can never drift apart. Named by role, not hue, so a future palette change
+     does not leave the names lying. */
+  --focus-ring:     rgba(27, 58, 107, 0.22);   /* focus rings                */
+  --brand-wash:     rgba(27, 58, 107, 0.12);   /* quiet navy fills           */
+  --brand-glow:     rgba(27, 58, 107, 0.75);   /* kiosk marker halo          */
+  --brand-pulse:    rgba(27, 58, 107, 0.35);   /* kiosk marker pulse ring    */
+  --highlight-wash: rgba(227, 163, 88, 0.38);  /* search-term highlight      */
 
   /* --- OpenStreetMap Carto ground, matching the cached tiles --- */
   --map-ground:     #778E81;
@@ -50,24 +60,25 @@
 
   /* --- semantic --- */
   --bg-color: var(--map-paper);
-  --text-color: #33413D;
+  --text-color: #33393D;
   --text-dark: var(--slsu-ink);
-  --text-muted: #63726A;        /* 4.98:1 — was #7C6F60 at 4.14, below AA   */
-  --primary-color: var(--slsu-teal);
-  --primary-strong: var(--slsu-teal-deep);
-  --secondary-color: var(--slsu-teal-mid);
-  --accent-color: var(--slsu-rufous);
-  --accent-strong: var(--slsu-rufous-deep);
-  --accent-dark: var(--slsu-rufous-dark);
-  --danger-color: #9E2B22;      /* 7.31:1, kept clearly apart from rufous   */
+  --text-muted: #6E6459;        /* 5.68:1 warm grey, sits on the stone panel */
+  --primary-color: var(--slsu-navy);
+  --primary-strong: var(--slsu-navy-deep);
+  --secondary-color: var(--slsu-sky);
+  --success-color: var(--slsu-green);
+  --accent-color: var(--warm-amber);
+  --accent-strong: var(--warm-amber-deep);
+  --accent-dark: var(--warm-amber-dark);
+  --danger-color: #96261F;      /* 7.95:1, kept clearly apart from the amber */
 
-  --surface-sidebar: var(--map-stone);
+  --surface-sidebar: var(--slsu-navy);   /* the panel chrome carries the brand */
   --surface-box: var(--map-paper);
   --surface-input: var(--map-paper);
   --surface-card: var(--map-paper);
   --surface-hover: #F1EBE3;
   --border-subtle: #C9BDB0;
-  --border-focus: var(--slsu-teal);
+  --border-focus: var(--slsu-navy);
   --card-shadow: 0 4px 14px rgba(70, 58, 46, 0.10);
   --card-shadow-hover: 0 6px 20px rgba(70, 58, 46, 0.16);
 
@@ -97,11 +108,13 @@ body, html {
   background: var(--bg-color);
 }
 
+/* Navy chrome holding warm paper cards: the brand reads at a glance, while
+   everything you actually read stays on the light, warm surface the map uses. */
 .panel {
   height: calc(100vh - 2 * var(--panel-gap));
   margin: var(--panel-gap);
   background: var(--surface-sidebar);
-  border: 1px solid var(--map-stone-deep);
+  border: 1px solid var(--slsu-navy-deep);
   border-radius: 16px;
   box-shadow: var(--card-shadow-hover);
   display: flex;
@@ -131,8 +144,10 @@ body, html {
   margin-bottom: 10px;
 }
 
+/* This one sits directly on the navy chrome rather than on a paper card. */
 .panel-right-label {
   padding: 0 18px;
+  color: var(--on-brand-muted);
 }
 
 .panel-search {
@@ -163,11 +178,11 @@ body, html {
   flex-direction: column;
   gap: 5px;
   scrollbar-width: thin;
-  scrollbar-color: var(--map-stone-deep) transparent;
+  scrollbar-color: var(--on-brand-edge) transparent;
 }
 
 .category-list::-webkit-scrollbar { width: 5px; }
-.category-list::-webkit-scrollbar-thumb { background: var(--map-stone-deep); border-radius: 4px; }
+.category-list::-webkit-scrollbar-thumb { background: var(--on-brand-edge); border-radius: 4px; }
 
 .cat-btn {
   display: flex;
@@ -228,7 +243,7 @@ body, html {
 .category-view-header h3 {
   font-size: 15px;
   font-weight: 700;
-  color: var(--text-dark);
+  color: var(--primary-strong);
   line-height: 1.3;
 }
 
@@ -308,7 +323,7 @@ body, html {
 
 .search-input-wrapper:focus-within {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px var(--teal-ring);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .search-icon {
@@ -377,7 +392,7 @@ body, html {
   border-radius: 10px;
   box-shadow: var(--card-shadow-hover);
   scrollbar-width: thin;
-  scrollbar-color: var(--map-stone-deep) transparent;
+  scrollbar-color: var(--on-brand-edge) transparent;
 }
 
 .suggestions.hidden {
@@ -385,7 +400,7 @@ body, html {
 }
 
 .suggestions::-webkit-scrollbar { width: 5px; }
-.suggestions::-webkit-scrollbar-thumb { background: var(--map-stone-deep); border-radius: 4px; }
+.suggestions::-webkit-scrollbar-thumb { background: var(--on-brand-edge); border-radius: 4px; }
 
 .suggestion {
   display: flex;
@@ -429,7 +444,7 @@ body, html {
 }
 
 .suggestion mark {
-  background: var(--gold-wash);
+  background: var(--highlight-wash);
   color: inherit;
   border-radius: 2px;
   padding: 0 1px;
@@ -488,7 +503,7 @@ body, html {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--teal-wash);
+  background: var(--brand-wash);
   color: var(--primary-strong);
   font-size: 12px;
   font-weight: 700;
@@ -499,6 +514,7 @@ body, html {
 }
 
 .step-content > strong {
+  color: var(--primary-strong);
   display: block;
   font-size: 13px;
   color: var(--text-dark);
@@ -596,7 +612,7 @@ body, html {
 
 .detail-row strong {
   display: block;
-  color: var(--text-dark);
+  color: var(--primary-color);
   font-size: 12px;
   font-weight: 600;
 }
@@ -623,23 +639,46 @@ body, html {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* The compass takes the SLSU navy against the light button. */
+#get-directions-btn .icon {
+  color: var(--primary-color);
 }
 
 .action-btn:active {
   transform: scale(0.98);
 }
 
-/* Deep rufous rather than the bright one: white on --accent-strong measures
-   6.08:1, while the brighter fill only reaches 4.09:1 and fails AA for text. */
+/* The filled primary: Save changes, Confirm, Add New Location. This class is
+   shared by six buttons, so it must stay the emphatic one. */
 .directions-btn {
   background: var(--accent-strong);
   color: var(--map-paper);
   border: none;
-  box-shadow: 0 4px 12px rgba(132, 60, 21, 0.30);
+  box-shadow: 0 4px 12px rgba(116, 65, 15, 0.32);
 }
 
 .directions-btn:hover {
   background: var(--accent-dark);
+}
+
+/* Ask for Directions alone sits level with Focus on Map and Edit details -
+   scoped by id so the shared class above is untouched. */
+#get-directions-btn {
+  background: var(--surface-card);
+  color: var(--text-dark);
+  border: 1px solid var(--border-subtle);
+  box-shadow: none;
+}
+
+#get-directions-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--map-stone-deep);
 }
 
 .secondary-btn {
@@ -724,8 +763,34 @@ body, html {
 }
 
 .auth-row.hidden,
-.edit-panel.hidden {
+.edit-panel.hidden,
+.edit-menu.hidden {
   display: none;
+}
+
+/* The three admin actions live behind one Edit button so the information
+   card stays short for ordinary visitors. */
+.edit-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--surface-hover);
+}
+
+.edit-menu-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+#edit-menu-btn.open {
+  background: var(--surface-hover);
+  border-color: var(--map-stone-deep);
 }
 
 .edit-panel {
@@ -750,7 +815,7 @@ body, html {
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   scrollbar-width: thin;
-  scrollbar-color: var(--map-stone-deep) transparent;
+  scrollbar-color: var(--on-brand-edge) transparent;
 }
 
 .cat-check {
@@ -818,6 +883,27 @@ body, html {
 .form-msg.err { color: var(--danger-color); font-weight: 600; }
 
 .detail-actions .danger-btn { margin-top: 2px; }
+
+/* The Edit group. The rule down its left edge and the inset ground say these
+   actions belong to the button above them rather than to the card. */
+.edit-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  margin-top: 2px;
+  background: var(--surface-hover);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--primary-color);
+  border-radius: 4px 10px 10px 4px;
+}
+
+#edit-menu-btn[aria-expanded="true"],
+#edit-menu-btn.open {
+  background: var(--surface-hover);
+  border-color: var(--primary-color);
+  color: var(--primary-strong);
+}
 
 .map-container {
   flex: 1;
@@ -953,7 +1039,7 @@ body, html {
   background: var(--primary-strong);
   border: 3px solid var(--map-paper);
   border-radius: 50%;
-  box-shadow: 0 0 10px var(--teal-glow);
+  box-shadow: 0 0 10px var(--brand-glow);
 }
 
 .kiosk-pulsing-marker::after {
@@ -964,7 +1050,7 @@ body, html {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: var(--teal-pulse);
+  background: var(--brand-pulse);
   animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
 

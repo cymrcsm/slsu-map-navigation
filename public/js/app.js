@@ -175,21 +175,37 @@ const basemap = L.tileLayer('tiles/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
 
-const campusOverlay = new GeoImageOverlay('assets/groundFloor_layer.svg', {
+// One drawing per level, in the same order as WALK_PATHS.levels. They share the
+// 320x570 frame and the same georeference, so they stack exactly.
+const FLOOR_ASSETS = ['assets/groundFloor_layer.svg', 'assets/secondFloor_layer.svg'];
+let activeLevel = 0;
+
+// Every floor is drawn at once rather than swapped. The floor being viewed sits
+// on top at full strength; the rest stay faint underneath so the building keeps
+// its shape while you move between them. The floor a route happens to end on
+// does not decide this - the floor the user is looking at does.
+const INACTIVE_FLOOR_OPACITY = 0.18;
+
+const floorOverlays = FLOOR_ASSETS.map(url => new GeoImageOverlay(url, {
   canvasWidth: MAP_WIDTH,
   canvasHeight: MAP_HEIGHT,
   bearingDeg: GEOREF.bearingDeg,
   className: 'campus-overlay'
-});
+}));
 
+// Bounds are identical across floors, so any one of them speaks for all.
+const campusOverlay = floorOverlays[0];
 const bounds = campusOverlay.getBounds();
 map.setMaxBounds(bounds.pad(0.25));
 
-// One drawing per level, in the same order as WALK_PATHS.levels. Switching
-// floors swaps this image and filters the pins; the map itself never moves,
-// because both drawings share the 320x570 frame and the same georeference.
-const FLOOR_ASSETS = ['assets/groundFloor_layer.svg', 'assets/secondFloor_layer.svg'];
-let activeLevel = 0;
+function applyFloorOpacity() {
+  const front = basemapVisible ? OVERLAY_OPACITY_OVER_BASEMAP : 1;
+  floorOverlays.forEach((ov, i) => {
+    const isActive = i === activeLevel;
+    ov.setOpacity(isActive ? front : INACTIVE_FLOOR_OPACITY);
+    if (ov.setZIndex) ov.setZIndex(isActive ? 2 : 1);
+  });
+}
 
 let basemapVisible = false;
 let basemapUsable = true;
@@ -197,14 +213,14 @@ let basemapUsable = true;
 function applyBasemap(on) {
   basemapVisible = on;
   if (on) { basemap.addTo(map); } else if (map.hasLayer(basemap)) { map.removeLayer(basemap); }
-  campusOverlay.setOpacity(on ? OVERLAY_OPACITY_OVER_BASEMAP : 1);
+  applyFloorOpacity();
   if (basemapBtn) {
     basemapBtn.classList.toggle('active-basemap', on);
     basemapBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
 }
 
-campusOverlay.addTo(map);
+floorOverlays.forEach(ov => ov.addTo(map));
 applyBasemap(true);
 
 const CAMPUS_CENTER = toLeafletCoords([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
@@ -490,6 +506,7 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   resetRemovePrompt();
   resetMovePrompt();
   resetEditPanel();
+  closeEditMenu();
 
   // Coming from a category listing, "back" should return to that listing.
   backToTutorialBtn.textContent = activeCategory === 'ALL'
@@ -852,15 +869,16 @@ function splitByLevel(points) {
   return runs;
 }
 
-function drawRoute(destination) {
+function drawRoute(destination, followDestination = false) {
   clearActiveRoute();
 
   const destLevel = levelOfFloor(destination.floor);
-  // Directions start where the user is standing, so show the kiosk's floor
-  // first even if the destination is upstairs. Passing false stops this from
-  // calling straight back into drawRoute.
-  if (destLevel !== KIOSK_LEVEL && activeLevel !== KIOSK_LEVEL) {
-    setActiveLevel(KIOSK_LEVEL, false);
+  // Asking for directions moves to the floor the room is on, because that is
+  // the part the user came for. Redraws that were triggered by the user picking
+  // a floor pass false, so their choice stands. Passing false to setActiveLevel
+  // stops it from calling straight back into drawRoute.
+  if (followDestination && destLevel !== activeLevel) {
+    setActiveLevel(destLevel, false);
   }
   const path = findWalkingPath(kioskCoords, destination.coords, KIOSK_LEVEL, destLevel);
 
@@ -959,7 +977,7 @@ if (basemapBtn) {
 }
 
 getDirectionsBtn.addEventListener('click', () => {
-  if (activeSelectedLocation) drawRoute(activeSelectedLocation);
+  if (activeSelectedLocation) drawRoute(activeSelectedLocation, true);
 });
 
 setKioskBtn.addEventListener('click', () => {
@@ -1080,12 +1098,12 @@ document.getElementById('recenter-map-btn').addEventListener('click', () => {
 // FLOOR SWITCHING
 // ==========================================
 
-/** Show a level: swap the drawing, refilter the pins, redraw the open route. */
+/** Show a level: bring its drawing forward, refilter the pins, redraw the route. */
 function setActiveLevel(level, redrawRoute = true) {
   if (!(level >= 0 && level < LEVELS.length)) return;
   if (level === activeLevel) return;
   activeLevel = level;
-  campusOverlay.setUrl(FLOOR_ASSETS[level] || FLOOR_ASSETS[0]);
+  applyFloorOpacity();
   document.querySelectorAll('.floor-btn').forEach(b => {
     b.classList.toggle('active', (parseInt(b.dataset.floor, 10) - 1) === level);
   });
@@ -1093,7 +1111,7 @@ function setActiveLevel(level, redrawRoute = true) {
   renderKioskMarker();
   // The route spans floors, so which part is drawn solid depends on this.
   if (redrawRoute && activeRouteLayers.length && activeSelectedLocation) {
-    drawRoute(activeSelectedLocation);
+    drawRoute(activeSelectedLocation, false);
   }
 }
 
@@ -1444,6 +1462,8 @@ moveCode.addEventListener('keydown', e => { if (e.key === 'Enter') moveConfirmBt
 // 16. EDIT A PINNED LOCATION
 // ==========================================
 
+const editMenuBtn = document.getElementById('edit-menu-btn');
+const editMenu = document.getElementById('edit-menu');
 const editLocationBtn = document.getElementById('edit-location-btn');
 const editPanel = document.getElementById('edit-panel');
 const editName = document.getElementById('edit-name');
@@ -1531,6 +1551,29 @@ function readCategories(previous) {
     .map(b => b.value);
   return kept.concat(added);
 }
+
+function closeEditMenu() {
+  if (!editMenu) return;
+  editMenu.classList.add('hidden');
+  editMenuBtn.classList.remove('open');
+  editMenuBtn.setAttribute('aria-expanded', 'false');
+}
+
+// One button in front of the three admin actions. Closing it also puts away
+// whichever of the three was open, so reopening starts from the menu again.
+editMenuBtn.addEventListener('click', () => {
+  const opening = editMenu.classList.contains('hidden');
+  if (!opening) {
+    resetEditPanel();
+    resetMovePrompt();
+    resetRemovePrompt();
+    closeEditMenu();
+    return;
+  }
+  editMenu.classList.remove('hidden');
+  editMenuBtn.classList.add('open');
+  editMenuBtn.setAttribute('aria-expanded', 'true');
+});
 
 editLocationBtn.addEventListener('click', () => {
   if (!activeSelectedLocation) return;
