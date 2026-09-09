@@ -24,12 +24,14 @@ survives closing the tab.
 3. Push (or re-run the workflow). It runs `node tools/build-web.mjs` and
    publishes `web/`. The Actions run prints the URL, e.g.
    `https://cymrcsm.github.io/slsu-map-navigation/`.
-4. **On the kiosk**, set the env var so the QR uses it:
-   ```
-   KIOSK_WEB_URL="https://cymrcsm.github.io/slsu-map-navigation" npm start
-   ```
-   (or add it to `deploy/slsu-kiosk.service` on the Pi). Leave it unset and the
-   kiosk falls back to a single local-only QR.
+4. **Tell the kiosk the URL** (any one of):
+   - put it on one line in a `web-url` file beside `server.js` — `npm start` then
+     picks it up with no env var (git-ignored, same idea as `certs/hostname`)
+   - `KIOSK_WEB_URL="https://cymrcsm.github.io/slsu-map-navigation" npm start`
+     (PowerShell: `$env:KIOSK_WEB_URL = "..."` on its own line first)
+   - on the Pi it's in `deploy/slsu-kiosk.service`
+
+   Leave all three unset and the kiosk falls back to a single local-only QR.
 
 That's it. Every later push that touches the map, data, tiles or the build
 script redeploys automatically.
