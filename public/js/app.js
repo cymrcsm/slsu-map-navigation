@@ -177,7 +177,9 @@ const basemap = L.tileLayer('tiles/{z}/{x}/{y}.png', {
 
 // One drawing per level, in the same order as WALK_PATHS.levels. They share the
 // 320x570 frame and the same georeference, so they stack exactly.
-const FLOOR_ASSETS = ['assets/groundFloor_layer.svg', 'assets/secondFloor_layer.svg'];
+const FLOOR_ASSETS = ['assets/groundFloor_layer.svg',
+                      'assets/secondFloor_layer.svg',
+                      'assets/thirdFloor_layer.svg'];
 let activeLevel = 0;
 
 // Every floor is drawn at once rather than swapped. The floor being viewed sits
@@ -871,6 +873,30 @@ function splitByLevel(points) {
   return runs;
 }
 
+// How strongly each leg of a cross-floor route is drawn. The floor on screen is
+// the one being explained, so its leg is solid and every other leg fades with
+// the number of storeys between them, in either direction.
+//
+// Asking for directions moves to the floor the room is on, so a fresh route to
+// a third-floor room reads 12% / 30% / 100% from the ground up: the two floors
+// already behind you are dimmer than the one you are heading for. Switching
+// floors while those directions are up moves the solid leg to the floor picked,
+// so the part of the walk being shown is always the strongest line on the map
+// even when it is a floor below the room.
+//
+// The legs off the selected floor are context, not the answer, and they are
+// drawn over a plan already faded to INACTIVE_FLOOR_OPACITY - so they sit well
+// below the selected leg rather than competing with it for attention.
+const ROUTE_RUN_OPACITY = [1, 0.3, 0.12];
+const ROUTE_RUN_OPACITY_FLOOR = 0.12;
+
+function routeRunOpacity(runLevel, focusLevel) {
+  const away = Math.abs(focusLevel - runLevel);
+  return ROUTE_RUN_OPACITY[away] !== undefined
+    ? ROUTE_RUN_OPACITY[away]
+    : ROUTE_RUN_OPACITY_FLOOR;
+}
+
 function drawRoute(destination, followDestination = false) {
   clearActiveRoute();
 
@@ -891,15 +917,17 @@ function drawRoute(destination, followDestination = false) {
 
   // A route across floors is two separate walks joined by a stair. Draw the run
   // the user is looking at solid and the rest faint, so the floor on screen is
-  // always the one being explained.
+  // always the one being explained. Weight and dash stay tied to the room's own
+  // floor instead, so the leg that actually arrives stays recognisable as the
+  // answer while the user looks over the floors below it.
   const runs = splitByLevel(path);
   runs.forEach(run => {
     if (run.pts.length < 2) return;
-    const onScreen = run.level === activeLevel;
+    const arrival = run.level === destLevel;
     activeRouteLayers.push(L.polyline(run.pts.map(toLeafletCoords), {
-      weight: onScreen ? 5 : 3,
-      opacity: onScreen ? 0.95 : 0.3,
-      dashArray: onScreen ? null : '4 8',
+      weight: arrival ? 5 : 3,
+      opacity: routeRunOpacity(run.level, activeLevel),
+      dashArray: arrival ? null : '4 8',
       className: 'route-line', lineCap: 'round', lineJoin: 'round'
     }).addTo(map));
   });
@@ -907,11 +935,15 @@ function drawRoute(destination, followDestination = false) {
   const startGap = dist2d(kioskCoords, path[0]);
   const endGap = dist2d(path[path.length - 1], destination.coords);
 
-  [[kioskCoords, path[0], startGap],
-   [path[path.length - 1], destination.coords, endGap]].forEach(hop => {
+  // The hops on and off the network belong to a floor as much as the walk does,
+  // so they fade with it - otherwise the stub at the kiosk stays bright over a
+  // ground-floor leg that has been dimmed down to a third of it.
+  [[kioskCoords, path[0], startGap, KIOSK_LEVEL],
+   [path[path.length - 1], destination.coords, endGap, destLevel]].forEach(hop => {
     if (hop[2] > 0.4 && hop[2] <= OFFPATH_LIMIT) {
       activeRouteLayers.push(L.polyline([hop[0], hop[1]].map(toLeafletCoords), {
-        weight: 4, opacity: 0.9, className: 'route-connector', lineCap: 'round'
+        weight: 4, opacity: 0.9 * routeRunOpacity(hop[3], activeLevel),
+        className: 'route-connector', lineCap: 'round'
       }).addTo(map));
     }
   });
