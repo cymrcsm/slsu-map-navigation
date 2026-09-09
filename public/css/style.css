@@ -152,6 +152,53 @@ body, html {
 
 .panel-search {
   padding: 18px 18px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Brand mark in the card chrome, to the left of the search bar. It sits
+   outside the scrolling .panel-body and outside the map, so it never moves
+   when the panel scrolls or the map is dragged.
+
+   It is also the only way into the admin panel. Styled to read as plain
+   artwork - no button chrome, no hover state - so the kiosk gives no sign
+   that a maintenance mode exists at all. */
+.panel-logo {
+  position: relative;
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  padding: 0;
+  background: none;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keyboard users still get a ring; pointer users see nothing. */
+.panel-logo:focus { outline: none; }
+.panel-logo:focus-visible {
+  outline: 2px solid var(--slsu-sky);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* logo.png is a 400x160 canvas, but the mark itself is only 109x110px
+   sitting at x146,y26 with transparent padding around it. Scale the whole
+   canvas by 64/110 and offset so just the mark lands in the box. One
+   downscale, no transform layer, so it stays as sharp as the source allows.
+   Re-measure these four numbers if the PNG is ever re-exported; if it is
+   exported square and tightly cropped, the block collapses to
+   width/height:100%. */
+.panel-logo img {
+  position: absolute;
+  width: 233px;
+  height: 93px;
+  left: -84.7px;
+  top: -15.1px;
+  user-select: none;
+  pointer-events: none;
 }
 
 .panel-body {
@@ -197,12 +244,6 @@ body, html {
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
 }
-
-.cat-btn:hover {
-  background: var(--surface-hover);
-  border-color: var(--map-stone-deep);
-}
-
 .cat-btn:active { transform: scale(0.99); }
 
 .cat-btn.active {
@@ -271,12 +312,6 @@ body, html {
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
-
-.result-item:hover {
-  background: var(--surface-hover);
-  border-color: var(--map-stone-deep);
-}
-
 .result-swatch {
   width: 9px;
   height: 9px;
@@ -374,6 +409,8 @@ body, html {
 
 .search-box {
   position: relative;
+  flex: 1;
+  min-width: 0;
 }
 
 .suggestions {
@@ -411,8 +448,7 @@ body, html {
   cursor: pointer;
 }
 
-.suggestion.active,
-.suggestion:hover {
+.suggestion.active {
   background: var(--surface-hover);
 }
 
@@ -482,21 +518,17 @@ body, html {
   gap: 10px;
 }
 
+/* The four guide cards are read, not operated - they carry no hover or press
+   response, so nothing on this panel invites a touch that does nothing. */
 .step-card {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  background: var(--surface-card);
+  background: var(--map-stone);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   padding: 12px 14px;
   box-shadow: 0 2px 6px rgba(70, 58, 46, 0.06);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.step-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--card-shadow);
 }
 
 .step-number {
@@ -521,9 +553,11 @@ body, html {
   margin-bottom: 2px;
 }
 
+/* --text-muted is tuned against --map-paper and only reaches 3.81:1 on the
+   stone ground these cards now use. --text-color restores it to 7.70:1. */
 .step-content p {
   font-size: 11.5px;
-  color: var(--text-muted);
+  color: var(--text-color);
   line-height: 1.4;
 }
 
@@ -547,11 +581,6 @@ body, html {
   align-items: center;
   gap: 4px;
 }
-
-.back-btn:hover {
-  text-decoration: underline;
-}
-
 .detail-badge {
   display: flex;
   flex-wrap: wrap;
@@ -662,11 +691,6 @@ body, html {
   border: none;
   box-shadow: 0 4px 12px rgba(116, 65, 15, 0.32);
 }
-
-.directions-btn:hover {
-  background: var(--accent-dark);
-}
-
 /* Ask for Directions alone sits level with Focus on Map and Edit details -
    scoped by id so the shared class above is untouched. */
 #get-directions-btn {
@@ -675,34 +699,16 @@ body, html {
   border: 1px solid var(--border-subtle);
   box-shadow: none;
 }
-
-#get-directions-btn:hover {
-  background: var(--surface-hover);
-  border-color: var(--map-stone-deep);
-}
-
 .secondary-btn {
   background: var(--surface-card);
   color: var(--text-dark);
   border: 1px solid var(--border-subtle);
 }
-
-.secondary-btn:hover {
-  background: var(--surface-hover);
-  border-color: var(--map-stone-deep);
-}
-
 .danger-btn {
   background: var(--surface-card);
   color: var(--danger-color);
   border: 1px solid var(--danger-color);
 }
-
-.danger-btn:hover {
-  background: var(--danger-color);
-  color: var(--map-paper);
-}
-
 #add-location-btn.active-placement {
   background: var(--accent-color);
   color: var(--map-paper);
@@ -961,11 +967,6 @@ body, html {
   justify-content: center;
   transition: background 0.15s ease, color 0.15s ease;
 }
-
-.ctrl-btn:hover {
-  background: var(--surface-hover);
-}
-
 .floor-btn.active {
   background: var(--primary-strong);
   color: var(--map-paper);
@@ -1006,13 +1007,7 @@ body, html {
   background: transparent;
   border: none;
   filter: drop-shadow(0 2px 3px rgba(51, 51, 51, 0.35));
-  transition: transform 0.12s ease;
 }
-
-.location-pin-icon:hover {
-  transform: translateY(-2px);
-}
-
 .location-dot-icon {
   background: transparent;
   border: none;
@@ -1027,11 +1022,6 @@ body, html {
   border: 1.5px solid var(--map-paper);
   box-shadow: 0 1px 2px rgba(51, 51, 51, 0.4);
 }
-
-.location-dot-icon:hover .dot {
-  transform: scale(1.35);
-}
-
 .kiosk-pulsing-marker {
   position: relative;
   width: 20px;
@@ -1105,4 +1095,119 @@ body, html {
   z-index: 999;
   border: 1px solid var(--border-subtle);
   box-shadow: 0 2px 6px rgba(70, 58, 46, 0.10);
+}
+
+
+/* ==========================================================================
+   ADMINISTRATOR PANEL
+
+   The kiosk surface carries no maintenance controls at all - they were moved
+   in here, behind the logo and behind the authorization code. Everything
+   except this card is blurred while it is open, so there is no doubt about
+   which surface is live.
+   ========================================================================== */
+.admin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(18, 41, 77, 0.45);
+  backdrop-filter: blur(8px) saturate(0.9);
+  -webkit-backdrop-filter: blur(8px) saturate(0.9);
+}
+
+.admin-overlay.hidden { display: none; }
+
+.admin-card {
+  position: relative;
+  width: min(430px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--surface-box);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(18, 41, 77, 0.40);
+  scrollbar-width: thin;
+  scrollbar-color: var(--map-stone-deep) transparent;
+}
+
+.admin-card::-webkit-scrollbar { width: 5px; }
+.admin-card::-webkit-scrollbar-thumb { background: var(--map-stone-deep); border-radius: 4px; }
+
+.admin-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.admin-header h2 {
+  font-size: 17px;
+  color: var(--text-dark);
+  padding-right: 30px;
+  margin-bottom: 4px;
+}
+
+.admin-subtitle {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.admin-gate,
+.admin-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-gate.hidden,
+.admin-tools.hidden { display: none; }
+
+/* The two controls lifted off the map read as a list of actions here rather
+   than as icon chrome, so they get a label and left alignment. */
+.admin-action { justify-content: flex-start; }
+
+/* The Edit group moved bodily into the dialog, so it needs no reveal rule -
+   it is simply not in the information card any more. Until a target is picked
+   there is nothing for it to act on, so the button reads as unavailable. */
+.admin-action:disabled,
+.admin-action[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Inside the dialog the group is a section of the card, not an aside hanging
+   off a button in a detail panel. */
+.admin-tools .edit-menu {
+  border-left-width: 1px;
+  border-radius: 10px;
+}
+
+.admin-tools .edit-panel { gap: 11px; }
+
+#admin-target {
+  padding: 9px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--surface-input);
+  color: var(--text-dark);
+  font-size: 13px;
 }
