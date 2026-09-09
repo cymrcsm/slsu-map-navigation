@@ -277,6 +277,8 @@ const backToTutorialBtn = document.getElementById('back-to-tutorial-btn');
 let activeCategory = 'ALL';
 const recenterRoomBtn = document.getElementById('recenter-room-btn');
 const getDirectionsBtn = document.getElementById('get-directions-btn');
+// "Take this on my phone" only appears once a route is on screen.
+const sendToPhoneBtn = document.getElementById('send-to-phone-btn');
 const setKioskBtn = document.getElementById('set-kiosk-btn');
 const inspector = document.getElementById('coord-inspector');
 
@@ -724,6 +726,7 @@ function chooseSuggestion(index) {
 function clearActiveRoute() {
   activeRouteLayers.forEach(l => map.removeLayer(l));
   activeRouteLayers = [];
+  if (sendToPhoneBtn) sendToPhoneBtn.hidden = true;
 }
 
 function routeLengthUnits(points) {
@@ -986,6 +989,9 @@ function drawRoute(destination, followDestination = false) {
   map.fitBounds(b, {
     padding: [70, 70], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 1
   });
+
+  // A route is now on screen — offer to take it to a phone.
+  if (sendToPhoneBtn) sendToPhoneBtn.hidden = false;
 }
 
 // ==========================================

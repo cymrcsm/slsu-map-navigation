@@ -6,6 +6,18 @@ node_modules/
 *.db
 *.fig
 
+# Local TLS certs for testing live GPS on a phone (never commit private keys)
+certs/
+
 # OS files
 .DS_Store
 Thumbs.db
+
+# thesis proposal PDF — kept locally, not committed (decide later)
+docs/*.pdf
+
+# public static build output (tools/build-web.mjs)
+web/
+
+# local override for the public phone-page URL (see docs/WEB-DEPLOY.md)
+web-url

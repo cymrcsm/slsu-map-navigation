@@ -1,0 +1,51 @@
+# Builds web/ (tools/build-web.mjs) and publishes it to GitHub Pages — the
+# public copy of the phone hand-off page. Enable once: repo Settings ▸ Pages ▸
+# Source = "GitHub Actions". Then set KIOSK_WEB_URL on the kiosk to the Pages URL
+# it prints (https://<owner>.github.io/<repo>/).
+
+name: Deploy phone hand-off page
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/mobile.html'
+      - 'public/js/mobile.js'
+      - 'public/js/routing.js'
+      - 'public/js/walkpaths.js'
+      - 'public/js/campus-data.js'
+      - 'public/js/georef.js'
+      - 'public/js/geo-overlay.js'
+      - 'public/assets/*Floor_layer.svg'
+      - 'public/tiles/**'
+      - 'public/vendor/leaflet/**'
+      - 'tools/build-web.mjs'
+      - '.github/workflows/deploy-web.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node tools/build-web.mjs
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - id: deploy
+        uses: actions/deploy-pages@v4
