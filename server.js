@@ -99,7 +99,7 @@ const route = handler => (req, res) => {
 // hand-made request cannot alter anything - unlike the old localStorage layer,
 // where the browser owned the data outright.
 
-const ADMIN_CODE = process.env.KIOSK_ADMIN_CODE || '@dmin123';
+const ADMIN_CODE = process.env.KIOSK_ADMIN_CODE || '@dm1n123';
 if (!process.env.KIOSK_ADMIN_CODE) {
   console.warn('⚠  KIOSK_ADMIN_CODE is not set; falling back to the built-in default.');
   console.warn('   Set it before deploying:  KIOSK_ADMIN_CODE="something-else" npm start');

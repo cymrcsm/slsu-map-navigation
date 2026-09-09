@@ -175,21 +175,37 @@ const basemap = L.tileLayer('tiles/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
 
-const campusOverlay = new GeoImageOverlay('assets/groundFloor_layer.svg', {
+// One drawing per level, in the same order as WALK_PATHS.levels. They share the
+// 320x570 frame and the same georeference, so they stack exactly.
+const FLOOR_ASSETS = ['assets/groundFloor_layer.svg', 'assets/secondFloor_layer.svg'];
+let activeLevel = 0;
+
+// Every floor is drawn at once rather than swapped. The floor being viewed sits
+// on top at full strength; the rest stay faint underneath so the building keeps
+// its shape while you move between them. The floor a route happens to end on
+// does not decide this - the floor the user is looking at does.
+const INACTIVE_FLOOR_OPACITY = 0.18;
+
+const floorOverlays = FLOOR_ASSETS.map(url => new GeoImageOverlay(url, {
   canvasWidth: MAP_WIDTH,
   canvasHeight: MAP_HEIGHT,
   bearingDeg: GEOREF.bearingDeg,
   className: 'campus-overlay'
-});
+}));
 
+// Bounds are identical across floors, so any one of them speaks for all.
+const campusOverlay = floorOverlays[0];
 const bounds = campusOverlay.getBounds();
 map.setMaxBounds(bounds.pad(0.25));
 
-// One drawing per level, in the same order as WALK_PATHS.levels. Switching
-// floors swaps this image and filters the pins; the map itself never moves,
-// because both drawings share the 320x570 frame and the same georeference.
-const FLOOR_ASSETS = ['assets/groundFloor_layer.svg', 'assets/secondFloor_layer.svg'];
-let activeLevel = 0;
+function applyFloorOpacity() {
+  const front = basemapVisible ? OVERLAY_OPACITY_OVER_BASEMAP : 1;
+  floorOverlays.forEach((ov, i) => {
+    const isActive = i === activeLevel;
+    ov.setOpacity(isActive ? front : INACTIVE_FLOOR_OPACITY);
+    if (ov.setZIndex) ov.setZIndex(isActive ? 2 : 1);
+  });
+}
 
 let basemapVisible = false;
 let basemapUsable = true;
@@ -197,14 +213,14 @@ let basemapUsable = true;
 function applyBasemap(on) {
   basemapVisible = on;
   if (on) { basemap.addTo(map); } else if (map.hasLayer(basemap)) { map.removeLayer(basemap); }
-  campusOverlay.setOpacity(on ? OVERLAY_OPACITY_OVER_BASEMAP : 1);
+  applyFloorOpacity();
   if (basemapBtn) {
     basemapBtn.classList.toggle('active-basemap', on);
     basemapBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
 }
 
-campusOverlay.addTo(map);
+floorOverlays.forEach(ov => ov.addTo(map));
 applyBasemap(true);
 
 const CAMPUS_CENTER = toLeafletCoords([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
@@ -370,7 +386,9 @@ function paintCategoryButtons() {
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     const color = id === 'ALL' ? 'var(--primary-strong)' : getCategoryColor(id);
     btn.style.borderColor = on ? color : '';
-    btn.style.background = on ? (id === 'ALL' ? 'var(--surface-hover)' : color + '14') : '';
+    // One selected ground for every category, so the pressed state reads the
+    // same everywhere; the border keeps the category colour as the identity.
+    btn.style.background = on ? 'var(--map-stone)' : '';
   });
 }
 
@@ -490,6 +508,7 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   resetRemovePrompt();
   resetMovePrompt();
   resetEditPanel();
+  closeEditMenu();
 
   // Coming from a category listing, "back" should return to that listing.
   backToTutorialBtn.textContent = activeCategory === 'ALL'
@@ -852,15 +871,16 @@ function splitByLevel(points) {
   return runs;
 }
 
-function drawRoute(destination) {
+function drawRoute(destination, followDestination = false) {
   clearActiveRoute();
 
   const destLevel = levelOfFloor(destination.floor);
-  // Directions start where the user is standing, so show the kiosk's floor
-  // first even if the destination is upstairs. Passing false stops this from
-  // calling straight back into drawRoute.
-  if (destLevel !== KIOSK_LEVEL && activeLevel !== KIOSK_LEVEL) {
-    setActiveLevel(KIOSK_LEVEL, false);
+  // Asking for directions moves to the floor the room is on, because that is
+  // the part the user came for. Redraws that were triggered by the user picking
+  // a floor pass false, so their choice stands. Passing false to setActiveLevel
+  // stops it from calling straight back into drawRoute.
+  if (followDestination && destLevel !== activeLevel) {
+    setActiveLevel(destLevel, false);
   }
   const path = findWalkingPath(kioskCoords, destination.coords, KIOSK_LEVEL, destLevel);
 
@@ -959,7 +979,7 @@ if (basemapBtn) {
 }
 
 getDirectionsBtn.addEventListener('click', () => {
-  if (activeSelectedLocation) drawRoute(activeSelectedLocation);
+  if (activeSelectedLocation) drawRoute(activeSelectedLocation, true);
 });
 
 setKioskBtn.addEventListener('click', () => {
@@ -1052,11 +1072,6 @@ suggestionList.addEventListener('mousedown', (e) => {
   chooseSuggestion(Number(li.dataset.index));
 });
 
-suggestionList.addEventListener('mousemove', (e) => {
-  const li = e.target.closest('.suggestion');
-  if (li) highlightSuggestion(Number(li.dataset.index));
-});
-
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.search-box')) closeSuggestions();
 });
@@ -1080,12 +1095,12 @@ document.getElementById('recenter-map-btn').addEventListener('click', () => {
 // FLOOR SWITCHING
 // ==========================================
 
-/** Show a level: swap the drawing, refilter the pins, redraw the open route. */
+/** Show a level: bring its drawing forward, refilter the pins, redraw the route. */
 function setActiveLevel(level, redrawRoute = true) {
   if (!(level >= 0 && level < LEVELS.length)) return;
   if (level === activeLevel) return;
   activeLevel = level;
-  campusOverlay.setUrl(FLOOR_ASSETS[level] || FLOOR_ASSETS[0]);
+  applyFloorOpacity();
   document.querySelectorAll('.floor-btn').forEach(b => {
     b.classList.toggle('active', (parseInt(b.dataset.floor, 10) - 1) === level);
   });
@@ -1093,7 +1108,7 @@ function setActiveLevel(level, redrawRoute = true) {
   renderKioskMarker();
   // The route spans floors, so which part is drawn solid depends on this.
   if (redrawRoute && activeRouteLayers.length && activeSelectedLocation) {
-    drawRoute(activeSelectedLocation);
+    drawRoute(activeSelectedLocation, false);
   }
 }
 
@@ -1444,6 +1459,8 @@ moveCode.addEventListener('keydown', e => { if (e.key === 'Enter') moveConfirmBt
 // 16. EDIT A PINNED LOCATION
 // ==========================================
 
+const editMenuBtn = document.getElementById('edit-menu-btn');
+const editMenu = document.getElementById('edit-menu');
 const editLocationBtn = document.getElementById('edit-location-btn');
 const editPanel = document.getElementById('edit-panel');
 const editName = document.getElementById('edit-name');
@@ -1531,6 +1548,29 @@ function readCategories(previous) {
     .map(b => b.value);
   return kept.concat(added);
 }
+
+function closeEditMenu() {
+  if (!editMenu) return;
+  editMenu.classList.add('hidden');
+  editMenuBtn.classList.remove('open');
+  editMenuBtn.setAttribute('aria-expanded', 'false');
+}
+
+// One button in front of the three admin actions. Closing it also puts away
+// whichever of the three was open, so reopening starts from the menu again.
+editMenuBtn.addEventListener('click', () => {
+  const opening = editMenu.classList.contains('hidden');
+  if (!opening) {
+    resetEditPanel();
+    resetMovePrompt();
+    resetRemovePrompt();
+    closeEditMenu();
+    return;
+  }
+  editMenu.classList.remove('hidden');
+  editMenuBtn.classList.add('open');
+  editMenuBtn.setAttribute('aria-expanded', 'true');
+});
 
 editLocationBtn.addEventListener('click', () => {
   if (!activeSelectedLocation) return;
@@ -1625,4 +1665,231 @@ populateFloorSelects();
 // still works; it just shows the published map and refuses admin actions.
 syncWithServer().then(ok => {
   if (!ok) console.warn('Kiosk: no server overrides loaded; showing the published map only.');
+});
+
+// ==========================================
+// ADMINISTRATOR PANEL
+// ==========================================
+//
+// No maintenance control appears on the kiosk surface, before or after anyone
+// signs in. All three - add a location, set the kiosk position, edit a pinned
+// location - exist only inside this dialog, so the information card stays a
+// read-only card for every visitor, the administrator included.
+//
+// The Edit group used to take its target from whichever pin was open in the
+// information card, which is why it had to live there. It takes it from the
+// picker below instead, so the whole group could move in here with it.
+//
+// The code is never checked in this file. POST /api/admin/verify does it on
+// the server, where the value lives, the comparison is constant-time and
+// guessing is throttled.
+
+const adminTrigger   = document.getElementById('admin-trigger');
+const adminOverlay   = document.getElementById('admin-overlay');
+const adminCloseBtn  = document.getElementById('admin-close-btn');
+const adminGate      = document.getElementById('admin-gate');
+const adminTools     = document.getElementById('admin-tools');
+const adminCodeInput = document.getElementById('admin-code');
+const adminUnlockBtn = document.getElementById('admin-unlock-btn');
+const adminTarget    = document.getElementById('admin-target');
+const adminMsg       = document.getElementById('admin-msg');
+const adminSubtitle  = document.getElementById('admin-subtitle');
+
+const LOCKED_SUBTITLE = 'Enter the authorization code to continue.';
+const AUTH_INPUTS = [addCode, editCode, moveCode, removeCode];
+
+// Held for the session so the confirmations inside the Edit group can be
+// filled in, rather than asking for the same code again at every action.
+let sessionAdminCode = '';
+
+// Placing a pin needs the map, so the dialog steps aside and comes back once
+// the click has landed.
+let reopenAfterPlacement = false;
+
+function setAdminMsg(text, kind) {
+  adminMsg.textContent = text || '';
+  adminMsg.className = 'form-msg' + (kind ? ' ' + kind : '');
+}
+
+function clearEditFlows() {
+  resetEditPanel();
+  resetMovePrompt();
+  resetRemovePrompt();
+  closeEditMenu();
+}
+
+// Rebuilt rather than patched: names, buildings and the roster itself all
+// change under admin edits, and the list is small enough that it does not
+// matter.
+function populateAdminTargets() {
+  if (!adminTarget) return;
+  const keep = adminTarget.value ||
+               (activeSelectedLocation ? activeSelectedLocation.id : '');
+
+  adminTarget.innerHTML = '';
+  const none = document.createElement('option');
+  none.value = '';
+  none.textContent = 'Select a location...';
+  adminTarget.appendChild(none);
+
+  PLACES.slice()
+    .sort((a, b) => String(a.name).localeCompare(String(b.name)))
+    .forEach(place => {
+      const opt = document.createElement('option');
+      opt.value = place.id;
+      opt.textContent = place.building && place.building !== place.name
+        ? place.name + ' - ' + place.building
+        : place.name;
+      adminTarget.appendChild(opt);
+    });
+
+  adminTarget.value = PLACES.some(p => p.id === keep) ? keep : '';
+  syncEditAvailability();
+}
+
+// Nothing in the Edit group means anything without a target.
+function syncEditAvailability() {
+  const chosen = !!(adminTarget && adminTarget.value);
+  editMenuBtn.disabled = !chosen;
+  if (!chosen) clearEditFlows();
+}
+
+function openAdminPanel() {
+  adminOverlay.classList.remove('hidden');
+  setAdminMsg('');
+  if (sessionAdminCode) { populateAdminTargets(); return; }
+  adminCodeInput.value = '';
+  adminCodeInput.focus();
+}
+
+function closeAdminPanel() {
+  adminOverlay.classList.add('hidden');
+  adminCodeInput.value = '';
+  setAdminMsg('');
+}
+
+function showAdminTools() {
+  adminGate.classList.add('hidden');
+  adminTools.classList.remove('hidden');
+  adminSubtitle.textContent = 'Unlocked. These controls exist only in this panel.';
+  populateAdminTargets();
+}
+
+async function unlockAdmin() {
+  const code = adminCodeInput.value;
+  if (!code) { setAdminMsg('Enter the authorization code.', 'err'); return; }
+
+  adminUnlockBtn.disabled = true;
+  setAdminMsg('Checking...');
+  try {
+    await adminFetch('POST', 'api/admin/verify', code);
+    sessionAdminCode = code;
+    AUTH_INPUTS.forEach(input => { if (input) input.value = code; });
+    adminCodeInput.value = '';
+    setAdminMsg('');
+    showAdminTools();
+  } catch (err) {
+    setAdminMsg(err.message, 'err');
+    adminCodeInput.select();
+  } finally {
+    adminUnlockBtn.disabled = false;
+  }
+}
+
+// Locking has to undo everything the code opened up, including a placement
+// mode or a half-filled form left behind, or the kiosk sits there unlocked in
+// all but name.
+function lockAdmin() {
+  sessionAdminCode = '';
+  reopenAfterPlacement = false;
+  adminTools.classList.add('hidden');
+  adminGate.classList.remove('hidden');
+  adminSubtitle.textContent = LOCKED_SUBTITLE;
+
+  stopPicking();
+  if (isSettingKioskLocation) {
+    isSettingKioskLocation = false;
+    setKioskBtn.classList.remove('active-placement');
+    inspector.innerText = 'Click map to log coordinates';
+  }
+  clearEditFlows();
+  AUTH_INPUTS.forEach(input => { if (input) input.value = ''; });
+  if (adminTarget) adminTarget.value = '';
+  if (!addView.classList.contains('hidden')) showTutorialView();
+  setAdminMsg('');
+}
+
+adminTrigger.addEventListener('click', openAdminPanel);
+adminUnlockBtn.addEventListener('click', unlockAdmin);
+
+// Leaving the panel and locking it are the same act: there is no way to shut
+// this dialog and still be signed in, so the kiosk cannot be walked away from
+// in an unlocked state. The placement handoff below is the one exception - it
+// calls closeAdminPanel directly, because the session has to survive the trip
+// to the map and back.
+function dismissAdminPanel() {
+  lockAdmin();
+  closeAdminPanel();
+}
+
+adminCloseBtn.addEventListener('click', dismissAdminPanel);
+
+adminCodeInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); unlockAdmin(); }
+});
+
+// Choosing a target drives the map and the information card, exactly as
+// clicking a pin used to - but the card gains no controls from it.
+adminTarget.addEventListener('change', () => {
+  clearEditFlows();
+  const loc = PLACES.find(p => p.id === adminTarget.value);
+  if (loc) showLocationDetails(loc);
+  else activeSelectedLocation = null;
+  syncEditAvailability();
+});
+
+// --- placement handoff -------------------------------------------------
+// These run after the handlers that own each button, so the mode flags they
+// read already hold the state the click produced.
+
+addLocationBtn.addEventListener('click', () => {
+  // The add form needs the map for its spot and fills the side panel, so the
+  // dialog stays shut until the administrator comes back to it.
+  reopenAfterPlacement = false;
+  closeAdminPanel();
+});
+
+setKioskBtn.addEventListener('click', () => {
+  reopenAfterPlacement = isSettingKioskLocation;
+  closeAdminPanel();
+});
+
+moveLocationBtn.addEventListener('click', () => {
+  if (!isMovingSpot) return;          // it was a cancel, or there is no target
+  reopenAfterPlacement = true;
+  closeAdminPanel();
+});
+
+map.on('click', () => {
+  if (!reopenAfterPlacement) return;
+  if (isSettingKioskLocation || isMovingSpot) return;   // still armed
+  reopenAfterPlacement = false;
+  openAdminPanel();
+});
+
+// Every admin write refreshes the roster, so the picker follows it.
+const syncWithServerBase = syncWithServer;
+syncWithServer = async function () {
+  const result = await syncWithServerBase.apply(this, arguments);
+  populateAdminTargets();
+  return result;
+};
+
+// Dismissing: the dimmed area, or Escape.
+adminOverlay.addEventListener('click', e => {
+  if (e.target === adminOverlay) dismissAdminPanel();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !adminOverlay.classList.contains('hidden')) dismissAdminPanel();
 });
