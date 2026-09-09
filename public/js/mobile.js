@@ -25,8 +25,13 @@ const ARRIVE_M = 15;       // "you have arrived" inside this
 const FLOOR_ASSETS = ['assets/groundFloor_layer.svg', 'assets/secondFloor_layer.svg'];
 
 // --- URL -------------------------------------------------------------------
+// Kiosk serves this at /go/<slug>; the public copy (GitHub Pages / Vercel) is a
+// flat static site, so it takes the destination from ?d=<slug> instead.
 const params = new URLSearchParams(location.search);
-const slug = decodeURIComponent((location.pathname.split('/go/')[1] || '').split(/[/?#]/)[0] || '');
+const slug = decodeURIComponent(
+  params.get('d') || (location.pathname.split('/go/')[1] || '').split(/[/?#]/)[0] || ''
+);
+const ON_KIOSK = !!document.querySelector('meta[name="kiosk-hosted"]');
 const fromParam = (params.get('from') || '').split(',').map(Number);
 let originXY = (fromParam.length === 2 && fromParam.every(Number.isFinite)) ? fromParam : null;
 const SIM = params.get('sim') === '1';
@@ -305,7 +310,9 @@ function bearingDeg(a, b) {
 // Draw straight away; if an admin edit is on record, apply it and redraw.
 render();
 
-fetch('api/overrides', { cache: 'no-store' })
+// Runtime admin edits live on the kiosk server. The public copy is static, so
+// skip the fetch there - its data snapshot is refreshed on every deploy.
+if (ON_KIOSK) fetch('api/overrides', { cache: 'no-store' })
   .then(r => r.ok ? r.json() : null)
   .then(o => {
     if (!o) return;

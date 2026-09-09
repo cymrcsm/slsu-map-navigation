@@ -310,13 +310,21 @@
       <button id="qr-close-btn" class="qr-close" aria-label="Close">✕</button>
       <h3 id="qr-title">Take the directions with you</h3>
       <p class="qr-dest" id="qr-dest-name">Destination</p>
-      <div id="qr-code" class="qr-code"></div>
-      <ol class="qr-steps">
-        <li>On your phone, join Wi-Fi <strong id="qr-wifi-name">SLSU-Kiosk-Map</strong></li>
-        <li>Open the camera and point it at this code</li>
-        <li>The map opens with your route and follows you as you walk</li>
-      </ol>
-      <p class="qr-hint" id="qr-hint" hidden>Map + route only — the moving GPS dot needs HTTPS. Start the kiosk with <code>npm run phone-test</code> (testing) or deploy per docs/KIOSK-DEPLOY.md.</p>
+      <p class="qr-lede" id="qr-lede">Scan with your phone camera — the map opens with your route and follows you as you walk.</p>
+
+      <div class="qr-pair">
+        <figure class="qr-primary">
+          <div id="qr-code" class="qr-code"></div>
+          <figcaption id="qr-primary-cap">Scan with your phone camera</figcaption>
+        </figure>
+        <figure class="qr-secondary" id="qr-secondary" hidden>
+          <div id="qr-code-local" class="qr-code qr-code-sm"></div>
+          <figcaption>No mobile data? Join Wi-Fi
+            <strong id="qr-wifi-name">SLSU-Kiosk-Map</strong>, then scan this</figcaption>
+        </figure>
+      </div>
+
+      <p class="qr-hint" id="qr-hint" hidden>The Wi-Fi option shows the map and route, but not the moving dot — that needs the kiosk's HTTPS certificate (see docs/KIOSK-DEPLOY.md).</p>
       <p class="qr-url" id="qr-url"></p>
     </div>
   </div>

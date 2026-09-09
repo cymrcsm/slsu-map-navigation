@@ -22,7 +22,8 @@ const stats = await health.body.json().catch(() => ({}));
 P('database has locations', (stats.locations || 0) > 100, 'locations=' + stats.locations);
 
 const cfg = await (await fetch(base + '/api/config')).json().catch(() => ({}));
-P('/api/config returns publicUrl', !!cfg.publicUrl, cfg.publicUrl + (cfg.https ? ' (https)' : ''));
+P('/api/config returns a kiosk URL', !!cfg.localUrl,
+  cfg.localUrl + (cfg.https ? ' (https)' : '') + (cfg.webUrl ? '  web: ' + cfg.webUrl : ''));
 
 for (const p of ['/api/categories', '/api/buildings', '/api/locations', '/api/overrides']) {
   const h = await head(p);

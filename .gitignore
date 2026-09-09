@@ -15,3 +15,6 @@ Thumbs.db
 
 # thesis proposal PDF — kept locally, not committed (decide later)
 docs/*.pdf
+
+# public static build output (tools/build-web.mjs)
+web/

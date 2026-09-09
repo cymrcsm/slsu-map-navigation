@@ -1,11 +1,27 @@
 # Phone hand-off — QR → GPS-following walking map
 
 After a visitor picks a destination on the kiosk, **"📱 Take this on my phone"**
-shows a QR code. Scanning it opens `/go/<slug>` on the phone: the same geographic
-map (cached OSM tiles + the georeferenced campus drawing), the destination
-pinned, the route from the kiosk drawn, and — where the browser allows it — a
-**live GPS dot that follows the phone as it moves**, re-routing from the current
-position (Google-Maps-style).
+shows a QR code. Scanning it opens the same geographic map (cached OSM tiles +
+the georeferenced campus drawing), the destination pinned, the route from the
+kiosk drawn, and a **live GPS dot that follows the phone as it moves**, re-routing
+from the current position (Google-Maps-style).
+
+## Two delivery paths
+
+The modal shows up to two QR codes:
+
+| | URL | Reaches | Needs |
+|---|---|---|---|
+| **primary** | `<KIOSK_WEB_URL>/?d=<slug>&from=…` | a static copy on GitHub Pages / Vercel | phone has internet |
+| **fallback** | `<kiosk>/go/<slug>?from=…` | the kiosk itself | phone on the kiosk Wi-Fi |
+
+The primary needs no cert or DNS and works on **any phone, any network**. The
+fallback covers a phone with no mobile data. If `KIOSK_WEB_URL` is unset, only
+the fallback QR is shown. Setup: **`docs/WEB-DEPLOY.md`** (primary) and
+**`docs/KIOSK-DEPLOY.md`** (fallback + the fully-offline Pi).
+
+The same `public/js/mobile.js` runs on both — it takes the destination from
+`?d=<slug>` (static copy) or `/go/<slug>` (kiosk).
 
 ## How it fits together
 

@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>SLSU Campus — Walking Directions</title>
-  <!-- served at /go/<slug>, so resolve every asset from the site root -->
+  <!-- served by the kiosk at /go/<slug>; both lines are stripped for the public
+       static build (tools/build-web.mjs), which is a flat site. -->
+  <meta name="kiosk-hosted" content="1" />
   <base href="/" />
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
   <style>

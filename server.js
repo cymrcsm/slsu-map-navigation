@@ -48,9 +48,10 @@ function certHostname() {
 }
 const KIOSK_HOSTNAME = process.env.KIOSK_HOSTNAME || certHostname();
 
-// When a cert + hostname are present the QR points at https://<hostname>,
-// dropping the port only when HTTPS is on 443.
-function defaultPublicUrl() {
+// The kiosk's OWN address, used for the "no mobile data" fallback QR (a phone on
+// the kiosk Wi-Fi reaches /go/<slug> here). With a cert + hostname it's
+// https://<hostname>, port dropped on 443.
+function kioskLocalUrl() {
   if (process.env.KIOSK_PUBLIC_URL) return process.env.KIOSK_PUBLIC_URL;
   if (KIOSK_HOSTNAME && tlsOptions) {
     return HTTPS_PORT === 443
@@ -59,7 +60,13 @@ function defaultPublicUrl() {
   }
   return detectLanBaseUrl(tlsOptions ? 'https' : 'http', tlsOptions ? HTTPS_PORT : PORT);
 }
-const PUBLIC_URL = defaultPublicUrl().replace(/\/+$/, '');
+const LOCAL_URL = kioskLocalUrl().replace(/\/+$/, '');
+
+// The public static copy (GitHub Pages / Vercel — tools/build-web.mjs). When set
+// it becomes the primary QR (?d=<slug> form); any phone with internet can open
+// it. Leave unset and the kiosk's own address is the only QR.
+const WEB_URL = (process.env.KIOSK_WEB_URL || '').replace(/\/+$/, '') || null;
+
 const WIFI_SSID = process.env.KIOSK_WIFI_SSID || 'SLSU-Kiosk-Map';
 
 app.use(cors());
@@ -246,7 +253,12 @@ app.get('/api/health', route(async (req, res) => {
 
 // Client config for the phone hand-off QR code (see /go/:slug below).
 app.get('/api/config', (req, res) => {
-  res.json({ publicUrl: PUBLIC_URL, wifiSsid: WIFI_SSID, https: !!tlsOptions });
+  res.json({
+    webUrl: WEB_URL,          // public static site, ?d=<slug> form (may be null)
+    localUrl: LOCAL_URL,      // this kiosk, /go/<slug> form — the offline fallback
+    wifiSsid: WIFI_SSID,
+    https: !!tlsOptions
+  });
 });
 
 // Unknown /api/* paths fail as JSON, not as the SPA shell.
@@ -267,9 +279,10 @@ app.get('*', (req, res) => {
 
 http.createServer(app).listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 SLSU Kiosk Server running on http://localhost:${PORT}`);
-  console.log(`   Phone hand-off QR points at: ${PUBLIC_URL}   (Wi-Fi: ${WIFI_SSID})`);
+  if (WEB_URL) console.log(`   Phone QR (any phone):   ${WEB_URL}/?d=<slug>`);
+  console.log(`   Phone QR (kiosk Wi-Fi): ${LOCAL_URL}/go/<slug>   (Wi-Fi: ${WIFI_SSID})`);
   if (!tlsOptions) {
-    console.log('   No certs/ — the phone\'s live GPS dot needs HTTPS. See docs/KIOSK-DEPLOY.md.');
+    console.log('   No certs/ — the kiosk-Wi-Fi QR is plain http, so its live GPS dot is off. See docs/KIOSK-DEPLOY.md.');
   }
 });
 

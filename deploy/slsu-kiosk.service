@@ -25,6 +25,9 @@ Environment=PORT=80
 Environment=HTTPS_PORT=443
 Environment=KIOSK_HOSTNAME=slsu-kiosk.duckdns.org
 Environment=KIOSK_WIFI_SSID=SLSU-Kiosk-Map
+# Primary phone QR — the public static copy (docs/WEB-DEPLOY.md). Comment out for
+# a local-only, single-QR kiosk.
+Environment=KIOSK_WEB_URL=https://cymrcsm.github.io/slsu-map-navigation
 # Set a real one before the evaluation:
 Environment=KIOSK_ADMIN_CODE=change-me
 
