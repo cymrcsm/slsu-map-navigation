@@ -35,10 +35,10 @@ for (const f of JS) fs.copyFileSync(path.join(PUB, 'js', f), path.join(OUT, 'js'
 
 fs.cpSync(path.join(PUB, 'vendor', 'leaflet'), path.join(OUT, 'vendor', 'leaflet'), { recursive: true });
 
+// Every floor drawing there is, so adding a storey needs no change here.
 fs.mkdirSync(path.join(OUT, 'assets'), { recursive: true });
-for (const f of ['groundFloor_layer.svg', 'secondFloor_layer.svg']) {
-  fs.copyFileSync(path.join(PUB, 'assets', f), path.join(OUT, 'assets', f));
-}
+const FLOORS = fs.readdirSync(path.join(PUB, 'assets')).filter(f => /Floor_layer\.svg$/.test(f));
+for (const f of FLOORS) fs.copyFileSync(path.join(PUB, 'assets', f), path.join(OUT, 'assets', f));
 
 fs.cpSync(path.join(PUB, 'tiles'), path.join(OUT, 'tiles'), { recursive: true });
 
@@ -92,5 +92,5 @@ const total = bytes(OUT);
 const tiles = fs.readdirSync(path.join(OUT, 'tiles'), { recursive: true }).filter(f => f.endsWith('.png')).length;
 console.log('web/ built:');
 console.log('  ' + (total / 1e6).toFixed(1) + ' MB total, ' + tiles + ' tiles');
-console.log('  index.html + ' + JS.length + ' scripts + leaflet + 2 floor SVGs + service worker');
+console.log('  index.html + ' + JS.length + ' scripts + leaflet + ' + FLOORS.length + ' floor SVGs + service worker');
 console.log('\ndeploy web/ as a static site; the QR should point at  <site>/?d=<slug>&from=<x>,<y>');

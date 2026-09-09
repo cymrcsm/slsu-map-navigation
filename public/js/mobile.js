@@ -22,7 +22,10 @@ const OFFPATH_LIMIT = 3;   // map units ≈ metres — matches app.js
 const SNAP_LIMIT = 12;     // pull the live dot onto a walkway within this
 const REROUTE_MOVE = 6;    // recompute the route after moving this far
 const ARRIVE_M = 15;       // "you have arrived" inside this
-const FLOOR_ASSETS = ['assets/groundFloor_layer.svg', 'assets/secondFloor_layer.svg'];
+// Same order as WALK_PATHS.levels (keep in step with FLOOR_ASSETS in app.js).
+const FLOOR_ASSETS = ['assets/groundFloor_layer.svg',
+                      'assets/secondFloor_layer.svg',
+                      'assets/thirdFloor_layer.svg'];
 
 // --- URL -------------------------------------------------------------------
 // Kiosk serves this at /go/<slug>; the public copy (GitHub Pages / Vercel) is a
