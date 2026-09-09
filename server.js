@@ -64,8 +64,14 @@ const LOCAL_URL = kioskLocalUrl().replace(/\/+$/, '');
 
 // The public static copy (GitHub Pages / Vercel — tools/build-web.mjs). When set
 // it becomes the primary QR (?d=<slug> form); any phone with internet can open
-// it. Leave unset and the kiosk's own address is the only QR.
-const WEB_URL = (process.env.KIOSK_WEB_URL || '').replace(/\/+$/, '') || null;
+// it. Source: KIOSK_WEB_URL, else a one-line `web-url` file beside server.js
+// (same idea as certs/hostname). Unset -> the kiosk's own address is the only QR.
+function webUrlSource() {
+  if (process.env.KIOSK_WEB_URL) return process.env.KIOSK_WEB_URL;
+  try { return fs.readFileSync(path.join(__dirname, 'web-url'), 'utf8').trim() || null; }
+  catch (err) { return null; }
+}
+const WEB_URL = (webUrlSource() || '').replace(/\/+$/, '') || null;
 
 const WIFI_SSID = process.env.KIOSK_WIFI_SSID || 'SLSU-Kiosk-Map';
 
