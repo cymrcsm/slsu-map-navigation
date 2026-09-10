@@ -83,6 +83,13 @@ if (!dest) {
 }
 
 let destLevel = 0;
+// Marker artwork, inlined rather than fetched: this page is opened on a phone
+// that may already be off the kiosk network, and an <img> that fails to load
+// would leave the destination unmarked. Each takes its colour from the class
+// wrapped around it.
+const DEST_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.25 10.1433C3.25 5.24427 7.15501 1.25 12 1.25C16.845 1.25 20.75 5.24427 20.75 10.1433C20.75 12.5084 20.076 15.0479 18.8844 17.2419C17.6944 19.4331 15.9556 21.3372 13.7805 22.3539C12.6506 22.882 11.3494 22.882 10.2195 22.3539C8.04437 21.3372 6.30562 19.4331 5.11556 17.2419C3.92403 15.0479 3.25 12.5084 3.25 10.1433ZM12 2.75C8.00843 2.75 4.75 6.04748 4.75 10.1433C4.75 12.2404 5.35263 14.5354 6.4337 16.526C7.51624 18.5192 9.04602 20.1496 10.8546 20.995C11.5821 21.335 12.4179 21.335 13.1454 20.995C14.954 20.1496 16.4838 18.5192 17.5663 16.526C18.6474 14.5354 19.25 12.2404 19.25 10.1433C19.25 6.04748 15.9916 2.75 12 2.75ZM12 7.75C10.7574 7.75 9.75 8.75736 9.75 10C9.75 11.2426 10.7574 12.25 12 12.25C13.2426 12.25 14.25 11.2426 14.25 10C14.25 8.75736 13.2426 7.75 12 7.75ZM8.25 10C8.25 7.92893 9.92893 6.25 12 6.25C14.0711 6.25 15.75 7.92893 15.75 10C15.75 12.0711 14.0711 13.75 12 13.75C9.92893 13.75 8.25 12.0711 8.25 10Z" fill="currentColor"></path></svg>';
+const PIN_TACK_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><line x1="12" y1="21.6666" x2="12" y2="16.3333" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></line><path d="M 19 16.3333 c -0.1187 -0.932 -0.424 -2.3467 -1.292 -3.8333 -0.4467 -0.7653 -0.9373 -1.3707 -1.3747 -1.8333 V 5 c 0 -1.4733 -1.1933 -2.6667 -2.6667 -2.6667 h -3.3333 c -1.4733 0 -2.6667 1.1933 -2.6667 2.6667 v 5.6667 c -0.4387 0.4627 -0.9293 1.068 -1.3747 1.8333 -0.8667 1.4867 -1.1733 2.9013 -1.292 3.8333 H 19 Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>';
+
 let destMarker = null, routeGroup = L.featureGroup().addTo(map);
 let currentPath = [];
 
@@ -101,12 +108,12 @@ function render() {
 
   if (destMarker) map.removeLayer(destMarker);
   destMarker = L.marker(svgToLatLng(dest.coords), {
-    icon: L.divIcon({ className: '', html: '<div class="dest-pin">📍</div>', iconSize: [30, 30], iconAnchor: [15, 28] })
+    icon: L.divIcon({ className: '', html: '<div class="dest-pin">' + DEST_ICON + '</div>', iconSize: [30, 30], iconAnchor: [15, 28] })
   }).addTo(map).bindTooltip(dest.name, { direction: 'top', offset: [0, -22] });
 
   if (originXY) {
     L.marker(svgToLatLng(originXY), {
-      icon: L.divIcon({ className: '', html: '<div class="kiosk-pin">🕹️</div>', iconSize: [20, 20], iconAnchor: [10, 10] }),
+      icon: L.divIcon({ className: '', html: '<div class="kiosk-pin">' + PIN_TACK_ICON + '</div>', iconSize: [20, 20], iconAnchor: [10, 19] }),
       interactive: false
     }).addTo(map).bindTooltip('Kiosk', { direction: 'top' });
     drawRoute(originXY, 'on foot from the kiosk');
@@ -230,18 +237,20 @@ function onPosition(rawXY, accuracyM, headingDeg) {
   if (following) map.panTo(ll, { animate: true, duration: 0.45 });
 }
 
-function drawMe(ll, radiusUnits, headingDeg) {
-  const hasHeading = Number.isFinite(headingDeg);
-  const html = hasHeading
-    ? '<div class="me-arrow" style="transform:rotate(' + headingDeg + 'deg)"></div>'
-    : '<div class="me-dot"></div>';
-  const size = hasHeading ? [18, 20] : [20, 20];
+// headingDeg is still taken so the caller does not change, but the pin does not
+// rotate: a tack drawn on its side reads as a broken icon rather than a bearing.
+function drawMe(ll, radiusUnits, headingDeg) {  // eslint-disable-line no-unused-vars
+  const html = '<div class="me-pin">' + PIN_TACK_ICON + '</div>';
+  // The tack's needle is its point, so the marker hangs by its bottom edge and
+  // the tip lands on the true position - the centre of the accuracy circle.
+  const size = [22, 22];
+  const anchor = [11, 21];
   if (!meMarker) {
-    meMarker = L.marker(ll, { icon: L.divIcon({ className: '', html: html, iconSize: size, iconAnchor: [size[0] / 2, size[1] / 2] }), zIndexOffset: 2000 }).addTo(map);
+    meMarker = L.marker(ll, { icon: L.divIcon({ className: '', html: html, iconSize: size, iconAnchor: anchor }), zIndexOffset: 2000 }).addTo(map);
     meCircle = L.circle(ll, { radius: radiusUnits, color: '#1a73e8', weight: 1, opacity: .5, fillOpacity: .12 }).addTo(map);
     if (following) map.setView(ll, Z_FOLLOW);
   } else {
-    meMarker.setIcon(L.divIcon({ className: '', html: html, iconSize: size, iconAnchor: [size[0] / 2, size[1] / 2] }));
+    meMarker.setIcon(L.divIcon({ className: '', html: html, iconSize: size, iconAnchor: anchor }));
     meMarker.setLatLng(ll);
     meCircle.setLatLng(ll).setRadius(radiusUnits);
   }
