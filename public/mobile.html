@@ -51,16 +51,25 @@
     .fab button.on { background:var(--teal); color:#fff; }
     .fab button[hidden] { display:none; }
 
-    .me-dot {
-      width:20px; height:20px; border-radius:50%;
-      background:var(--me); border:3px solid #fff; box-shadow:0 0 0 1.5px rgba(0,0,0,.25);
+    /* Both markers are inline SVG that inherits colour from these rules, so the
+       phone shows the destination warm and the walker blue, as the map does. */
+    .dest-pin, .me-pin, .kiosk-pin { display:block; }
+    .dest-pin svg, .me-pin svg, .kiosk-pin svg { width:100%; height:100%; display:block; }
+    .dest-pin {
+      width:30px; height:30px; color:var(--rufous);
+      filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));
     }
-    .me-arrow {
-      width:0; height:0; border-left:9px solid transparent; border-right:9px solid transparent;
-      border-bottom:20px solid var(--me); filter:drop-shadow(0 1px 1px rgba(0,0,0,.35));
+    .me-pin {
+      width:22px; height:22px; color:var(--me);
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.45));
     }
-    .dest-pin { font-size:30px; line-height:1; filter:drop-shadow(0 2px 3px rgba(0,0,0,.4)); }
-    .kiosk-pin { font-size:20px; line-height:1; opacity:.85; }
+    /* Where the walk started. Same tack as the walker, in the structural teal
+       and a size down, so the two read as related without competing - the
+       blue one is you, this one is the kiosk you left. */
+    .kiosk-pin {
+      width:20px; height:20px; color:var(--teal-deep); opacity:.85;
+      filter:drop-shadow(0 1px 2px rgba(0,0,0,.3));
+    }
   </style>
 </head>
 <body>

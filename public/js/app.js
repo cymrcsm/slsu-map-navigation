@@ -325,13 +325,18 @@ const kioskIcon = L.divIcon({
   iconAnchor: [11, 11]
 });
 
+// The pin that labels the kiosk on the map, inline so it takes the tooltip's
+// own colour the way every other icon on the panel does.
+const KIOSK_TIP_ICON = '<svg class="icon kiosk-tip-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><line x1="12" y1="21.6666" x2="12" y2="16.3333" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></line><path d="M 19 16.3333 c -0.1187 -0.932 -0.424 -2.3467 -1.292 -3.8333 -0.4467 -0.7653 -0.9373 -1.3707 -1.3747 -1.8333 V 5 c 0 -1.4733 -1.1933 -2.6667 -2.6667 -2.6667 h -3.3333 c -1.4733 0 -2.6667 1.1933 -2.6667 2.6667 v 5.6667 c -0.4387 0.4627 -0.9293 1.068 -1.3747 1.8333 -0.8667 1.4867 -1.1733 2.9013 -1.292 3.8333 H 19 Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>';
+
 function renderKioskMarker() {
   const leafletPos = toLeafletCoords(kioskCoords);
   if (kioskMarker) {
     kioskMarker.setLatLng(leafletPos);
   } else {
     kioskMarker = L.marker(leafletPos, { icon: kioskIcon, zIndexOffset: 1000 });
-    kioskMarker.bindTooltip('📍 You Are Here (Kiosk)', { permanent: true, direction: 'top', offset: [0, -12] });
+    kioskMarker.bindTooltip('<span class="kiosk-tip">' + KIOSK_TIP_ICON + '<span>You Are Here (Kiosk)</span></span>',
+                            { permanent: true, direction: 'top', offset: [0, -12] });
   }
   // "You are here" is only true on the floor the kiosk stands on.
   const shouldShow = activeLevel === KIOSK_LEVEL;
@@ -914,7 +919,7 @@ function drawRoute(destination, followDestination = false) {
   const path = findWalkingPath(kioskCoords, destination.coords, KIOSK_LEVEL, destLevel);
 
   if (!path.length) {
-    inspector.innerText = '🧭 ' + destination.name + ' — no drawn path reaches it';
+    inspector.innerText = destination.name + ' — no drawn path reaches it';
     return;
   }
 
@@ -965,7 +970,7 @@ function drawRoute(destination, followDestination = false) {
   metres = Math.round(metres * GEOREF.metresPerUnit);
 
   const changes = runs.length - 1;
-  let note = '🧭 ' + destination.name + ' — about ' + metres + ' m on foot';
+  let note = destination.name + ' — about ' + metres + ' m on foot';
   if (changes > 0) {
     const last = runs[runs.length - 1];
     const dir = last.level > runs[0].level ? 'up' : 'down';
@@ -1024,7 +1029,7 @@ setKioskBtn.addEventListener('click', () => {
   isSettingKioskLocation = !isSettingKioskLocation;
   if (isSettingKioskLocation) {
     setKioskBtn.classList.add('active-placement');
-    inspector.innerText = '📍 Click anywhere on the map to set the new Kiosk position.';
+    inspector.innerText = 'Click anywhere on the map to set the new Kiosk position.';
   } else {
     setKioskBtn.classList.remove('active-placement');
     inspector.innerText = 'Click map to log coordinates';
@@ -1044,7 +1049,7 @@ map.on('click', (e) => {
     renderKioskMarker();
     isSettingKioskLocation = false;
     setKioskBtn.classList.remove('active-placement');
-    inspector.innerText = `✔ Kiosk position updated to: [${x}, ${y}]`;
+    inspector.innerText = `Kiosk position updated to: [${x}, ${y}]`;
     if (activeRouteLayers.length && activeSelectedLocation) drawRoute(activeSelectedLocation);
     return;
   }
@@ -1069,7 +1074,7 @@ map.on('click', (e) => {
     pickSpotBtn.classList.remove('active-placement');
     addLocationBtn.classList.remove('active-placement');
     showPendingSpot();
-    inspector.innerText = `✔ New location spot set to: [${x}, ${y}]`;
+    inspector.innerText = `New location spot set to: [${x}, ${y}]`;
     return;
   }
 
@@ -1182,6 +1187,7 @@ const backFromAddBtn = document.getElementById('back-from-add-btn');
 const addName = document.getElementById('add-name');
 const addFloor = document.getElementById('add-floor');
 const addBuilding = document.getElementById('add-building');
+const addCategories = document.getElementById('add-categories');
 const buildingOptions = document.getElementById('building-options');
 const pickSpotBtn = document.getElementById('pick-spot-btn');
 const addCoordsEl = document.getElementById('add-coords');
@@ -1271,6 +1277,7 @@ function resetAddForm() {
   // Default to the floor on screen: a pin dropped while viewing 2F belongs to 2F.
   addFloor.value = LEVELS[activeLevel] || LEVELS[0];
   addBuilding.value = '';
+  catBoxes(addCategories).forEach(box => { box.checked = false; });
   addName.classList.remove('invalid');
   pendingSpot = null;
   showPendingSpot();
@@ -1314,7 +1321,7 @@ pickSpotBtn.addEventListener('click', () => {
   pickSpotBtn.classList.toggle('active-placement', isPickingSpot);
   addLocationBtn.classList.toggle('active-placement', isPickingSpot);
   inspector.innerText = isPickingSpot
-    ? '📍 Click anywhere on the map to place the new location.'
+    ? 'Click anywhere on the map to place the new location.'
     : 'Click map to log coordinates';
 });
 
@@ -1336,7 +1343,7 @@ function validateAdd() {
     name: name,
     acronym: '',
     building: addBuilding.value.trim() || 'SLSU Main Campus',
-    categories: [],
+    categories: readCategories([], addCategories),
     floor: addFloor.value,
     hours: '',
     coords: pendingSpot.slice(),
@@ -1379,7 +1386,7 @@ addConfirmBtn.addEventListener('click', async () => {
   resetAddForm();
   const saved = PLACES.find(p => p.id === place.id);
   if (saved) showLocationDetails(saved);
-  inspector.innerText = '✔ Added "' + place.name + '"';
+  inspector.innerText = 'Added "' + place.name + '"';
 });
 
 addCode.addEventListener('keydown', e => { if (e.key === 'Enter') addConfirmBtn.click(); });
@@ -1413,7 +1420,7 @@ removeConfirmBtn.addEventListener('click', async () => {
   await syncWithServer();
   resetRemovePrompt();
   showTutorialView();
-  inspector.innerText = '✔ Removed "' + loc.name + '"';
+  inspector.innerText = 'Removed "' + loc.name + '"';
 });
 
 removeCode.addEventListener('keydown', e => { if (e.key === 'Enter') removeConfirmBtn.click(); });
@@ -1457,7 +1464,7 @@ moveLocationBtn.addEventListener('click', () => {
   moveAuth.classList.add('hidden');
   moveLocationBtn.classList.add('active-placement');
   say(moveMsg, 'Click the map to place "' + activeSelectedLocation.name + '".');
-  inspector.innerText = '📍 Click anywhere on the map to move "' + activeSelectedLocation.name + '".';
+  inspector.innerText = 'Click anywhere on the map to move "' + activeSelectedLocation.name + '".';
 });
 
 moveCancelBtn.addEventListener('click', () => {
@@ -1488,7 +1495,7 @@ moveConfirmBtn.addEventListener('click', async () => {
   resetMovePrompt();
   showLocationDetails(current, map.getZoom());
   if (activeRouteLayers.length) drawRoute(current);
-  inspector.innerText = '✔ Moved "' + loc.name + '" to [' + xy[0] + ', ' + xy[1] + ']';
+  inspector.innerText = 'Moved "' + loc.name + '" to [' + xy[0] + ', ' + xy[1] + ']';
 });
 
 moveCode.addEventListener('keydown', e => { if (e.key === 'Enter') moveConfirmBtn.click(); });
@@ -1549,9 +1556,12 @@ function fillEditForm(loc) {
   editCatBoxes().forEach(box => { box.checked = on.has(box.value); });
 }
 
-// Every category except the ALL pseudo-entry, built once and reused.
-function buildCategoryChecklist() {
-  editCategories.innerHTML = '';
+// Every category except the ALL pseudo-entry, built once and reused. The add
+// and the edit form show the same list, so they share one builder rather than
+// drifting apart as categories are added.
+function buildCategoryChecklist(host) {
+  if (!host) return;
+  host.innerHTML = '';
   CATEGORIES.filter(c => c.id !== 'ALL').forEach(cat => {
     const label = document.createElement('label');
     label.className = 'cat-check';
@@ -1568,20 +1578,26 @@ function buildCategoryChecklist() {
     text.textContent = cat.name;
 
     label.append(box, swatch, text);
-    editCategories.appendChild(label);
+    host.appendChild(label);
   });
 }
 
+function catBoxes(host) {
+  return host ? [].slice.call(host.querySelectorAll('input[type="checkbox"]')) : [];
+}
+
 function editCatBoxes() {
-  return [].slice.call(editCategories.querySelectorAll('input[type="checkbox"]'));
+  return catBoxes(editCategories);
 }
 
 // The first category decides the pin colour, so the existing order is kept and
-// anything newly ticked is appended rather than reshuffling the whole list.
-function readCategories(previous) {
-  const ticked = new Set(editCatBoxes().filter(b => b.checked).map(b => b.value));
+// anything newly ticked is appended rather than reshuffling the whole list. A
+// new location has no previous order, so there it is simply what was ticked.
+function readCategories(previous, host) {
+  const boxes = catBoxes(host || editCategories);
+  const ticked = new Set(boxes.filter(b => b.checked).map(b => b.value));
   const kept = (previous || []).filter(id => ticked.has(id));
-  const added = editCatBoxes()
+  const added = boxes
     .filter(b => b.checked && kept.indexOf(b.value) === -1)
     .map(b => b.value);
   return kept.concat(added);
@@ -1690,12 +1706,13 @@ editConfirmBtn.addEventListener('click', async () => {
   resetEditPanel();
   showLocationDetails(current, map.getZoom());
   if (activeRouteLayers.length) drawRoute(current);
-  inspector.innerText = '✔ Updated "' + current.name + '"';
+  inspector.innerText = 'Updated "' + current.name + '"';
 });
 
 editCode.addEventListener('keydown', e => { if (e.key === 'Enter') editConfirmBtn.click(); });
 
-buildCategoryChecklist();
+buildCategoryChecklist(editCategories);
+buildCategoryChecklist(addCategories);
 populateFloorSelects();
 
 // The map draws from campus-data.js first so it is on screen immediately, then
@@ -1733,7 +1750,9 @@ const adminTarget    = document.getElementById('admin-target');
 const adminMsg       = document.getElementById('admin-msg');
 const adminSubtitle  = document.getElementById('admin-subtitle');
 
-const LOCKED_SUBTITLE = 'Enter the authorization code to continue.';
+// Locked, the panel says nothing: the field label and its placeholder already
+// ask for the code, so a third line of the same instruction only crowds it.
+const LOCKED_SUBTITLE = '';
 const AUTH_INPUTS = [addCode, editCode, moveCode, removeCode];
 
 // Held for the session so the confirmations inside the Edit group can be
@@ -1923,11 +1942,9 @@ syncWithServer = async function () {
   return result;
 };
 
-// Dismissing: the dimmed area, or Escape.
-adminOverlay.addEventListener('click', e => {
-  if (e.target === adminOverlay) dismissAdminPanel();
-});
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && !adminOverlay.classList.contains('hidden')) dismissAdminPanel();
-});
+// Dismissing: the close button, and nothing else. A stray tap on the dimmed
+// area used to shut the panel and lock the session with it, which on a touch
+// screen happens by accident more often than on purpose - mid-form, with the
+// authorization code thrown away. Leaving is now always a deliberate act.
+// Escape is gone for the same reason: a kiosk has no keyboard to press it on,
+// but the phone hand-off and the on-screen one both do.

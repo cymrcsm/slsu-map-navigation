@@ -88,9 +88,8 @@
 
   swapEl.addEventListener('click', () => { mode = mode === 'web' ? 'local' : 'web'; render(); });
   btn.addEventListener('click', open);
+  // The close button is the only way out. Someone lining their phone camera up
+  // with the code leans over the screen, and a stray touch on the dimmed area
+  // used to take the QR away mid-scan.
   document.getElementById('qr-close-btn').addEventListener('click', close);
-  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !overlay.classList.contains('hidden')) close();
-  });
 })();

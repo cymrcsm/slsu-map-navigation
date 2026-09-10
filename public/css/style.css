@@ -1083,10 +1083,25 @@ body, html {
   border-top-color: var(--map-paper) !important;
 }
 
+/* The kiosk's own label on the map. */
+.kiosk-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.kiosk-tip-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--primary-color);
+}
+
 #coord-inspector {
   position: absolute;
   bottom: 22px;
   left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: rgba(254, 253, 249, 0.92);
   color: var(--text-muted);
   padding: 6px 12px;
@@ -1096,6 +1111,20 @@ body, html {
   z-index: 999;
   border: 1px solid var(--border-subtle);
   box-shadow: 0 2px 6px rgba(70, 58, 46, 0.10);
+}
+
+/* Every message in this box is written with innerText, which would wipe out an
+   icon kept as a child element. A masked ::before is not a child, so it stays
+   put through all of them - and taking its colour from the box means it tracks
+   the text instead of being painted into the file. */
+#coord-inspector::before {
+  content: '';
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  background: currentColor;
+  -webkit-mask: url('../assets/info-circle-outline.svg') center / contain no-repeat;
+  mask: url('../assets/info-circle-outline.svg') center / contain no-repeat;
 }
 
 
@@ -1171,6 +1200,23 @@ body, html {
   color: var(--text-muted);
   line-height: 1.45;
 }
+
+/* Locked, this line is empty - an empty <p> still claims a line box, so it is
+   taken out of the flow entirely rather than leaving a gap under the title. */
+.admin-subtitle:empty { display: none; }
+
+/* The unlock button carries the panel's own navy rather than the warm accent
+   the shared primary uses, so the one control that opens the maintenance
+   tools does not read as just another action on the kiosk surface. */
+#admin-unlock-btn {
+  background: #12294D;
+  color: var(--map-paper);
+  border: none;
+  box-shadow: 0 4px 12px rgba(18, 41, 77, 0.32);
+}
+
+#admin-unlock-btn:hover:not(:disabled) { background: #1A3866; }
+#admin-unlock-btn:disabled { opacity: 0.6; cursor: default; }
 
 .admin-gate,
 .admin-tools {
