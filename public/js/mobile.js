@@ -62,6 +62,7 @@ L.tileLayer('tiles/{z}/{x}/{y}.png', {
 
 let overlay = null;
 let shownFloor = 0;
+let homeFloor = 0;   // what this page is about; where it returns to
 // Set once the walker taps a floor themselves. The page still opens on the
 // ground and still jumps to the room's floor on arrival, but after a tap it
 // stops moving the picker under them.
@@ -117,9 +118,14 @@ function applyRouteEmphasis() {
   routeParts.forEach(part => {
     if (!part.layer || !part.layer.setStyle) return;
     const here = part.level === shownFloor;
+    // A leg on another floor is dashed on both copies, but only faded where a
+    // picker can bring it back. Without one, the walk from the kiosk to the
+    // building is on the 'other' floor for any upstairs room - and that is the
+    // part still to be walked, so it stays legible.
+    const faded = here ? 1 : (HAS_FLOOR_PICKER ? 0.3 : 0.75);
     part.layer.setStyle(part.connector
-      ? { weight: 4, opacity: here ? .8 : .3 }
-      : { weight: here ? 6 : 3, opacity: here ? .9 : .3, dashArray: here ? null : '4 8' });
+      ? { weight: 4, opacity: .8 * faded }
+      : { weight: here ? 6 : 4, opacity: .9 * faded, dashArray: here ? null : '4 8' });
   });
 }
 
@@ -176,11 +182,19 @@ let currentPath = [];
 
 function render() {
   destLevel = WalkRouting.levelOfFloor(dest.floor);
-  // The walk to the building happens outdoors, so the ground plan is the one
-  // that matches where the dot is moving. The destination's own floor only
-  // becomes the useful drawing on arrival - see onPosition().
-  shownFloor = 0;
-  showFloor(0);
+
+  // Which floor this page is about.
+  //
+  // On the kiosk-hosted copy it is the room's own floor. That page is opened
+  // over the kiosk's http, where the browser refuses geolocation, so there is
+  // no dot to follow outdoors - it is a drawing of one route, and the room is
+  // what was asked for. A second-floor room opens on the second-floor plan.
+  //
+  // The public copy opens on the ground, because there the live dot does work
+  // and the walk to the building is what is happening first. It has the picker
+  // for the rest, and follows the room's floor on arrival.
+  homeFloor = (!HAS_FLOOR_PICKER && FLOOR_ASSETS[destLevel]) ? destLevel : 0;
+  showFloor(homeFloor);
 
   document.getElementById('dest-name').textContent = dest.name;
   document.getElementById('dest-sub').textContent =
@@ -327,7 +341,7 @@ function onPosition(rawXY, accuracyM, headingDeg) {
       setStatus('You have arrived at ' + dest.name + '.' + up + ' Open the floor plan for indoor directions.', 'big');
     } else if (left > ARRIVE_M) {
       // Walked back out of range - the ground plan is the right one again.
-      if (!floorPinned && arrived && shownFloor !== 0) showFloor(0);
+      if (!floorPinned && arrived && shownFloor !== homeFloor) showFloor(homeFloor);
       arrived = false;
     }
   }
