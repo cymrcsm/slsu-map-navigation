@@ -83,6 +83,15 @@ function overlayFor(level) {
   return overlays[level];
 }
 
+// The three drawings share the 320x570 frame and one georeference, so the
+// bounds are the same whichever floor is up. Setting them inside showFloor re-ran
+// Leaflet's panInsideBounds on every switch, and that pulls the centre back
+// inside the bounds - on a map panned toward the edge of campus it reads as the
+// floor button recentring the map. Set once, from the ground drawing.
+map.setMaxBounds(overlayFor(0).getBounds().pad(0.4));
+
+// Switching floors swaps a layer and restyles what is drawn. It does not move
+// the map: the walker chose the view they are looking at.
 function showFloor(level) {
   shownFloor = level;
   const next = overlayFor(level);
@@ -90,7 +99,6 @@ function showFloor(level) {
   if (overlay) map.removeLayer(overlay);
   overlay = next;
   overlay.addTo(map);
-  map.setMaxBounds(overlay.getBounds().pad(0.4));
   paintFloorButtons();
   applyFloorVisibility();
   applyRouteEmphasis();
