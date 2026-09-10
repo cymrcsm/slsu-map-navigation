@@ -31,9 +31,17 @@
   --on-brand-edge:   rgba(237, 231, 220, 0.22);
 
   /* --- warm action colour, from the OSM clay in the tiles --- */
-  --warm-amber:      #B0691E;  /*         pins and the route line            */
+  --warm-amber:      #B0691E;  /*         the filled action buttons          */
   --warm-amber-deep: #8F5216;  /*  6.09:1 with white text on it              */
   --warm-amber-dark: #74410F;  /*         pressed                            */
+
+  /* --- the walking route ---
+     The same teal the phone page draws its route in (--teal in mobile.html),
+     so a walk handed over by QR looks like the one on the kiosk rather than
+     changing colour on the way. Kept as its own token rather than folded into
+     the warm action colour, because the route is not an action: it is the
+     answer, and it should not restyle when a button palette changes. */
+  --route-teal:      #0F7A87;
 
   /* Translucent tints, declared beside the colours they derive from so the two
      can never drift apart. Named by role, not hue, so a future palette change
@@ -1051,7 +1059,7 @@ body, html {
 }
 
 .leaflet-interactive.route-line {
-  stroke: var(--accent-color);
+  stroke: var(--route-teal);
   stroke-dasharray: 10, 10;
   paint-order: stroke;
   animation: dash 1s linear infinite;
@@ -1062,7 +1070,9 @@ body, html {
 }
 
 .leaflet-interactive.route-connector {
-  stroke: var(--accent-strong);
+  /* The phone page draws its off-path hops in the same teal as the legs and
+     separates them by dash alone, so this follows rather than going darker. */
+  stroke: var(--route-teal);
   stroke-dasharray: 3, 7;
   opacity: 0.85;
   animation: dash 1.4s linear infinite;
