@@ -911,7 +911,12 @@ function routeRunOpacity(runLevel, focusLevel) {
     : ROUTE_RUN_OPACITY_FLOOR;
 }
 
-function drawRoute(destination, followDestination = false) {
+// refit frames the map around the whole route. That belongs to the moment the
+// route is asked for, not to every redraw: switching floors redraws to move
+// the emphasis, and re-framing there fights the user - each tap starts a
+// one-second animation over the last, so a fast run along GF/2F/3F leaves the
+// map somewhere none of the taps asked for.
+function drawRoute(destination, followDestination = false, refit = true) {
   clearActiveRoute();
 
   const destLevel = levelOfFloor(destination.floor);
@@ -997,9 +1002,11 @@ function drawRoute(destination, followDestination = false) {
   const b = L.featureGroup(activeRouteLayers).getBounds()
     .extend(toLeafletCoords(kioskCoords))
     .extend(toLeafletCoords(destination.coords));
-  map.fitBounds(b, {
-    padding: [70, 70], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 1
-  });
+  if (refit) {
+    map.fitBounds(b, {
+      padding: [70, 70], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 1
+    });
+  }
 
   // A route is now on screen — offer to take it to a phone.
   if (sendToPhoneBtn) sendToPhoneBtn.hidden = false;
@@ -1155,9 +1162,10 @@ function setActiveLevel(level, redrawRoute = true) {
   });
   renderMarkers(activeCategory, searchInput ? searchInput.value : '');
   renderKioskMarker();
-  // The route spans floors, so which part is drawn solid depends on this.
+  // The route spans floors, so which part is drawn solid depends on this. The
+  // map is left where it is: the floor changed, not the route.
   if (redrawRoute && activeRouteLayers.length && activeSelectedLocation) {
-    drawRoute(activeSelectedLocation, false);
+    drawRoute(activeSelectedLocation, false, false);
   }
 }
 

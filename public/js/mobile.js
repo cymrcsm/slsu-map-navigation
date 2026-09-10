@@ -68,12 +68,27 @@ let homeFloor = 0;   // what this page is about; where it returns to
 // stops moving the picker under them.
 let floorPinned = false;
 
+// One overlay per floor, built the first time that floor is asked for and kept
+// afterwards. Each drawing is a multi-megabyte SVG: building a fresh one on
+// every tap makes the browser decode it again, so a fast run along GF/2F/3F
+// leaves the map blank between floors while images that are already in hand
+// are re-read. Reusing them makes a switch a detach and an attach.
+const overlays = [];
+function overlayFor(level) {
+  if (!overlays[level]) {
+    overlays[level] = new GeoImageOverlay(FLOOR_ASSETS[level] || FLOOR_ASSETS[0], {
+      canvasWidth: W, canvasHeight: H, bearingDeg: GEOREF.bearingDeg, opacity: 0.85
+    });
+  }
+  return overlays[level];
+}
+
 function showFloor(level) {
   shownFloor = level;
+  const next = overlayFor(level);
+  if (overlay === next) return;
   if (overlay) map.removeLayer(overlay);
-  overlay = new GeoImageOverlay(FLOOR_ASSETS[level] || FLOOR_ASSETS[0], {
-    canvasWidth: W, canvasHeight: H, bearingDeg: GEOREF.bearingDeg, opacity: 0.85
-  });
+  overlay = next;
   overlay.addTo(map);
   map.setMaxBounds(overlay.getBounds().pad(0.4));
   paintFloorButtons();

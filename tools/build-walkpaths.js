@@ -83,6 +83,15 @@ const CHAIN_GAP = 4;
 // not connected to anything and is reported instead of linked.
 const MAX_SNAP = 8;
 
+// How far a stranded walkway fragment may reach to rejoin the network it was
+// drawn against. A corridor stub that stops a metre or two short of the one it
+// meets is a drawing near-miss, not a wall: the pin sitting on it is a room you
+// can plainly walk to, but the router has no way through and the directions
+// button does nothing. Bounded well under MAX_SNAP so a genuinely separate
+// piece of the campus is reported rather than wired into the network across a
+// gap that might be a building.
+const ORPHAN_BRIDGE = 6;
+
 // Climbing a floor costs more than the few metres it covers in plan. Vertical
 // travel is conventionally weighted about 3x horizontal; one storey of stairs
 // works out near this many map units (1 unit = 1 metre).
@@ -452,6 +461,58 @@ function main() {
   split.forEach(([a, b]) => addEdge(a, b));
   console.log('');
   console.log('Noding: %d segments -> %d after splitting at touch points', before, edges.length);
+
+  // ---- rejoin fragments the drawing left just short -----------------------
+  // Noding joins lines that touch. A corridor stub drawn a metre shy of the one
+  // it meets never touches, so it comes out as an island: the pin sitting on it
+  // projects onto a real edge, the router finds no path to it, and the
+  // directions button appears to do nothing at all. Each island reaches once
+  // for the network, and only as far as ORPHAN_BRIDGE - past that the gap is
+  // treated as real and reported for the artwork to answer.
+  const bridged_ = [];
+  for (;;) {
+    const link = nodes.map(() => []);
+    edges.forEach(([a, b]) => { link[a].push(b); link[b].push(a); });
+    links.forEach(([a, b]) => { link[a].push(b); link[b].push(a); });
+
+    const mark = new Int32Array(nodes.length).fill(-1);
+    const groups = [];
+    for (let i = 0; i < nodes.length; i++) {
+      if (mark[i] !== -1) continue;
+      const stack = [i], members = [];
+      mark[i] = groups.length;
+      while (stack.length) {
+        const c = stack.pop();
+        members.push(c);
+        link[c].forEach(k => { if (mark[k] === -1) { mark[k] = groups.length; stack.push(k); } });
+      }
+      groups.push(members);
+    }
+    if (groups.length < 2) break;
+
+    const main = groups.reduce((a, b) => (a.length >= b.length ? a : b));
+    let best = null;
+    groups.forEach(g => {
+      if (g === main) return;
+      g.forEach(x => main.forEach(y => {
+        if (nodes[x][2] !== nodes[y][2]) return;
+        const d = dist(nodes[x], nodes[y]);
+        if (d <= ORPHAN_BRIDGE && (!best || d < best.d)) best = { d: d, a: x, b: y, size: g.length };
+      }));
+    });
+    if (!best) break;
+    addEdge(best.a, best.b);
+    bridged_.push(best);
+  }
+
+  if (bridged_.length) {
+    console.log('');
+    console.log('Rejoined %d stranded fragment(s) within %d units of the network:',
+                bridged_.length, ORPHAN_BRIDGE);
+    bridged_.forEach(b => console.log('    %d node(s) on L%d, %s units across  [%s,%s] -> [%s,%s]',
+                                     b.size, nodes[b.a][2], b.d.toFixed(2),
+                                     nodes[b.a][0], nodes[b.a][1], nodes[b.b][0], nodes[b.b][1]));
+  }
 
   // ---- prune what no walkway can reach ------------------------------------
   // Dropping a link strands the stub that was drawn towards it. Left in, that
