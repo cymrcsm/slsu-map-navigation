@@ -84,7 +84,18 @@ function showFloor(level) {
 // the markers that belong to other floors go away, and the leg of the route on
 // the floor being viewed is the emphatic one. A floor with no drawing behind it
 // is disabled rather than blanking the map.
-const floorButtons = [].slice.call(document.querySelectorAll('#floor-picker .floor-btn'));
+// Public copy only. The kiosk-hosted page is opened over the kiosk's own
+// Wi-Fi, standing in front of the kiosk, and its whole job is the walk to the
+// building - so it keeps the single ground plan it always drew, and every
+// marker stays on screen rather than coming and going with a floor.
+const HAS_FLOOR_PICKER = !ON_KIOSK;
+
+const picker = document.getElementById('floor-picker');
+if (picker && !HAS_FLOOR_PICKER) picker.hidden = true;
+
+const floorButtons = HAS_FLOOR_PICKER
+  ? [].slice.call(document.querySelectorAll('#floor-picker .floor-btn'))
+  : [];
 floorButtons.forEach(btn => {
   const level = parseInt(btn.dataset.floor, 10);
   if (!FLOOR_ASSETS[level]) {
@@ -124,6 +135,8 @@ function paintFloorButtons() {
 // room that is not there. The walker and the kiosk are both outdoors, which is
 // the ground floor's drawing.
 function applyFloorVisibility() {
+  // Without a picker there is no way back, so nothing is taken away.
+  if (!HAS_FLOOR_PICKER) return;
   const show = (layer, level) => {
     if (!layer) return;
     const want = level === shownFloor;

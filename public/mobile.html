@@ -67,6 +67,9 @@
     .floors button + button { border-top:1px solid rgba(34,49,47,.12); }
     .floors button.on { background:var(--teal); color:#fff; }
     .floors button:disabled { opacity:.35; }
+    /* display:flex above would otherwise beat the hidden attribute the kiosk
+       copy sets on this group. */
+    .floors[hidden] { display:none; }
     .fab button[hidden] { display:none; }
 
     /* Both markers are inline SVG that inherits colour from these rules, so the
