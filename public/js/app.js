@@ -1429,6 +1429,7 @@ addConfirmBtn.addEventListener('click', async () => {
   const saved = PLACES.find(p => p.id === place.id);
   if (saved) showLocationDetails(saved);
   inspector.innerText = 'Added "' + place.name + '"';
+  returnToAdminPanel();
 });
 
 addCode.addEventListener('keydown', e => { if (e.key === 'Enter') addConfirmBtn.click(); });
@@ -1749,6 +1750,7 @@ editConfirmBtn.addEventListener('click', async () => {
   showLocationDetails(current, map.getZoom());
   if (activeRouteLayers.length) drawRoute(current);
   inspector.innerText = 'Updated "' + current.name + '"';
+  returnToAdminPanel();
 });
 
 editCode.addEventListener('keydown', e => { if (e.key === 'Enter') editConfirmBtn.click(); });
@@ -1804,6 +1806,19 @@ let sessionAdminCode = '';
 // Placing a pin needs the map, so the dialog steps aside and comes back once
 // the click has landed.
 let reopenAfterPlacement = false;
+
+// Every admin change ends here: back at the panel, so it can be locked and
+// closed deliberately rather than left open behind the map. Leaving the kiosk
+// unlocked is the thing worth avoiding, and that is easiest when the way out is
+// already on screen.
+//
+// Nothing happens if the session was locked while the form was open - that is a
+// deliberate exit, and reopening would undo it.
+function returnToAdminPanel() {
+  reopenAfterPlacement = false;
+  if (!sessionAdminCode) return;
+  openAdminPanel();
+}
 
 function setAdminMsg(text, kind) {
   adminMsg.textContent = text || '';
@@ -1953,7 +1968,8 @@ adminTarget.addEventListener('change', () => {
 
 addLocationBtn.addEventListener('click', () => {
   // The add form needs the map for its spot and fills the side panel, so the
-  // dialog stays shut until the administrator comes back to it.
+  // dialog stays shut for the whole of it - not just for one click - and the
+  // save at the end brings it back rather than the map click.
   reopenAfterPlacement = false;
   closeAdminPanel();
 });
@@ -1969,11 +1985,13 @@ moveLocationBtn.addEventListener('click', () => {
   closeAdminPanel();
 });
 
+// Setting the kiosk position and moving a pin both hand the map over for one
+// click. This runs after the handlers that own that click, so the flags they
+// clear already read false by the time it looks at them.
 map.on('click', () => {
   if (!reopenAfterPlacement) return;
   if (isSettingKioskLocation || isMovingSpot) return;   // still armed
-  reopenAfterPlacement = false;
-  openAdminPanel();
+  returnToAdminPanel();
 });
 
 // Every admin write refreshes the roster, so the picker follows it.
