@@ -35,8 +35,11 @@ for (const f of JS) fs.copyFileSync(path.join(PUB, 'js', f), path.join(OUT, 'js'
 
 fs.cpSync(path.join(PUB, 'vendor', 'leaflet'), path.join(OUT, 'vendor', 'leaflet'), { recursive: true });
 
+// Every floor the page can draw, in FLOOR_ASSETS order - a floor missing here
+// is a destination the phone shows on the wrong plan.
+const FLOORS = ['groundFloor_layer.svg', 'secondFloor_layer.svg', 'thirdFloor_layer.svg'];
 fs.mkdirSync(path.join(OUT, 'assets'), { recursive: true });
-for (const f of ['groundFloor_layer.svg', 'secondFloor_layer.svg']) {
+for (const f of FLOORS) {
   fs.copyFileSync(path.join(PUB, 'assets', f), path.join(OUT, 'assets', f));
 }
 
@@ -92,5 +95,5 @@ const total = bytes(OUT);
 const tiles = fs.readdirSync(path.join(OUT, 'tiles'), { recursive: true }).filter(f => f.endsWith('.png')).length;
 console.log('web/ built:');
 console.log('  ' + (total / 1e6).toFixed(1) + ' MB total, ' + tiles + ' tiles');
-console.log('  index.html + ' + JS.length + ' scripts + leaflet + 2 floor SVGs + service worker');
+console.log('  index.html + ' + JS.length + ' scripts + leaflet + ' + FLOORS.length + ' floor SVGs + service worker');
 console.log('\ndeploy web/ as a static site; the QR should point at  <site>/?d=<slug>&from=<x>,<y>');

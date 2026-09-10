@@ -22,7 +22,8 @@ const OFFPATH_LIMIT = 3;   // map units ≈ metres — matches app.js
 const SNAP_LIMIT = 12;     // pull the live dot onto a walkway within this
 const REROUTE_MOVE = 6;    // recompute the route after moving this far
 const ARRIVE_M = 15;       // "you have arrived" inside this
-const FLOOR_ASSETS = ['assets/groundFloor_layer.svg', 'assets/secondFloor_layer.svg'];
+const FLOOR_ASSETS = ['assets/groundFloor_layer.svg', 'assets/secondFloor_layer.svg',
+                      'assets/thirdFloor_layer.svg'];
 
 // --- URL -------------------------------------------------------------------
 // Kiosk serves this at /go/<slug>; the public copy (GitHub Pages / Vercel) is a
@@ -60,7 +61,9 @@ L.tileLayer('tiles/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 let overlay = null;
+let shownFloor = 0;
 function showFloor(level) {
+  shownFloor = level;
   if (overlay) map.removeLayer(overlay);
   overlay = new GeoImageOverlay(FLOOR_ASSETS[level] || FLOOR_ASSETS[0], {
     canvasWidth: W, canvasHeight: H, bearingDeg: GEOREF.bearingDeg, opacity: 0.85
@@ -95,7 +98,11 @@ let currentPath = [];
 
 function render() {
   destLevel = WalkRouting.levelOfFloor(dest.floor);
-  showFloor(0);  // the walk happens on the ground; a stair note covers upstairs
+  // The walk to the building happens outdoors, so the ground plan is the one
+  // that matches where the dot is moving. The destination's own floor only
+  // becomes the useful drawing on arrival - see onPosition().
+  shownFloor = 0;
+  showFloor(0);
 
   document.getElementById('dest-name').textContent = dest.name;
   document.getElementById('dest-sub').textContent =
@@ -228,8 +235,13 @@ function onPosition(rawXY, accuracyM, headingDeg) {
     if (typeof left === 'number' && left <= ARRIVE_M && !arrived) {
       arrived = true;
       const up = destLevel > 0 ? ' Take the stairs up to ' + (WalkRouting.levels[destLevel] || 'the next floor') + '.' : '';
+      // Arrived: the outdoor walk is done and the room is the question now, so
+      // the drawing switches to the floor it is on.
+      if (destLevel !== shownFloor && FLOOR_ASSETS[destLevel]) showFloor(destLevel);
       setStatus('You have arrived at ' + dest.name + '.' + up + ' Open the floor plan for indoor directions.', 'big');
     } else if (left > ARRIVE_M) {
+      // Walked back out of range - the ground plan is the right one again.
+      if (arrived && shownFloor !== 0) showFloor(0);
       arrived = false;
     }
   }
