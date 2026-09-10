@@ -46,7 +46,18 @@ fs.mkdirSync(path.join(ROOT, 'certs'), { recursive: true });
 fs.writeFileSync(path.join(ROOT, 'certs', 'key.pem'), pems.private);
 fs.writeFileSync(path.join(ROOT, 'certs', 'cert.pem'), pems.cert);
 
+// certs/hostname is what server.js puts in the kiosk-Wi-Fi QR, so it has to
+// describe THIS cert. A name left over from a previous cert would advertise a
+// host this one does not cover, and the phone would refuse the connection.
+const hostFile = path.join(ROOT, 'certs', 'hostname');
+const dnsName = args.find(a => !isIp(a));
+if (dnsName) fs.writeFileSync(hostFile, dnsName + '\n');
+else fs.rmSync(hostFile, { force: true });   // IP-only cert: fall back to the LAN address
+
 const san = altNames.map(n => (n.ip ? 'IP:' + n.ip : 'DNS:' + n.value)).join(', ');
 console.log('wrote certs/cert.pem and certs/key.pem');
 console.log('  valid for: ' + san);
 console.log('  825 days from today');
+console.log(dnsName
+  ? '  certs/hostname -> ' + dnsName + '   (used in the kiosk-Wi-Fi QR)'
+  : '  certs/hostname cleared - the QR will use this machine’s LAN address');
