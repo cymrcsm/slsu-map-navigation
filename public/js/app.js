@@ -65,7 +65,13 @@ const EDITABLE = ['name', 'acronym', 'floor', 'building'];
 
 function buildPlaces() {
   const gone = new Set(removedIds);
-  const base = LOCATIONS.filter(l => !gone.has(l.id));
+  // A custom location can appear on both sides: tools/build-data.js bakes the
+  // overrides into campus-data.js so the phone pages can see them, while the
+  // row it was baked from stays on the kiosk. Without this the pin, its label
+  // and its search hit would all come out twice. The override wins - it is the
+  // newer of the two, and the one the admin panel edits.
+  const fromOverrides = new Set(customPlaces.map(p => p.id));
+  const base = LOCATIONS.filter(l => !gone.has(l.id) && !fromOverrides.has(l.id));
   // Written onto the same objects rather than copies, so markers and the open
   // detail panel keep pointing at the entry they already hold.
   base.forEach(l => {

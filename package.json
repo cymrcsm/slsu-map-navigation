@@ -10,7 +10,9 @@
     "phone-test": "node tools/dev-https.mjs",
     "make-cert": "node tools/make-cert.mjs",
     "install-cert": "node tools/install-cert.mjs",
-    "smoke": "node tools/smoke.mjs"
+    "smoke": "node tools/smoke.mjs",
+    "build:data": "node tools/build-data.js",
+    "build:paths": "node tools/build-walkpaths.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

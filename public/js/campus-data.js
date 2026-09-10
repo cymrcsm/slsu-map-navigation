@@ -1,3 +1,18 @@
+// GENERATED FILE - do not edit by hand.
+// Built by tools/build-data.js from db/slsu_directory.db, with the kiosk's
+// admin overrides (db/kiosk_overrides.db) layered on top.
+//
+// This is the whole directory for the phone pages: the public copy on GitHub
+// Pages has no server to ask, so a location missing here cannot be reached by
+// any QR code. Re-run this tool after adding or editing locations on the kiosk,
+// then commit the result.
+//
+//   CATEGORIES  id, name, colour; the ALL entry is the "no filter" pseudo-entry
+//   LOCATIONS   id, name, acronym, building, categories, floor, hours, coords,
+//               textH (label height hint), description
+//
+// 260 locations (2nd Floor: 2, Ground Floor: 258),
+// 16 categories.
 const CATEGORIES = [
   {
     "id": "ALL",
@@ -641,6 +656,40 @@ const LOCATIONS = [
   "description": "Comfort room and hygiene facility."
  },
  {
+  "id": "comfort-room-10",
+  "name": "Comfort Room",
+  "acronym": "CR",
+  "building": "SLSU Main Campus",
+  "categories": [
+   "comfort-rooms"
+  ],
+  "floor": "Ground Floor",
+  "hours": "Open during campus hours",
+  "coords": [
+   65.4,
+   449.9
+  ],
+  "textH": 0.99,
+  "description": "Comfort room and hygiene facility."
+ },
+ {
+  "id": "comfort-room-11",
+  "name": "Comfort Room",
+  "acronym": "CR",
+  "building": "SLSU Main Campus",
+  "categories": [
+   "comfort-rooms"
+  ],
+  "floor": "Ground Floor",
+  "hours": "Open during campus hours",
+  "coords": [
+   135.6,
+   126
+  ],
+  "textH": 0.33,
+  "description": "Comfort room and hygiene facility."
+ },
+ {
   "id": "comfort-room-2",
   "name": "Comfort Room",
   "acronym": "CR",
@@ -774,40 +823,6 @@ const LOCATIONS = [
    389.1
   ],
   "textH": 0.67,
-  "description": "Comfort room and hygiene facility."
- },
- {
-  "id": "comfort-room-10",
-  "name": "Comfort Room",
-  "acronym": "CR",
-  "building": "SLSU Main Campus",
-  "categories": [
-   "comfort-rooms"
-  ],
-  "floor": "Ground Floor",
-  "hours": "Open during campus hours",
-  "coords": [
-   65.4,
-   449.9
-  ],
-  "textH": 0.99,
-  "description": "Comfort room and hygiene facility."
- },
- {
-  "id": "comfort-room-11",
-  "name": "Comfort Room",
-  "acronym": "CR",
-  "building": "SLSU Main Campus",
-  "categories": [
-   "comfort-rooms"
-  ],
-  "floor": "Ground Floor",
-  "hours": "Open during campus hours",
-  "coords": [
-   135.6,
-   126
-  ],
-  "textH": 0.33,
   "description": "Comfort room and hygiene facility."
  },
  {
@@ -2722,7 +2737,7 @@ const LOCATIONS = [
  },
  {
   "id": "mmc-3",
-  "name": "MMC 3",
+  "name": "Multi-Media Center 3",
   "acronym": "MMC3",
   "building": "Multi-Media Center (MMC)",
   "categories": [
@@ -2735,26 +2750,6 @@ const LOCATIONS = [
    386.2
   ],
   "textH": 0.75,
-  "description": "Classroom or lecture space used for scheduled instruction."
- },
- {
-  "id": "multi-purpose-court-mpc",
-  "name": "Multi Purpose Court (MPC)",
-  "acronym": "MPC",
-  "building": "Multi Purpose Court (MPC)",
-  "categories": [
-   "classrooms",
-   "student-orgs",
-   "sports-recreation",
-   "auxiliary-services"
-  ],
-  "floor": "Ground Floor",
-  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
-  "coords": [
-   182.5,
-   146.4
-  ],
-  "textH": 2.12,
   "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
@@ -2791,6 +2786,26 @@ const LOCATIONS = [
    384.2
   ],
   "textH": 1.35,
+  "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
+  "id": "multi-purpose-court-mpc",
+  "name": "Multi Purpose Court (MPC)",
+  "acronym": "MPC",
+  "building": "Multi Purpose Court (MPC)",
+  "categories": [
+   "classrooms",
+   "student-orgs",
+   "sports-recreation",
+   "auxiliary-services"
+  ],
+  "floor": "Ground Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   182.5,
+   146.4
+  ],
+  "textH": 2.12,
   "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
@@ -2992,6 +3007,22 @@ const LOCATIONS = [
   ],
   "textH": 0.86,
   "description": "Administrative office handling university operations and student transactions."
+ },
+ {
+  "id": "office-of-the-supreme-student-council-ssc",
+  "custom": true,
+  "name": "Office of the Supreme Student Council(SSC)",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "Student Center",
+  "categories": [
+   "student-orgs",
+   "auxiliary-services"
+  ],
+  "coords": [
+   145.4,
+   341.2
+  ]
  },
  {
   "id": "office-of-the-vice-president",
@@ -3197,6 +3228,40 @@ const LOCATIONS = [
   "description": "Parking bay or transit waiting area."
  },
  {
+  "id": "parking-area-10",
+  "name": "Parking Area",
+  "acronym": "PA",
+  "building": "SLSU Main Campus",
+  "categories": [
+   "parking-waiting"
+  ],
+  "floor": "Ground Floor",
+  "hours": "Open during campus hours",
+  "coords": [
+   176.1,
+   364
+  ],
+  "textH": 0.81,
+  "description": "Parking bay or transit waiting area."
+ },
+ {
+  "id": "parking-area-11",
+  "name": "Parking Area",
+  "acronym": "PA",
+  "building": "SLSU Main Campus",
+  "categories": [
+   "parking-waiting"
+  ],
+  "floor": "Ground Floor",
+  "hours": "Open during campus hours",
+  "coords": [
+   125.4,
+   388.3
+  ],
+  "textH": 0.81,
+  "description": "Parking bay or transit waiting area."
+ },
+ {
   "id": "parking-area-2",
   "name": "Parking Area",
   "acronym": "PA",
@@ -3330,40 +3395,6 @@ const LOCATIONS = [
    335.5
   ],
   "textH": 0.75,
-  "description": "Parking bay or transit waiting area."
- },
- {
-  "id": "parking-area-10",
-  "name": "Parking Area",
-  "acronym": "PA",
-  "building": "SLSU Main Campus",
-  "categories": [
-   "parking-waiting"
-  ],
-  "floor": "Ground Floor",
-  "hours": "Open during campus hours",
-  "coords": [
-   176.1,
-   364
-  ],
-  "textH": 0.81,
-  "description": "Parking bay or transit waiting area."
- },
- {
-  "id": "parking-area-11",
-  "name": "Parking Area",
-  "acronym": "PA",
-  "building": "SLSU Main Campus",
-  "categories": [
-   "parking-waiting"
-  ],
-  "floor": "Ground Floor",
-  "hours": "Open during campus hours",
-  "coords": [
-   125.4,
-   388.3
-  ],
-  "textH": 0.81,
   "description": "Parking bay or transit waiting area."
  },
  {
@@ -4211,23 +4242,6 @@ const LOCATIONS = [
   "description": "Records, storage and supply area maintained by the university."
  },
  {
-  "id": "student-records-archives-2",
-  "name": "Student Records Archives",
-  "acronym": "SRA",
-  "building": "Administration Building",
-  "categories": [
-   "stock-archives"
-  ],
-  "floor": "Ground Floor",
-  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
-  "coords": [
-   211.9,
-   323
-  ],
-  "textH": 0.88,
-  "description": "Records, storage and supply area maintained by the university."
- },
- {
   "id": "supply-and-property-building",
   "name": "Supply and Property Building",
   "acronym": "SPB",
@@ -4321,6 +4335,21 @@ const LOCATIONS = [
   ],
   "textH": 0.88,
   "description": "Campus location."
+ },
+ {
+  "id": "training-hall",
+  "custom": true,
+  "name": "Training Hall",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "Student Center",
+  "categories": [
+   "sports-recreation"
+  ],
+  "coords": [
+   149.5,
+   344.8
+  ]
  },
  {
   "id": "twin-s-snack-house",
