@@ -36,12 +36,13 @@
   --warm-amber-dark: #74410F;  /*         pressed                            */
 
   /* --- the walking route ---
-     The same teal the phone page draws its route in (--teal in mobile.html),
-     so a walk handed over by QR looks like the one on the kiosk rather than
-     changing colour on the way. Kept as its own token rather than folded into
-     the warm action colour, because the route is not an action: it is the
-     answer, and it should not restyle when a button palette changes. */
-  --route-teal:      #0F7A87;
+     The brand's deep navy, matched by the phone page (--route in mobile.html)
+     so a walk handed over by QR does not change colour on the way. Kept as its
+     own token rather than folded into the warm action colour, because the route
+     is not an action: it is the answer, and it should not restyle when a button
+     palette changes. Named for the role, not the hue - this is the second
+     colour it has worn. */
+  --route-line:      var(--slsu-navy-deep);   /* #12294D */
 
   /* Translucent tints, declared beside the colours they derive from so the two
      can never drift apart. Named by role, not hue, so a future palette change
@@ -1059,7 +1060,7 @@ body, html {
 }
 
 .leaflet-interactive.route-line {
-  stroke: var(--route-teal);
+  stroke: var(--route-line);
   stroke-dasharray: 10, 10;
   paint-order: stroke;
   animation: dash 1s linear infinite;
@@ -1070,9 +1071,9 @@ body, html {
 }
 
 .leaflet-interactive.route-connector {
-  /* The phone page draws its off-path hops in the same teal as the legs and
+  /* The phone page draws its off-path hops in the same colour as the legs and
      separates them by dash alone, so this follows rather than going darker. */
-  stroke: var(--route-teal);
+  stroke: var(--route-line);
   stroke-dasharray: 3, 7;
   opacity: 0.85;
   animation: dash 1.4s linear infinite;

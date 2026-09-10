@@ -19,6 +19,9 @@ const Z_MAX = GEO_ZOOM_SHIFT + 7;
 const Z_FOLLOW = GEO_ZOOM_SHIFT + 3.4;
 
 const OFFPATH_LIMIT = 3;   // map units ≈ metres — matches app.js
+// Both the legs and the off-path hops are drawn in this; --route in
+// mobile.html carries the same value for anything styled in CSS.
+const ROUTE_COLOUR = '#12294D';
 const SNAP_LIMIT = 12;     // pull the live dot onto a walkway within this
 const REROUTE_MOVE = 6;    // recompute the route after moving this far
 const ARRIVE_M = 15;       // "you have arrived" inside this
@@ -272,7 +275,7 @@ function drawRoute(fromXY, tail) {
   WalkRouting.splitByLevel(path).forEach(run => {
     if (run.pts.length < 2) return;
     const layer = L.polyline(run.pts.map(svgToLatLng), {
-      color: '#0F7A87', lineCap: 'round', lineJoin: 'round'
+      color: ROUTE_COLOUR, lineCap: 'round', lineJoin: 'round'
     }).addTo(routeGroup);
     routeParts.push({ layer: layer, level: run.level });
   });
@@ -283,7 +286,7 @@ function drawRoute(fromXY, tail) {
    [path[path.length - 1], dest.coords, endGap, destLevel]].forEach(hop => {
     if (hop[2] > 0.4 && hop[2] <= OFFPATH_LIMIT) {
       const layer = L.polyline([hop[0], hop[1]].map(svgToLatLng), {
-        color: '#0F7A87', dashArray: '3 6'
+        color: ROUTE_COLOUR, dashArray: '3 6'
       }).addTo(routeGroup);
       routeParts.push({ layer: layer, level: hop[3], connector: true });
     }
