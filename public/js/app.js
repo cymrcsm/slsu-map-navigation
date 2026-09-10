@@ -164,6 +164,31 @@ const map = L.map('map', {
 // and let autoCenterCampus() refine it once the panes exist.
 map.setView(svgToLatLng([MAP_WIDTH / 2, MAP_HEIGHT / 2]), 18, { animate: false });
 
+// Every animated view change goes through these two.
+//
+// Leaflet starts a new animation on top of one already running, and the two
+// here pull opposite ways: selecting a room flies in tight (readableZoom, up
+// to MAX_ZOOM) while asking for directions pulls back to frame the whole walk
+// (ROUTE_MAX_ZOOM, about two and a half levels wider). Clicking between them
+// faster than 0.8s leaves each one abandoned mid-flight, and the next starts
+// from wherever that frame landed rather than from a settled view.
+//
+// map.stop() ends the running animation first. With zoomSnap: 0 it also fires
+// viewreset, which is what GeoImageOverlay._reset listens for - so the floor
+// drawings recompute their size and position from the map rather than keeping
+// the half-applied scale a cancelled zoom animation left on them. That is the
+// part that shows: the artwork drifting out of register with the route and the
+// street map under it.
+function flyToView(latlng, zoom, options) {
+  map.stop();
+  map.flyTo(latlng, zoom, options);
+}
+
+function fitView(bounds, options) {
+  map.stop();
+  map.fitBounds(bounds, options);
+}
+
 // OpenStreetMap requires visible credit wherever its tiles are shown.
 L.control.attribution({ position: 'bottomleft', prefix: false }).addTo(map);
 
@@ -242,6 +267,9 @@ function overviewZoom() {
 }
 
 function autoCenterCampus(animate = true) {
+  // Same reason as flyToView/fitView: the recentre button is next to the floor
+  // and directions controls, so it lands mid-animation as often as not.
+  if (animate) map.stop();
   map.setView(CAMPUS_CENTER, overviewZoom(), { animate: animate });
 }
 
@@ -535,7 +563,7 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   if (typeof setActiveLevel === 'function') setActiveLevel(levelOfFloor(loc.floor), false);
 
   showPanel(detailView);
-  map.flyTo(toLeafletCoords(loc.coords), flyZoom, { animate: true, duration: 0.8 });
+  flyToView(toLeafletCoords(loc.coords), flyZoom, { animate: true, duration: 0.8 });
 }
 
 // Only one of the three left-panel views is visible at a time.
@@ -610,7 +638,7 @@ function selectCategory(id) {
   // Frame the pins that are left, so the category is visible at a glance.
   if (shown.length) {
     const group = L.featureGroup(shown.map(l => markerFor.get(l.id)));
-    map.fitBounds(group.getBounds(), {
+    fitView(group.getBounds(), {
       padding: [80, 80], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 0.8
     });
   }
@@ -1003,7 +1031,7 @@ function drawRoute(destination, followDestination = false, refit = true) {
     .extend(toLeafletCoords(kioskCoords))
     .extend(toLeafletCoords(destination.coords));
   if (refit) {
-    map.fitBounds(b, {
+    fitView(b, {
       padding: [70, 70], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 1
     });
   }
@@ -1023,7 +1051,7 @@ recenterRoomBtn.addEventListener('click', () => {
   if (activeSelectedLocation) {
     // "Focus on Map" goes a step tighter than the automatic selection zoom.
     const z = Math.min(MAX_ZOOM, readableZoom(activeSelectedLocation) + 1);
-    map.flyTo(toLeafletCoords(activeSelectedLocation.coords), z, { animate: true });
+    flyToView(toLeafletCoords(activeSelectedLocation.coords), z, { animate: true });
   }
 });
 
