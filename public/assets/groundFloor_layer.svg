@@ -2105,16 +2105,16 @@
 <path id="Vector 73_106" d="M259.5 430.5V436.5H268L267.5 450" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="Vector 73_107" d="M252.5 426.5V430.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="Vector 73_108" d="M138.5 384.5V361.5V361" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="Vector 73_109" d="M156.5 386.5V358L159.5 362.5V358.5" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="Vector 73_110" d="M138.5 361.5V357.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="Vector 73_109" d="M138.5 361.5V357.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="Vector 74" d="M127.5 468.5L126.5 483V499.5M155 445.5H117.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="Vector 75" d="M152.5 445.5V459.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="Vector 76" d="M141.5 194.5V190.5H137.5V177.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="Vector 77" d="M175.5 195.5L161 204.5M175.5 204.5V218.5V229.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="Vector 78" d="M156.5 386.5V362.5L158.5 358.5M158.5 358.5V362.5M158.5 358.5V351.5M158.5 327V351.5M156.5 351.5H158.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="walkpath4" d="M251.5 223.5C251.5 223.328 251.5 223.162 251.5 223V223.5Z" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="walkpath4_2" d="M275.492 180C275.495 179.832 275.497 179.665 275.5 179.5L275.492 180Z" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="walkpath4_3" d="M86.5 116.528C86.3291 116.518 86.1623 116.509 86 116.5L86.5 116.528Z" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_4" d="M128.5 345V344.5V341.5V331.5H141.5V332" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_4" d="M128.5 345V344.5V341.5V331.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="walkpath4_5" d="M124.5 344.5H128.5L138.5 347.357L139 347.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="walkpath4_6" d="M124 344.5H124.5L125.71 351.5L126.574 356.5C125.883 356.5 101.529 354.833 89.4392 354L89.2693 351.5L87.5 325.474L78.5 325L81.5 388.25L77.5 388.472L77 388.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="walkpath4_7" d="M131.5 400V399.5V385L127.265 360.5L126.574 356.5L156.5 358.293L184.521 359.971V364L184.5 363.5" stroke="#1E1E1E" stroke-opacity="0"/>
@@ -2303,34 +2303,32 @@
 <path id="walkpath4_190" d="M209.5 452V452.5H220" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="walkpath4_191" d="M138.5 347.357V350.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="walkpath4_192" d="M138.5 351V350.5L156.5 351.473L157 351.5" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_193" d="M156.5 358.293V351.473V338.5H186.775" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_194" d="M156.5 338.5V333.5" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_195" d="M156.5 194V194.5H160.5H161" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_196" d="M161 204V194" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_197" d="M156.5 195V191" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_198" d="M160 191L160.5 178.445" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_199" d="M160.5 190.5H137.5H137" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_200" d="M137.5 195V194.5H141H141.5H142" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_201" d="M137 194V197" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_202" d="M156.5 333.5L141.5 331.5V197.5H128.5V197" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_203" d="M156.5 333.5V204.5" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_204" d="M92.0185 331.5H128.5V204L156.5 203.5V204.5H170.674C173.4 212.334 178.717 227.543 179.5 229.5L203.5 231.5L218.5 246.5L225.5 269.5L220.5 296.5L201.5 314.5H93.5L89.75 323" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_205" d="M128.5 203.5V197.5" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_206" d="M93.5 314.5L73 294L69.5 269L75.5 248.5L85.5 235.5L104 229.5H110.5" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_207" d="M179.5 229.5H110.5" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_208" d="M170.5 204C170.557 204.163 170.615 204.33 170.674 204.5H175.5C175.5 204.1 175.5 186.811 175.5 178.217" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_209" d="M128.5 204V203.5" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_210" d="M128.5 203.5H119" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_211" d="M110.5 177.523V229.5" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_212" d="M159 362.44L185.469 386.766" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_213" d="M185.455 386.41H157" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_214" d="M148 386.41H148.5H157" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_215" d="M148.5 386.41V384.5" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_216" d="M148.5 384V384.5H138.5H138" stroke="#1E1E1E" stroke-opacity="0"/>
-<path id="walkpath4_217" d="M138.5 384.5L124.5 399.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_193" d="M158 338.5H186.775" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_194" d="M156.5 194V194.5H160.5H161" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_195" d="M161 204V194" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_196" d="M156.5 195V191" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_197" d="M160 191L160.5 178.445" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_198" d="M160.5 190.5H137.5H137" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_199" d="M137.5 195V194.5H141H141.5H142" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_200" d="M137 194V197" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_201" d="M141.5 327.5V197.5H128.5V197" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_202" d="M128.5 331.5V204L156.5 203.5V204.5H170.674C173.4 212.334 178.717 227.543 179.5 229.5L203.5 231.5L218.5 246.5L225.5 269.5L220.5 296.5L201.5 314.5H93.5L89.75 323" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_203" d="M128.5 203.5V197.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_204" d="M93.5 314.5L73 294L69.5 269L75.5 248.5L85.5 235.5L104 229.5H110.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_205" d="M179.5 229.5H110.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_206" d="M170.5 204C170.557 204.163 170.615 204.33 170.674 204.5H175.5C175.5 204.1 175.5 186.811 175.5 178.217" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_207" d="M128.5 204V203.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_208" d="M128.5 203.5H119" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_209" d="M110.5 177.523V229.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_210" d="M159 362.44L185.469 386.766" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_211" d="M185.455 386.41H157" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_212" d="M148 386.41H148.5H157" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_213" d="M148.5 386.41V384.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_214" d="M148.5 384V384.5H138.5H138" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="walkpath4_215" d="M138.5 384.5L124.5 399.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="Vector 44" d="M243.5 351H250V355.5" stroke="#1E1E1E" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 41" d="M196.5 352.5V349.5M196.5 390.5V393M252.5 69.5V67" stroke="#1E1E1E" stroke-width="0.5" stroke-opacity="0"/>
-<path id="Vector 37" d="M185 349.5H180.291M180.291 349.5V353M180.291 349.5V347H169.5V344.5L163 342.5H161.5M156.5 342.5H161.5M161.5 342.5V343.5" stroke="#1E1E1E" stroke-width="0.5" stroke-opacity="0"/>
+<path id="Vector 37" d="M185 349.5H180.291M180.291 349.5V353M180.291 349.5V347H169.5V344.5L163 342.5H161.5M158 342.5H161.5M161.5 342.5V343.5" stroke="#1E1E1E" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 36" d="M100.5 351V349M130.5 345V349" stroke="#1E1E1E" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 22" d="M94 150.5L93 153.5M86.5 112.5H92M78.5 329.5L75 330M79.5 388.5V390H83.5M84 390H83.5M83.5 390V391M121.5 393.5H123M150.5 426.5V434M201.5 426.5V423M217.5 426.5V428.5M243.5 392L250 392.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="Vector 23" d="M199.5 426.5V420M166.5 476.5V481" stroke="#1E1E1E" stroke-opacity="0"/>
