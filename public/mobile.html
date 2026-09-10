@@ -49,6 +49,24 @@
       font-size:1.25rem; color:var(--teal-deep); display:grid; place-items:center;
     }
     .fab button.on { background:var(--teal); color:#fff; }
+
+    /* Floor picker. One stacked group like the kiosk's, sitting above the
+       follow button so both thumb targets stay in the same corner. */
+    .floors {
+      position:absolute; right:12px; z-index:1000;
+      bottom:calc(42vh + 74px);
+      display:flex; flex-direction:column;
+      border-radius:12px; overflow:hidden;
+      background:var(--paper); box-shadow:0 2px 10px rgba(0,0,0,.28);
+    }
+    .floors button {
+      width:46px; height:40px; border:none; background:transparent;
+      color:var(--teal-deep); font-size:.9rem; font-weight:700;
+      display:grid; place-items:center;
+    }
+    .floors button + button { border-top:1px solid rgba(34,49,47,.12); }
+    .floors button.on { background:var(--teal); color:#fff; }
+    .floors button:disabled { opacity:.35; }
     .fab button[hidden] { display:none; }
 
     /* Both markers are inline SVG that inherits colour from these rules, so the
@@ -74,6 +92,12 @@
 </head>
 <body>
   <div id="map"></div>
+
+  <div class="floors" id="floor-picker" role="group" aria-label="Floor">
+    <button type="button" class="floor-btn" data-floor="0">GF</button>
+    <button type="button" class="floor-btn" data-floor="1">2F</button>
+    <button type="button" class="floor-btn" data-floor="2">3F</button>
+  </div>
 
   <div class="fab">
     <button id="recenter-btn" aria-label="Follow my location" title="Follow my location">◎</button>

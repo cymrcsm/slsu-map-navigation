@@ -62,6 +62,11 @@ L.tileLayer('tiles/{z}/{x}/{y}.png', {
 
 let overlay = null;
 let shownFloor = 0;
+// Set once the walker taps a floor themselves. The page still opens on the
+// ground and still jumps to the room's floor on arrival, but after a tap it
+// stops moving the picker under them.
+let floorPinned = false;
+
 function showFloor(level) {
   shownFloor = level;
   if (overlay) map.removeLayer(overlay);
@@ -70,6 +75,65 @@ function showFloor(level) {
   });
   overlay.addTo(map);
   map.setMaxBounds(overlay.getBounds().pad(0.4));
+  paintFloorButtons();
+  applyFloorVisibility();
+  applyRouteEmphasis();
+}
+
+// The floor picker, matching the kiosk's GF/2F/3F group: the drawing swaps,
+// the markers that belong to other floors go away, and the leg of the route on
+// the floor being viewed is the emphatic one. A floor with no drawing behind it
+// is disabled rather than blanking the map.
+const floorButtons = [].slice.call(document.querySelectorAll('#floor-picker .floor-btn'));
+floorButtons.forEach(btn => {
+  const level = parseInt(btn.dataset.floor, 10);
+  if (!FLOOR_ASSETS[level]) {
+    btn.disabled = true;
+    btn.title = 'No drawing for this floor yet';
+    return;
+  }
+  btn.addEventListener('click', () => {
+    if (level === shownFloor) return;
+    floorPinned = true;
+    showFloor(level);
+  });
+});
+
+// The floor on screen is the one being explained, so its leg is the emphatic
+// one and every other leg drops back - the same rule the kiosk map follows,
+// in this page's own weights.
+function applyRouteEmphasis() {
+  routeParts.forEach(part => {
+    if (!part.layer || !part.layer.setStyle) return;
+    const here = part.level === shownFloor;
+    part.layer.setStyle(part.connector
+      ? { weight: 4, opacity: here ? .8 : .3 }
+      : { weight: here ? 6 : 3, opacity: here ? .9 : .3, dashArray: here ? null : '4 8' });
+  });
+}
+
+function paintFloorButtons() {
+  floorButtons.forEach(btn => {
+    const on = parseInt(btn.dataset.floor, 10) === shownFloor;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+
+// A marker belongs to one floor, so on any other it would be pointing at a
+// room that is not there. The walker and the kiosk are both outdoors, which is
+// the ground floor's drawing.
+function applyFloorVisibility() {
+  const show = (layer, level) => {
+    if (!layer) return;
+    const want = level === shownFloor;
+    if (want && !map.hasLayer(layer)) map.addLayer(layer);
+    if (!want && map.hasLayer(layer)) map.removeLayer(layer);
+  };
+  show(destMarker, destLevel);
+  show(originMarker, 0);
+  show(meMarker, 0);
+  show(meCircle, 0);
 }
 
 // --- destination --------------------------------------------------------
@@ -93,7 +157,8 @@ let destLevel = 0;
 const DEST_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.25 10.1433C3.25 5.24427 7.15501 1.25 12 1.25C16.845 1.25 20.75 5.24427 20.75 10.1433C20.75 12.5084 20.076 15.0479 18.8844 17.2419C17.6944 19.4331 15.9556 21.3372 13.7805 22.3539C12.6506 22.882 11.3494 22.882 10.2195 22.3539C8.04437 21.3372 6.30562 19.4331 5.11556 17.2419C3.92403 15.0479 3.25 12.5084 3.25 10.1433ZM12 2.75C8.00843 2.75 4.75 6.04748 4.75 10.1433C4.75 12.2404 5.35263 14.5354 6.4337 16.526C7.51624 18.5192 9.04602 20.1496 10.8546 20.995C11.5821 21.335 12.4179 21.335 13.1454 20.995C14.954 20.1496 16.4838 18.5192 17.5663 16.526C18.6474 14.5354 19.25 12.2404 19.25 10.1433C19.25 6.04748 15.9916 2.75 12 2.75ZM12 7.75C10.7574 7.75 9.75 8.75736 9.75 10C9.75 11.2426 10.7574 12.25 12 12.25C13.2426 12.25 14.25 11.2426 14.25 10C14.25 8.75736 13.2426 7.75 12 7.75ZM8.25 10C8.25 7.92893 9.92893 6.25 12 6.25C14.0711 6.25 15.75 7.92893 15.75 10C15.75 12.0711 14.0711 13.75 12 13.75C9.92893 13.75 8.25 12.0711 8.25 10Z" fill="currentColor"></path></svg>';
 const PIN_TACK_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><line x1="12" y1="21.6666" x2="12" y2="16.3333" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></line><path d="M 19 16.3333 c -0.1187 -0.932 -0.424 -2.3467 -1.292 -3.8333 -0.4467 -0.7653 -0.9373 -1.3707 -1.3747 -1.8333 V 5 c 0 -1.4733 -1.1933 -2.6667 -2.6667 -2.6667 h -3.3333 c -1.4733 0 -2.6667 1.1933 -2.6667 2.6667 v 5.6667 c -0.4387 0.4627 -0.9293 1.068 -1.3747 1.8333 -0.8667 1.4867 -1.1733 2.9013 -1.292 3.8333 H 19 Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>';
 
-let destMarker = null, routeGroup = L.featureGroup().addTo(map);
+let destMarker = null, originMarker = null, routeGroup = L.featureGroup().addTo(map);
+let routeParts = [];   // { layer, level } for every leg and connector drawn
 let currentPath = [];
 
 function render() {
@@ -119,7 +184,8 @@ function render() {
   }).addTo(map).bindTooltip(dest.name, { direction: 'top', offset: [0, -22] });
 
   if (originXY) {
-    L.marker(svgToLatLng(originXY), {
+    if (originMarker) map.removeLayer(originMarker);
+    originMarker = L.marker(svgToLatLng(originXY), {
       icon: L.divIcon({ className: '', html: '<div class="kiosk-pin">' + PIN_TACK_ICON + '</div>', iconSize: [20, 20], iconAnchor: [10, 19] }),
       interactive: false
     }).addTo(map).bindTooltip('Kiosk', { direction: 'top' });
@@ -130,12 +196,17 @@ function render() {
     setStatus('Turn on location to get directions to ' + dest.name + '.');
   }
 
+  // The markers are built above, after showFloor() has already had its pass,
+  // so the floor they belong to is applied once more here.
+  applyFloorVisibility();
+
   startPositioning();
 }
 
 // --- routing -----------------------------------------------------------
 function drawRoute(fromXY, tail) {
   routeGroup.clearLayers();
+  routeParts = [];
   const path = WalkRouting.findPath(fromXY, dest.coords, 0, destLevel);
   currentPath = path;
 
@@ -150,22 +221,24 @@ function drawRoute(fromXY, tail) {
 
   WalkRouting.splitByLevel(path).forEach(run => {
     if (run.pts.length < 2) return;
-    const onGround = run.level === 0;
-    L.polyline(run.pts.map(svgToLatLng), {
-      weight: onGround ? 6 : 3, opacity: onGround ? .9 : .35,
-      dashArray: onGround ? null : '4 8', color: '#0F7A87', lineCap: 'round', lineJoin: 'round'
+    const layer = L.polyline(run.pts.map(svgToLatLng), {
+      color: '#0F7A87', lineCap: 'round', lineJoin: 'round'
     }).addTo(routeGroup);
+    routeParts.push({ layer: layer, level: run.level });
   });
 
   const startGap = WalkRouting.dist(fromXY, path[0]);
   const endGap = WalkRouting.dist(path[path.length - 1], dest.coords);
-  [[fromXY, path[0], startGap], [path[path.length - 1], dest.coords, endGap]].forEach(hop => {
+  [[fromXY, path[0], startGap, 0],
+   [path[path.length - 1], dest.coords, endGap, destLevel]].forEach(hop => {
     if (hop[2] > 0.4 && hop[2] <= OFFPATH_LIMIT) {
-      L.polyline([hop[0], hop[1]].map(svgToLatLng), {
-        weight: 4, opacity: .8, color: '#0F7A87', dashArray: '3 6'
+      const layer = L.polyline([hop[0], hop[1]].map(svgToLatLng), {
+        color: '#0F7A87', dashArray: '3 6'
       }).addTo(routeGroup);
+      routeParts.push({ layer: layer, level: hop[3], connector: true });
     }
   });
+  applyRouteEmphasis();
 
   const walked = [];
   if (startGap <= OFFPATH_LIMIT) walked.push([fromXY[0], fromXY[1], 0]);
@@ -237,11 +310,11 @@ function onPosition(rawXY, accuracyM, headingDeg) {
       const up = destLevel > 0 ? ' Take the stairs up to ' + (WalkRouting.levels[destLevel] || 'the next floor') + '.' : '';
       // Arrived: the outdoor walk is done and the room is the question now, so
       // the drawing switches to the floor it is on.
-      if (destLevel !== shownFloor && FLOOR_ASSETS[destLevel]) showFloor(destLevel);
+      if (!floorPinned && destLevel !== shownFloor && FLOOR_ASSETS[destLevel]) showFloor(destLevel);
       setStatus('You have arrived at ' + dest.name + '.' + up + ' Open the floor plan for indoor directions.', 'big');
     } else if (left > ARRIVE_M) {
       // Walked back out of range - the ground plan is the right one again.
-      if (arrived && shownFloor !== 0) showFloor(0);
+      if (!floorPinned && arrived && shownFloor !== 0) showFloor(0);
       arrived = false;
     }
   }
@@ -266,6 +339,9 @@ function drawMe(ll, radiusUnits, headingDeg) {  // eslint-disable-line no-unused
     meMarker.setLatLng(ll);
     meCircle.setLatLng(ll).setRadius(radiusUnits);
   }
+  // Both were just added to the map; if the walker is looking upstairs they
+  // do not belong on screen.
+  applyFloorVisibility();
 }
 
 function setFollowing(on) {
