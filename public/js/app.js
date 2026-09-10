@@ -136,7 +136,13 @@ const MIN_ROOM_ZOOM = 3 + GEO_ZOOM_SHIFT;
 // How far a route may leave the walkpaths, at the very start and the very end.
 // Inside this budget the last step is drawn straight to the pin; beyond it the
 // route stops on the walkway and says how much further the destination is.
-const OFFPATH_LIMIT = 3;
+//
+// Two units - two pixels of the 320x570 drawing, which the georeference makes
+// two metres. The route is meant to be the drawn lines and nothing else, so
+// this is only the allowance for a pin that sits just off the corridor it
+// belongs to, not a licence to cut a corner. Anything further is reported as a
+// distance to walk rather than drawn as a line nobody surveyed.
+const OFFPATH_LIMIT = 2;
 
 // The drawing is opaque, so it would hide the street map completely. Easing it
 // back while the basemap is on lets the surrounding roads read through.

@@ -18,7 +18,7 @@ const Z_MIN = GEO_ZOOM_SHIFT + 0.5;
 const Z_MAX = GEO_ZOOM_SHIFT + 7;
 const Z_FOLLOW = GEO_ZOOM_SHIFT + 3.4;
 
-const OFFPATH_LIMIT = 3;   // map units ≈ metres — matches app.js
+const OFFPATH_LIMIT = 2;   // map units ≈ metres — matches app.js
 // Both the legs and the off-path hops are drawn in this; --route in
 // mobile.html carries the same value for anything styled in CSS.
 const ROUTE_COLOUR = '#12294D';
