@@ -72,9 +72,17 @@ ROLE[STAIR_FINISH] = 'FINISH';
 
 const KNOWN = new Set(Object.keys(WALKWAY_LEVEL).concat(Object.keys(ROLE)));
 
-// Two points this close are the same junction. Figma rarely lands endpoints on
-// exactly the same value, so without this the network comes out in pieces.
-const SNAP = 0.35;
+// Two points this close are the same junction, and a line passing this close to
+// a point is noded into it. Figma rarely lands endpoints on exactly the same
+// value, so without this the network comes out in pieces.
+//
+// Half a unit, because that is how the artwork is drawn: a stub meeting a
+// corridor lands a consistent half unit off it - [144.5,476] against a line
+// running through y=476.5, [161,204] against one at y=204.5, and so on. At 0.35
+// every one of those missed, and the drawing looked joined while the network
+// came apart in eight pieces. It is a tolerance for how precisely the lines are
+// drawn, not licence to cross a gap: half a unit is half a metre.
+const SNAP = 0.5;
 
 // How near a stub must sit to a stairs end to count as that stair's mouth.
 const CHAIN_GAP = 4;
@@ -497,17 +505,32 @@ function main() {
 
     if (groups.length > 1) {
       const main = groups.reduce((a, b) => (a.length >= b.length ? a : b));
+      const mainSet = new Set(main);
       groups.forEach(g => {
         if (g === main) return;
         // Only walkway nodes are worth reporting: a stair stub with no walkway
         // on its floor is already covered by the dropped-link report above.
         if (!g.some(i => fromWalkway.has(i))) return;
+        // Measured to the nearest point on an edge, not to the nearest corner.
+        // A stub that stops half a unit from a corridor is half a unit away,
+        // however far off the corridor's endpoints happen to be - reporting the
+        // corner distance instead makes a near-miss look like a chasm.
         let best = null;
-        g.forEach(x => main.forEach(y => {
-          if (nodes[x][2] !== nodes[y][2]) return;
-          const d = dist(nodes[x], nodes[y]);
-          if (!best || d < best.d) best = { d: d, a: x, b: y, size: g.length };
-        }));
+        g.forEach(x => {
+          const P = nodes[x];
+          edges.forEach(([A, B]) => {
+            if (nodes[A][2] !== P[2]) return;
+            if (!mainSet.has(A) && !mainSet.has(B)) return;
+            const x1 = nodes[A][0], y1 = nodes[A][1];
+            const dx = nodes[B][0] - x1, dy = nodes[B][1] - y1;
+            const len2 = dx * dx + dy * dy;
+            let t = len2 ? ((P[0] - x1) * dx + (P[1] - y1) * dy) / len2 : 0;
+            t = t < 0 ? 0 : t > 1 ? 1 : t;
+            const c = [x1 + t * dx, y1 + t * dy];
+            const d = dist(P, c);
+            if (!best || d < best.d) best = { d: d, a: x, to: c, size: g.length };
+          });
+        });
         if (best) stranded_.push(best);
       });
     }
@@ -521,7 +544,8 @@ function main() {
     stranded_.sort((a, b) => a.d - b.d).forEach(b =>
       console.log('    %d node(s) on L%d, gap %s units  [%s,%s] -> [%s,%s]',
                   b.size, nodes[b.a][2], b.d.toFixed(2),
-                  nodes[b.a][0], nodes[b.a][1], nodes[b.b][0], nodes[b.b][1]));
+                  nodes[b.a][0], nodes[b.a][1],
+                  +b.to[0].toFixed(2), +b.to[1].toFixed(2)));
   }
 
   // ---- prune what no walkway can reach ------------------------------------
