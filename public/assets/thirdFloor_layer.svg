@@ -802,6 +802,7 @@
 <path id="Vector 83" d="M128 205V203.5" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="Vector 84" d="M119.5 203.5H70" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="Vector 85" d="M53.5 223.5C54.3 223.5 62.5 223.5 66.5 223.5M53.5 208.5H69" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="Vector 86" d="M138.5 347V340M137 340.5H146.5M147 340.5H146.5M146.5 340.5V351" stroke="#1E1E1E" stroke-opacity="0"/>
 </g>
 <path id="walkpath4" d="M251.5 223.5C251.5 223.328 251.5 223.162 251.5 223V223.5Z" stroke="#1E1E1E" stroke-opacity="0"/>
 <path id="walkpath4_2" d="M275.492 180C275.495 179.832 275.497 179.665 275.5 179.5L275.492 180Z" stroke="#1E1E1E" stroke-opacity="0"/>
@@ -1031,6 +1032,15 @@
 <path id="Vector 43" d="M98.5 350V349" stroke="#05930E" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 45" d="M78.5 335H77" stroke="#05930E" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 48" d="M255 277.5H262.5" stroke="#1E1E1E" stroke-width="0.5" stroke-opacity="0"/>
+<path id="link-it-402" d="M123 469L123.5 469" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="link-volleyball-court-2" d="M161 204L161 204.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="link-comfort-room-2" d="M237 392L237 390.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="link-html-office" d="M144.5 476L154.5 476.5" stroke="#1E1E1E" stroke-opacity="0"/>
+<path id="Vector 61" d="M100.5 349V348" stroke="#0A15DA" stroke-width="0.5" stroke-opacity="0"/>
+<path id="Vector 62" d="M75 330H74" stroke="#0A15DA" stroke-width="0.5" stroke-opacity="0"/>
+<path id="Vector 35" d="M193.5 412V411" stroke="#0A15DA" stroke-width="0.5" stroke-opacity="0"/>
+<path id="Vector 43" d="M98.5 350V349" stroke="#05930E" stroke-width="0.5" stroke-opacity="0"/>
+<path id="Vector 45" d="M78.5 335H77" stroke="#05930E" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 54" d="M138.5 475V474" stroke="#0A15DA" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 55" d="M166.5 481V482" stroke="#0A15DA" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 61" d="M100.5 349V348" stroke="#0A15DA" stroke-width="0.5" stroke-opacity="0"/>
