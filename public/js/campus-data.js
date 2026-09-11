@@ -11,7 +11,7 @@
 //   LOCATIONS   id, name, acronym, building, categories, floor, hours, coords,
 //               textH (label height hint), description
 //
-// 260 locations (2nd Floor: 2, Ground Floor: 258),
+// 261 locations (2nd Floor: 2, 3rd Floor: 1, Ground Floor: 258),
 // 16 categories.
 const CATEGORIES = [
   {
@@ -4349,6 +4349,23 @@ const LOCATIONS = [
   "coords": [
    149.5,
    344.8
+  ]
+ },
+ {
+  "id": "training-hall-2",
+  "custom": true,
+  "name": "Training Hall",
+  "acronym": "",
+  "floor": "3rd Floor",
+  "building": "Research, Innovation and Extension Services (RIES) Building",
+  "categories": [
+   "admin-offices",
+   "laboratories",
+   "libraries"
+  ],
+  "coords": [
+   171.5,
+   348.6
   ]
  },
  {
