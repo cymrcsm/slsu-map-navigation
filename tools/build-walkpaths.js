@@ -81,16 +81,15 @@ const CHAIN_GAP = 4;
 
 // A stair whose snapped end is further than this from its floor's network is
 // not connected to anything and is reported instead of linked.
+//
+// Bridging a stair mouth to its walkway is one of the three places a route is
+// allowed to leave the drawn lines - the others being the kiosk reaching the
+// walkway beside it, and the destination pin at the far end. A stub drawn
+// towards a corridor it does not quite touch is still unambiguously the way
+// into that stairwell. Walkway to walkway has no such warrant and is only
+// reported; see the stranded-fragment pass below.
 const MAX_SNAP = 8;
 
-// How far a stranded walkway fragment may reach to rejoin the network it was
-// drawn against. A corridor stub that stops a metre or two short of the one it
-// meets is a drawing near-miss, not a wall: the pin sitting on it is a room you
-// can plainly walk to, but the router has no way through and the directions
-// button does nothing. Bounded well under MAX_SNAP so a genuinely separate
-// piece of the campus is reported rather than wired into the network across a
-// gap that might be a building.
-const ORPHAN_BRIDGE = 6;
 
 // Climbing a floor costs more than the few metres it covers in plan. Vertical
 // travel is conventionally weighted about 3x horizontal; one storey of stairs
@@ -462,15 +461,22 @@ function main() {
   console.log('');
   console.log('Noding: %d segments -> %d after splitting at touch points', before, edges.length);
 
-  // ---- rejoin fragments the drawing left just short -----------------------
-  // Noding joins lines that touch. A corridor stub drawn a metre shy of the one
-  // it meets never touches, so it comes out as an island: the pin sitting on it
-  // projects onto a real edge, the router finds no path to it, and the
-  // directions button appears to do nothing at all. Each island reaches once
-  // for the network, and only as far as ORPHAN_BRIDGE - past that the gap is
-  // treated as real and reported for the artwork to answer.
-  const bridged_ = [];
-  for (;;) {
+  // ---- report fragments the drawing left short ----------------------------
+  // Noding joins lines that touch. A corridor drawn a metre shy of the one it
+  // meets never touches, so it comes out as an island and nothing on it can be
+  // routed to. This pass used to close those gaps with an edge of its own.
+  //
+  // It no longer does. A route may leave the drawn lines in three places and no
+  // others: the kiosk reaching the walkway it stands beside, a ground walkway
+  // reaching the START of a stair, and the FINISH of a stair reaching the
+  // walkway on the floor it arrives at. Walkway to walkway is not among them -
+  // an invented edge there is a line across open ground that no one surveyed,
+  // and it is indistinguishable, once drawn, from a corridor that exists.
+  //
+  // So the gaps are measured and printed instead. Each one is a place for the
+  // artwork to answer, with the two ends to draw between.
+  const stranded_ = [];
+  {
     const link = nodes.map(() => []);
     edges.forEach(([a, b]) => { link[a].push(b); link[b].push(a); });
     links.forEach(([a, b]) => { link[a].push(b); link[b].push(a); });
@@ -488,30 +494,34 @@ function main() {
       }
       groups.push(members);
     }
-    if (groups.length < 2) break;
 
-    const main = groups.reduce((a, b) => (a.length >= b.length ? a : b));
-    let best = null;
-    groups.forEach(g => {
-      if (g === main) return;
-      g.forEach(x => main.forEach(y => {
-        if (nodes[x][2] !== nodes[y][2]) return;
-        const d = dist(nodes[x], nodes[y]);
-        if (d <= ORPHAN_BRIDGE && (!best || d < best.d)) best = { d: d, a: x, b: y, size: g.length };
-      }));
-    });
-    if (!best) break;
-    addEdge(best.a, best.b);
-    bridged_.push(best);
+    if (groups.length > 1) {
+      const main = groups.reduce((a, b) => (a.length >= b.length ? a : b));
+      groups.forEach(g => {
+        if (g === main) return;
+        // Only walkway nodes are worth reporting: a stair stub with no walkway
+        // on its floor is already covered by the dropped-link report above.
+        if (!g.some(i => fromWalkway.has(i))) return;
+        let best = null;
+        g.forEach(x => main.forEach(y => {
+          if (nodes[x][2] !== nodes[y][2]) return;
+          const d = dist(nodes[x], nodes[y]);
+          if (!best || d < best.d) best = { d: d, a: x, b: y, size: g.length };
+        }));
+        if (best) stranded_.push(best);
+      });
+    }
   }
 
-  if (bridged_.length) {
+  if (stranded_.length) {
     console.log('');
-    console.log('Rejoined %d stranded fragment(s) within %d units of the network:',
-                bridged_.length, ORPHAN_BRIDGE);
-    bridged_.forEach(b => console.log('    %d node(s) on L%d, %s units across  [%s,%s] -> [%s,%s]',
-                                     b.size, nodes[b.a][2], b.d.toFixed(2),
-                                     nodes[b.a][0], nodes[b.a][1], nodes[b.b][0], nodes[b.b][1]));
+    console.log('%d walkway fragment(s) are not joined to the network. Nothing on them',
+                stranded_.length);
+    console.log('can be routed to. Draw between the two ends to close each one:');
+    stranded_.sort((a, b) => a.d - b.d).forEach(b =>
+      console.log('    %d node(s) on L%d, gap %s units  [%s,%s] -> [%s,%s]',
+                  b.size, nodes[b.a][2], b.d.toFixed(2),
+                  nodes[b.a][0], nodes[b.a][1], nodes[b.b][0], nodes[b.b][1]));
   }
 
   // ---- prune what no walkway can reach ------------------------------------
