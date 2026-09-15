@@ -2302,14 +2302,20 @@ keyboardCloseBtn.addEventListener('click', hideKeyboard);
 // refocuses a field (the search bar's clear button, say) does not summon it.
 // A tap anywhere else leaves it alone: it stays up until its close button is
 // pressed, or one of the few things that put it away on their own - a search
-// result chosen, the admin panel closing, the choices key handing over to a
-// dropdown, or a key pressed for a field that is no longer there.
+// result chosen, the admin panel closing, a dropdown opened - a floor or
+// location picker, or the choices key handing over to a field's own - or a
+// key pressed for a field that is no longer there.
 // The dropdown opens on the tap itself, before any click handler runs, so a
 // field that has one is held back at pointerdown - the keyboard is about to
 // take it. A field with no keyboard interest is left alone.
 document.addEventListener('pointerdown', e => {
   const input = e.target.closest('input');
   if (keyboardEligible(input)) holdBackList(input);
+  // A dropdown - a floor picker, the location picker - opens its own list on
+  // the tap, and that list is drawn over everything, keyboard included. The
+  // keyboard goes first, so the choices are what is on screen. Done at
+  // pointerdown, ahead of the popup, the same as the datalist above.
+  if (e.target.closest('select')) hideKeyboard();
 }, true);
 
 document.addEventListener('click', e => {
