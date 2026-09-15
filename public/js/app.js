@@ -2067,8 +2067,7 @@ syncWithServer = async function () {
 // The kiosk is a touch screen with no physical keys. This keyboard appears when
 // any text field is tapped - the search bar, or a field in the admin panel and
 // its add and edit forms - and types into whichever one was tapped last. It
-// goes away from its own close button, on its own when a search result is
-// chosen, and when the admin panel closes.
+// goes on a tap anywhere outside it, and on its own when the typing is done.
 //
 // Laid out like a phone's: a letters layer with shift, and a symbols layer
 // behind a ?123 key, each with comma, full stop, space and enter along the
@@ -2082,7 +2081,6 @@ syncWithServer = async function () {
 
 const kioskKeyboard = document.getElementById('kiosk-keyboard');
 const keyboardRows = document.getElementById('keyboard-rows');
-const keyboardCloseBtn = document.getElementById('keyboard-close-btn');
 
 // Which field the keys go to. Set on every tap of an eligible input.
 let keyboardTarget = null;
@@ -2290,15 +2288,11 @@ keyboardRows.addEventListener('click', e => {
   if (keyboardShift === 'once') { keyboardShift = 'off'; renderKeyboard(); }
 });
 
-keyboardCloseBtn.addEventListener('click', hideKeyboard);
-
 // Shown on a tap of any eligible field - a tap, not any focus, so a button that
 // refocuses a field (the search bar's clear button, say) does not summon it.
-// A tap anywhere else leaves it alone: it stays up until its close button is
-// pressed, or one of the few things that put it away on their own - a search
-// result chosen, Enter pressed, a choice picked from a field's dropdown, a
-// confirm, cancel or unlock button tapped, the admin panel closing, a floor or
-// location picker opened, or a key pressed for a field that is no longer there.
+// A tap anywhere else puts it away. Taps on the keyboard itself never reach
+// here - it stops them above - so pressing a key is not a tap elsewhere, and a
+// tap on the field being typed into keeps it, since that tap shows it again.
 // The field was tapped, so its dropdown goes on top: the list is given back
 // at pointerdown, ahead of the tap opening it, and it opens over the keyboard
 // as it always did. A tap on a key hands the top back to the keyboard.
@@ -2315,6 +2309,7 @@ document.addEventListener('pointerdown', e => {
 document.addEventListener('click', e => {
   const input = e.target.closest('input');
   if (keyboardEligible(input)) showKeyboardFor(input);
+  else if (!kioskKeyboard.hidden) hideKeyboard();
 });
 
 // So is any button that submits what was typed, or abandons it: unlock, the

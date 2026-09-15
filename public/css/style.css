@@ -1138,7 +1138,6 @@ body, html {
   mask: url('../assets/info-circle-outline.svg') center / contain no-repeat;
 }
 
-
 /* ==========================================================================
    ADMINISTRATOR PANEL
 
@@ -1350,9 +1349,9 @@ body, html {
 /* ==========================================================================
    ON-SCREEN KEYBOARD
 
-   The kiosk is a touch screen with no physical keys. This appears only when
-   the search bar is tapped, closes from its own button or on picking a result,
-   and sits over the map card: the card's full width, centred, with a height
+   The kiosk is a touch screen with no physical keys. This appears when a text
+   field is tapped and goes on a tap anywhere else, and sits over the map
+   card: the card's full width, centred, with a height
    that follows from the width so the keys stay square-ish at any size.
    ========================================================================== */
 .kiosk-keyboard {
@@ -1365,7 +1364,7 @@ body, html {
      dialog's fields too, and must sit over its dimmed backdrop to be tapped. */
   z-index: 4100;
   aspect-ratio: 5 / 2;
-  padding: 44px 14px 14px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   background: var(--surface-card);
@@ -1375,20 +1374,6 @@ body, html {
 }
 .kiosk-keyboard[hidden] { display: none; }
 
-.keyboard-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 16px;
-  cursor: pointer;
-}
-.keyboard-close:hover { background: var(--surface-hover); color: var(--text-dark); }
 
 .keyboard-rows {
   flex: 1;
