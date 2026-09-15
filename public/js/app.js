@@ -2088,11 +2088,6 @@ const keyboardCloseBtn = document.getElementById('keyboard-close-btn');
 let keyboardTarget = null;
 let keyboardLayer = 'letters';       // 'letters' | 'symbols'
 let keyboardShift = 'off';           // 'off' | 'once' | 'lock'
-const kioskChoices = document.getElementById('kiosk-choices');
-const choicesList = document.getElementById('choices-list');
-const choicesTitle = document.getElementById('choices-title');
-const choicesCloseBtn = document.getElementById('choices-close-btn');
-const choicesKeyboardBtn = document.getElementById('choices-keyboard-btn');
 
 const KEYBOARD_TYPES = new Set(['text', 'password', 'number', 'search']);
 function keyboardEligible(el) {
@@ -2156,22 +2151,10 @@ function keyboardBackspace() {
   t.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-// A field with a dropdown behind it (a <datalist>) gets one more key on the
-// bottom row: choices, which hands over to the dropdown. Space gives up the
-// width, so the row still totals ten.
-function keyboardRowsFor(layer) {
-  const rows = KEYBOARD_LAYERS[layer];
-  if (!keyboardTarget || !keyboardTarget.dataset.keyboardList) return rows;
-  const last = rows.length - 1;
-  return rows.map((row, r) => r !== last ? row : row.map(key =>
-    key.k === 'space' ? K('space', 2.5, 'space') : key
-  ).flatMap(key => key.k === ',' ? [K('choices', 1.5, '▾ choices'), key] : [key]));
-}
-
 function renderKeyboard() {
   keyboardRows.innerHTML = '';
   const insets = KEYBOARD_INSET[keyboardLayer] || {};
-  keyboardRowsFor(keyboardLayer).forEach((row, r) => {
+  KEYBOARD_LAYERS[keyboardLayer].forEach((row, r) => {
     const rowEl = document.createElement('div');
     rowEl.className = 'keyboard-row' + (insets[r] ? ' ' + insets[r] : '');
     row.forEach(key => {
@@ -2201,12 +2184,13 @@ function renderKeyboard() {
 // the admin dialog the keyboard docks to the bottom of the map card instead and
 // the dialog moves up, because the dialog sits exactly where the keyboard would
 // and a keyboard over the field it is typing into is no use to anyone.
-// A field's dropdown and the keyboard cannot share the screen: the browser
-// draws the dropdown above everything, and it covers the keys. So while the
-// keyboard has a field, that field's list attribute is set aside and the
-// dropdown stays shut; the choices key gives it back and opens it, with the
-// keyboard out of the way. Whatever else puts the keyboard away gives it back
-// too, so a plain tap on the field with no keyboard behaves as it always did.
+// A field with a dropdown behind it (a <datalist>) and the keyboard take
+// turns on top, decided by what was tapped last. The browser draws the
+// dropdown above everything, so "keyboard on top" means the dropdown shut:
+// tapping a key sets the field's list attribute aside, which closes the
+// dropdown and keeps it closed while the keys are in use. Tapping the field
+// gives the list back, and the same tap opens the dropdown over the keyboard
+// as it always did. Putting the keyboard away gives the list back too.
 function holdBackList(input) {
   if (input && input.hasAttribute('list')) {
     input.dataset.keyboardList = input.getAttribute('list');
@@ -2221,10 +2205,8 @@ function giveBackList(input) {
 }
 
 function showKeyboardFor(input) {
-  hideChoices();
   if (keyboardTarget && keyboardTarget !== input) giveBackList(keyboardTarget);
   keyboardTarget = input;
-  holdBackList(input);
   const inAdmin = !!input.closest('#admin-overlay');
   kioskKeyboard.classList.toggle('docked', inAdmin);
   adminOverlay.classList.toggle('keyboard-open', inAdmin);
@@ -2246,89 +2228,25 @@ function hideKeyboard() {
 
 renderKeyboard();
 
-// ---- the choices panel ---------------------------------------------------
-// The options behind a field's <datalist>, as buttons in the keyboard's
-// place: same position, same docking, same size. If the field already holds
-// some text the list is narrowed to what matches it - it is a field you can
-// search as well as pick from - and widened back out if nothing matches.
-let choicesTarget = null;
-
-function choicesOf(input) {
-  const id = input.dataset.keyboardList || input.getAttribute('list');
-  const list = id && document.getElementById(id);
-  return list ? [].slice.call(list.options).map(o => o.value).filter(Boolean) : [];
-}
-
-function showChoicesFor(input) {
-  choicesTarget = input;
-  const all = choicesOf(input);
-  const q = input.value.trim().toLowerCase();
-  const narrowed = q ? all.filter(v => v.toLowerCase().includes(q)) : [];
-  const shown = narrowed.length ? narrowed : all;
-
-  choicesTitle.textContent = narrowed.length
-    ? 'Matching "' + input.value.trim() + '"'
-    : 'Choose one';
-  choicesList.innerHTML = '';
-  if (!shown.length) {
-    const none = document.createElement('div');
-    none.className = 'choices-empty';
-    none.textContent = 'Nothing to choose from yet.';
-    choicesList.appendChild(none);
-  }
-  shown.forEach(v => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = v;
-    btn.dataset.value = v;
-    choicesList.appendChild(btn);
-  });
-
-  const inAdmin = !!input.closest('#admin-overlay');
-  kioskChoices.classList.toggle('docked', inAdmin);
-  adminOverlay.classList.toggle('keyboard-open', inAdmin);
-  kioskChoices.hidden = false;
-}
-
-function hideChoices() {
-  if (kioskChoices.hidden) return;
-  kioskChoices.hidden = true;
-  kioskChoices.classList.remove('docked');
-  if (kioskKeyboard.hidden) adminOverlay.classList.remove('keyboard-open');
-  choicesTarget = null;
-}
-
-// Picking one fills the field the way typing it would, then the panel goes.
-choicesList.addEventListener('click', e => {
-  const btn = e.target.closest('button[data-value]');
-  if (!btn || !choicesTarget) return;
-  const field = choicesTarget;
-  field.value = btn.dataset.value;
-  field.dispatchEvent(new Event('input', { bubbles: true }));
-  field.dispatchEvent(new Event('change', { bubbles: true }));
-  hideChoices();
-});
-
-// Its own close, and a way back to typing into the same field.
-choicesCloseBtn.addEventListener('click', hideChoices);
-choicesKeyboardBtn.addEventListener('click', () => {
-  const field = choicesTarget;
-  hideChoices();
-  if (field) showKeyboardFor(field);
-});
-
-// Like the keyboard, the panel must not take focus from the field, and a tap
-// on it is not a tap elsewhere.
-kioskChoices.addEventListener('pointerdown', e => e.preventDefault());
-kioskChoices.addEventListener('click', e => e.stopPropagation());
-
 // Keys must not take focus from the field, or the suggestion list closes under
 // the finger - the same guard the suggestion list itself uses above. Done on
 // pointerdown, which covers a finger and a mouse alike and stops the focus
 // change without stopping the click that follows. (Cancelling touchstart, as
 // this once did, cancels that click as well - on the touch screen itself the
 // keys would never have registered.)
-kioskKeyboard.addEventListener('pointerdown', e => e.preventDefault());
+kioskKeyboard.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  // The keyboard was tapped, so it goes on top: the field's dropdown, if it
+  // has one and it is open, is shut by setting the list aside, and a blur and
+  // refocus closes a popup that was already showing. Refocusing by script
+  // does not reopen it - only a tap on the field does.
+  const t = keyboardTarget;
+  if (t && t.hasAttribute('list')) {
+    holdBackList(t);
+    t.blur();
+    t.focus();
+  }
+});
 
 // A tap on the keyboard is not a tap outside the search box.
 kioskKeyboard.addEventListener('click', e => e.stopPropagation());
@@ -2356,16 +2274,6 @@ keyboardRows.addEventListener('click', e => {
     renderKeyboard();
     return;
   }
-  if (key === 'choices') {
-    // The field's options, drawn by the app in the keyboard's place - on this
-    // tap, with nothing able to cover them. The browser's own popup is not
-    // used: it cannot be opened on command everywhere, and it draws over the
-    // keys when it does open.
-    const field = keyboardTarget;
-    hideKeyboard();
-    showChoicesFor(field);
-    return;
-  }
   if (key === 'backspace') { keyboardBackspace(); return; }
   if (key === 'enter') {
     keyboardTarget.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
@@ -2384,20 +2292,19 @@ keyboardCloseBtn.addEventListener('click', hideKeyboard);
 // refocuses a field (the search bar's clear button, say) does not summon it.
 // A tap anywhere else leaves it alone: it stays up until its close button is
 // pressed, or one of the few things that put it away on their own - a search
-// result chosen, the admin panel closing, a dropdown opened - a floor or
-// location picker, or the choices key handing over to a field's own - or a
-// key pressed for a field that is no longer there.
-// The dropdown opens on the tap itself, before any click handler runs, so a
-// field that has one is held back at pointerdown - the keyboard is about to
-// take it. A field with no keyboard interest is left alone.
+// result chosen, the admin panel closing, a floor or location picker opened,
+// or a key pressed for a field that is no longer there.
+// The field was tapped, so its dropdown goes on top: the list is given back
+// at pointerdown, ahead of the tap opening it, and it opens over the keyboard
+// as it always did. A tap on a key hands the top back to the keyboard.
 document.addEventListener('pointerdown', e => {
   const input = e.target.closest('input');
-  if (keyboardEligible(input)) holdBackList(input);
+  if (keyboardEligible(input)) giveBackList(input);
   // A dropdown - a floor picker, the location picker - opens its own list on
   // the tap, and that list is drawn over everything, keyboard included. The
   // keyboard goes first, so the choices are what is on screen. Done at
   // pointerdown, ahead of the popup, the same as the datalist above.
-  if (e.target.closest('select')) { hideKeyboard(); hideChoices(); }
+  if (e.target.closest('select')) hideKeyboard();
 }, true);
 
 document.addEventListener('click', e => {
@@ -2419,7 +2326,6 @@ const closeAdminPanelBase = closeAdminPanel;
 closeAdminPanel = function () {
   closeAdminPanelBase.apply(this, arguments);
   hideKeyboard();
-  hideChoices();
   adminCancelFloat.hidden = !sessionAdminCode;
 };
 

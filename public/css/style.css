@@ -1355,8 +1355,7 @@ body, html {
    and sits over the map card: the card's full width, centred, with a height
    that follows from the width so the keys stay square-ish at any size.
    ========================================================================== */
-.kiosk-keyboard,
-.kiosk-choices {
+.kiosk-keyboard {
   position: absolute;
   left: 0;
   right: 0;
@@ -1374,8 +1373,7 @@ body, html {
   border-radius: 14px;
   box-shadow: var(--card-shadow-hover);
 }
-.kiosk-keyboard[hidden],
-.kiosk-choices[hidden] { display: none; }
+.kiosk-keyboard[hidden] { display: none; }
 
 .keyboard-close {
   position: absolute;
@@ -1426,8 +1424,7 @@ body, html {
 /* Typing into the admin dialog: the dialog sits centred, exactly where the
    keyboard would go, so the keyboard docks to the bottom of the map card and
    the dialog moves to the top to stay clear of it. */
-.kiosk-keyboard.docked,
-.kiosk-choices.docked {
+.kiosk-keyboard.docked {
   top: auto;
   bottom: 14px;
   transform: none;
@@ -1468,59 +1465,3 @@ body, html {
 }
 .admin-cancel-float:hover { background: var(--danger-color); color: var(--map-paper); }
 .admin-cancel-float[hidden] { display: none; }
-
-/* The choices panel: a field's options as big tappable buttons, in the place
-   the keyboard occupied. A "keyboard" button in its head goes back to typing. */
-.choices-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-right: 40px;   /* clear of the close button */
-  margin-bottom: 10px;
-}
-.choices-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-}
-.choices-keyboard-btn {
-  padding: 8px 14px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 999px;
-  background: var(--surface-hover);
-  color: var(--text-dark);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.choices-list {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 8px;
-  align-content: start;
-}
-.choices-list button {
-  padding: 14px 16px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  background: var(--map-paper);
-  color: var(--text-dark);
-  font-size: 14px;
-  font-weight: 600;
-  text-align: left;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.choices-list button:active { background: var(--surface-hover); transform: scale(0.98); }
-.choices-list .choices-empty {
-  grid-column: 1 / -1;
-  color: var(--text-muted);
-  font-size: 13px;
-  padding: 8px 2px;
-}
