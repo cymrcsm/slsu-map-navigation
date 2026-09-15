@@ -43,7 +43,9 @@
  *   levels [name]             display names; node[2] indexes into this
  *   nodes  [x, y, level]      map units
  *   edges  [a, b]             both endpoints always on the same level
- *   links  [a, b, kind, cost] the ONLY edges that change level
+ *   links  [a, b, kind, cost, along] the ONLY edges that change level; along
+ *                                is the stairs' own line, foot to head, for
+ *                                drawing the route up them
  */
 
 const fs = require('fs');
@@ -359,8 +361,13 @@ function main() {
       const foot = nodeFor(bottomPt, below);
       const head = nodeFor(topPt, above);
       const isRamp = /ramp/i.test(run.id) || /ramp/i.test((startStub || {}).id || '');
+      // The run's own line, foot to head, so the route can be drawn along the
+      // stairs rather than jumping from the bottom step to the top one. A link
+      // stays one edge for the router; this is only what it looks like.
+      const along = (useFwd ? run.pts : run.pts.slice().reverse())
+        .map(q => [+q[0].toFixed(2), +q[1].toFixed(2)]);
       links.push([foot, head, isRamp ? 'ramp' : 'stair',
-                  isRamp ? RAMP_COST : STAIR_COST, run.id]);
+                  isRamp ? RAMP_COST : STAIR_COST, run.id, along]);
       made++;
     });
 
@@ -572,7 +579,7 @@ function main() {
   const keptEdges = edges.filter(([a, b]) => reachable[a] && reachable[b])
                          .map(([a, b]) => [remap[a], remap[b]]);
   const keptLinks = links.filter(l => reachable[l[0]] && reachable[l[1]])
-                         .map(l => [remap[l[0]], remap[l[1]], l[2], l[3], l[4]]);
+                         .map(l => [remap[l[0]], remap[l[1]], l[2], l[3], l[4], l[5]]);
 
   const prunedNodes = nodes.length - keptNodes.length;
   nodes.length = 0; keptNodes.forEach(n => nodes.push(n));
@@ -638,7 +645,9 @@ function main() {
 //   levels  display names; node[2] indexes into this
 //   nodes   [x, y, level] in map units
 //   edges   [nodeA, nodeB] pairs, each a straight walkable segment
-//   links   [a, b, kind, cost] the only edges that change level
+//   links   [a, b, kind, cost, along] the only edges that change level;
+//           along is the stairs' own line from a to b, so a route can be
+//           drawn up the steps instead of jumping from foot to head
 //
 // ${nodes.length} nodes (${FLOORS.map((f, i) => f.name + ': ' + countPer[i]).join(', ')}),
 // ${edges.length} edges, ${links.length} vertical links, ${Math.round(length)} map units of path.
@@ -646,7 +655,7 @@ const WALK_PATHS = {
   levels: ${j(FLOORS.map(f => f.name))},
   nodes: ${j(nodes)},
   edges: ${j(edges)},
-  links: ${j(links.map(l => [l[0], l[1], l[2], l[3]]))}
+  links: ${j(links.map(l => [l[0], l[1], l[2], l[3], l[5]]))}
 };
 `;
   fs.writeFileSync(OUT, out);

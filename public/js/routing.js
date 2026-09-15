@@ -29,9 +29,17 @@ const WalkRouting = (function () {
   // Stairs and ramps are the only edges that change level; the generator writes
   // a fixed cost with each because climbing a storey takes longer than the few
   // map metres it covers.
-  links.forEach(([a, b, kind, cost]) => {
+  // Each link also carries the stairs' own line, foot to head - not part of
+  // the graph, but what the route is drawn along so it climbs the steps rather
+  // than jumping from the bottom one to the top.
+  const along = new Map();
+  links.forEach(([a, b, kind, cost, run]) => {
     adj[a].push({ n: b, w: cost, kind: kind });
     adj[b].push({ n: a, w: cost, kind: kind });
+    if (run && run.length) {
+      along.set(a + ':' + b, run);
+      along.set(b + ':' + a, run.slice().reverse());
+    }
   });
 
   const FLOOR_ALIASES = {
@@ -119,9 +127,26 @@ const WalkRouting = (function () {
     }
 
     if (from[G] === -1) return [];
+    const ids = [];
+    for (let c = G; c !== -1; c = from[c]) ids.push(c);
+    ids.reverse();
+
+    // Between the foot and head of a stair, the stairs' own line - once on the
+    // floor it leaves and once on the floor it reaches, so the route traces the
+    // steps whichever floor is drawn. Marked, so walkMetres leaves them out.
     const out = [];
-    for (let c = G; c !== -1; c = from[c]) out.push(pos(c));
-    return out.reverse();
+    ids.forEach((cur, i) => {
+      if (i > 0) {
+        const run = along.get(ids[i - 1] + ':' + cur);
+        if (run) {
+          const lo = pos(ids[i - 1])[2], hi = pos(cur)[2];
+          run.forEach(q => out.push([q[0], q[1], lo, 'stair']));
+          run.forEach(q => out.push([q[0], q[1], hi, 'stair']));
+        }
+      }
+      out.push(pos(cur));
+    });
+    return out;
   }
 
   /** Break a route into runs of consecutive points on the same level. */
@@ -145,7 +170,8 @@ const WalkRouting = (function () {
   /** Horizontal metres only: stairs are a step in the directions, not distance. */
   function walkMetres(points, metresPerUnit) {
     let m = 0;
-    splitByLevel(points).forEach(run => {
+    // A stair is a step in the directions, not distance walked in plan.
+    splitByLevel(points.filter(p => p[3] !== 'stair')).forEach(run => {
       if (run.pts.length > 1) m += lengthUnits(run.pts);
     });
     return m * (metresPerUnit || 1);

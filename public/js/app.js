@@ -796,11 +796,21 @@ const NET = (() => {
   // Stairs and ramps are the ONLY way to change level. Their cost is not the
   // plan distance - climbing a storey takes longer than the couple of metres it
   // covers on the map - so the generator writes a fixed cost with each link.
-  (WALK_PATHS.links || []).forEach(([a, b, kind, cost]) => {
+  // Each link also carries the stairs' own line, foot to head. It is not part
+  // of the graph - a link stays one edge with one cost - but it is what the
+  // route is drawn along, so the line climbs the steps rather than jumping
+  // from the bottom one to the top.
+  const along = new Map();
+  (WALK_PATHS.links || []).forEach(([a, b, kind, cost, run]) => {
     adj[a].push({ n: b, w: cost, kind: kind });
     adj[b].push({ n: a, w: cost, kind: kind });
+    if (run && run.length) {
+      along.set(a + ':' + b, run);
+      along.set(b + ':' + a, run.slice().reverse());
+    }
   });
-  return { nodes: nodes, edges: WALK_PATHS.edges, adj: adj, links: WALK_PATHS.links || [] };
+  return { nodes: nodes, edges: WALK_PATHS.edges, adj: adj, links: WALK_PATHS.links || [],
+           along: along };
 })();
 
 const LEVELS = WALK_PATHS.levels || ['Ground Floor'];
@@ -904,9 +914,28 @@ function findWalkingPath(fromCoords, toCoords, fromLevel = 0, toLevel = 0) {
   }
 
   if (from[G] === -1) return [];
+  const ids = [];
+  for (let c = G; c !== -1; c = from[c]) ids.push(c);
+  ids.reverse();
+
+  // Where two consecutive nodes are the foot and head of a stair, the stairs'
+  // own line goes in between them - once on the floor it leaves and once on the
+  // floor it reaches, so the route traces the steps whichever floor is on
+  // screen. Those points are marked, and drawRoute leaves them out of the
+  // metres: a stair is a step in the directions, not distance walked in plan.
   const out = [];
-  for (let c = G; c !== -1; c = from[c]) out.push(pos(c));
-  return out.reverse();
+  ids.forEach((cur, i) => {
+    if (i > 0) {
+      const run = NET.along.get(ids[i - 1] + ':' + cur);
+      if (run) {
+        const lo = pos(ids[i - 1])[2], hi = pos(cur)[2];
+        run.forEach(q => out.push([q[0], q[1], lo, 'stair']));
+        run.forEach(q => out.push([q[0], q[1], hi, 'stair']));
+      }
+    }
+    out.push(pos(cur));
+  });
+  return out;
 }
 
 /** Break a route into runs of consecutive points on the same level. */
@@ -1003,7 +1032,7 @@ function drawRoute(destination, followDestination = false, refit = true) {
 
   const walked = [];
   if (startGap <= OFFPATH_LIMIT) walked.push([kioskCoords[0], kioskCoords[1], KIOSK_LEVEL]);
-  path.forEach(p => walked.push(p));
+  path.filter(p => p[3] !== 'stair').forEach(p => walked.push(p));
   if (endGap <= OFFPATH_LIMIT) walked.push([destination.coords[0], destination.coords[1], destLevel]);
 
   // Only horizontal travel is reported as distance. The stair is a step in the
