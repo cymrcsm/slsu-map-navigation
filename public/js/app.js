@@ -2134,10 +2134,22 @@ function keyboardBackspace() {
   t.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
+// A field with a dropdown behind it (a <datalist>) gets one more key on the
+// bottom row: choices, which hands over to the dropdown. Space gives up the
+// width, so the row still totals ten.
+function keyboardRowsFor(layer) {
+  const rows = KEYBOARD_LAYERS[layer];
+  if (!keyboardTarget || !keyboardTarget.dataset.keyboardList) return rows;
+  const last = rows.length - 1;
+  return rows.map((row, r) => r !== last ? row : row.map(key =>
+    key.k === 'space' ? K('space', 2.5, 'space') : key
+  ).flatMap(key => key.k === ',' ? [K('choices', 1.5, '▾ choices'), key] : [key]));
+}
+
 function renderKeyboard() {
   keyboardRows.innerHTML = '';
   const insets = KEYBOARD_INSET[keyboardLayer] || {};
-  KEYBOARD_LAYERS[keyboardLayer].forEach((row, r) => {
+  keyboardRowsFor(keyboardLayer).forEach((row, r) => {
     const rowEl = document.createElement('div');
     rowEl.className = 'keyboard-row' + (insets[r] ? ' ' + insets[r] : '');
     row.forEach(key => {
@@ -2167,15 +2179,38 @@ function renderKeyboard() {
 // the admin dialog the keyboard docks to the bottom of the map card instead and
 // the dialog moves up, because the dialog sits exactly where the keyboard would
 // and a keyboard over the field it is typing into is no use to anyone.
+// A field's dropdown and the keyboard cannot share the screen: the browser
+// draws the dropdown above everything, and it covers the keys. So while the
+// keyboard has a field, that field's list attribute is set aside and the
+// dropdown stays shut; the choices key gives it back and opens it, with the
+// keyboard out of the way. Whatever else puts the keyboard away gives it back
+// too, so a plain tap on the field with no keyboard behaves as it always did.
+function holdBackList(input) {
+  if (input && input.hasAttribute('list')) {
+    input.dataset.keyboardList = input.getAttribute('list');
+    input.removeAttribute('list');
+  }
+}
+function giveBackList(input) {
+  if (input && input.dataset.keyboardList) {
+    input.setAttribute('list', input.dataset.keyboardList);
+    delete input.dataset.keyboardList;
+  }
+}
+
 function showKeyboardFor(input) {
+  if (keyboardTarget && keyboardTarget !== input) giveBackList(keyboardTarget);
   keyboardTarget = input;
+  holdBackList(input);
   const inAdmin = !!input.closest('#admin-overlay');
   kioskKeyboard.classList.toggle('docked', inAdmin);
   adminOverlay.classList.toggle('keyboard-open', inAdmin);
   kioskKeyboard.hidden = false;
+  renderKeyboard();
 }
 
 function hideKeyboard() {
+  giveBackList(keyboardTarget);
   kioskKeyboard.hidden = true;
   kioskKeyboard.classList.remove('docked');
   adminOverlay.classList.remove('keyboard-open');
@@ -2222,6 +2257,16 @@ keyboardRows.addEventListener('click', e => {
     renderKeyboard();
     return;
   }
+  if (key === 'choices') {
+    // Hand over to the field's own dropdown: keyboard away, list restored,
+    // and the picker opened on the tap that asked for it. showPicker needs a
+    // user gesture, which this is; where it is not supported the field is
+    // focused instead and the next tap on it opens the list natively.
+    const field = keyboardTarget;
+    hideKeyboard();
+    try { field.showPicker(); } catch (err) { field.focus(); }
+    return;
+  }
   if (key === 'backspace') { keyboardBackspace(); return; }
   if (key === 'enter') {
     keyboardTarget.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
@@ -2241,6 +2286,14 @@ keyboardCloseBtn.addEventListener('click', hideKeyboard);
 // A tap on anything else puts it away: whatever was tapped needs no keyboard,
 // and a phone's behaves the same way. Taps on the keyboard itself never reach
 // here - it stops them above - so pressing a key is not a tap elsewhere.
+// The dropdown opens on the tap itself, before any click handler runs, so a
+// field that has one is held back at pointerdown - the keyboard is about to
+// take it. A field with no keyboard interest is left alone.
+document.addEventListener('pointerdown', e => {
+  const input = e.target.closest('input');
+  if (keyboardEligible(input)) holdBackList(input);
+}, true);
+
 document.addEventListener('click', e => {
   const input = e.target.closest('input');
   if (keyboardEligible(input)) showKeyboardFor(input);
