@@ -1855,24 +1855,18 @@ function returnToAdminPanel() {
   openAdminPanel();
 }
 
-// "Cancel changes": abandon whatever admin task is in progress and come back
-// to the panel. This is the same disarming lockAdmin does - placement off,
-// the edit, move and remove flows cleared, the add form put away - without
-// the lock, so the administrator lands back on the tools rather than the
-// gate. Safe to press at any point in any flow; there is nothing to save.
+// "Cancel changes": abandon whatever admin task is in progress, lock, and
+// come back to the panel at its gate. lockAdmin already does every bit of the
+// disarming - placement off, the edit, move and remove flows cleared, the add
+// form put away, the code fields emptied - and ends the session with it, so
+// cancelling is also the end of being signed in: the next thing needs the
+// code again. Nothing is saved by it, so it is safe at any point in any flow.
 const adminCancelFloat = document.getElementById('admin-cancel-float');
 const editCancelChangesBtn = document.getElementById('edit-cancel-changes-btn');
 
 function cancelAdminChanges() {
-  stopPicking();
-  if (isSettingKioskLocation) {
-    isSettingKioskLocation = false;
-    setKioskBtn.classList.remove('active-placement');
-    inspector.innerText = 'Click map to log coordinates';
-  }
-  clearEditFlows();
-  if (!addView.classList.contains('hidden')) { resetAddForm(); showTutorialView(); }
-  returnToAdminPanel();
+  lockAdmin();
+  openAdminPanel();
 }
 
 adminCancelFloat.addEventListener('click', cancelAdminChanges);
