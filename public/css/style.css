@@ -1346,3 +1346,79 @@ body, html {
 }
 .qr-swap[hidden] { display: none; }
 .qr-swap:hover { color: var(--primary-strong); }
+
+/* ==========================================================================
+   ON-SCREEN KEYBOARD
+
+   The kiosk is a touch screen with no physical keys. This appears only when
+   the search bar is tapped, closes from its own button or on picking a result,
+   and sits over the map card: the card's full width, centred, with a height
+   that follows from the width so the keys stay square-ish at any size.
+   ========================================================================== */
+.kiosk-keyboard {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1002;
+  aspect-ratio: 5 / 2;
+  padding: 44px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  box-shadow: var(--card-shadow-hover);
+}
+.kiosk-keyboard[hidden] { display: none; }
+
+.keyboard-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+}
+.keyboard-close:hover { background: var(--surface-hover); color: var(--text-dark); }
+
+.keyboard-rows {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.keyboard-row {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 8px;
+}
+/* Shorter rows are inset so every key keeps the same width as the ten-key rows. */
+.keyboard-row.inset-half { padding: 0 5%; }
+.keyboard-row.inset-one  { padding: 0 10%; }
+
+.keyboard-key {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--map-paper);
+  color: var(--text-dark);
+  font-size: clamp(14px, 1.7vw, 24px);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.keyboard-key:active { background: var(--surface-hover); transform: scale(0.97); }
+.keyboard-key.key-wide  { flex: 2 1 0; }
+.keyboard-key.key-space { flex: 6 1 0; }
+.keyboard-key.key-enter { background: var(--primary-color); color: var(--map-paper); border-color: var(--primary-color); }

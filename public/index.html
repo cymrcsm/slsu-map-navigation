@@ -222,6 +222,13 @@
       </div>
 
       <div id="coord-inspector">Click map to log coordinates</div>
+
+      <!-- On-screen keyboard for the touch screen. Shown only when the search
+           bar is tapped; sits over the map card at its full width. -->
+      <div id="kiosk-keyboard" class="kiosk-keyboard" hidden aria-label="On-screen keyboard">
+        <button type="button" id="keyboard-close-btn" class="keyboard-close" aria-label="Close keyboard">✕</button>
+        <div id="keyboard-rows" class="keyboard-rows"></div>
+      </div>
     </main>
 
     <aside class="panel panel-right">

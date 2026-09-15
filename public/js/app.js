@@ -2014,3 +2014,105 @@ syncWithServer = async function () {
 // authorization code thrown away. Leaving is now always a deliberate act.
 // Escape is gone for the same reason: a kiosk has no keyboard to press it on,
 // but the phone hand-off and the on-screen one both do.
+
+// ==========================================
+// ON-SCREEN KEYBOARD
+// ==========================================
+// The kiosk is a touch screen with no physical keys. This keyboard appears when
+// the search bar is tapped, and goes away from its own close button or as soon
+// as a search result is chosen. It types into the search box by dispatching the
+// same input and keydown events a real keyboard would, so the suggestion list
+// and the Enter behaviour above are reused rather than repeated.
+
+const kioskKeyboard = document.getElementById('kiosk-keyboard');
+const keyboardRows = document.getElementById('keyboard-rows');
+const keyboardCloseBtn = document.getElementById('keyboard-close-btn');
+
+const KEYBOARD_LAYOUT = [
+  { keys: '1234567890'.split('') },
+  { keys: 'qwertyuiop'.split('') },
+  { keys: 'asdfghjkl'.split(''), inset: 'inset-half' },
+  { keys: 'zxcvbnm'.split('').concat(['backspace']), inset: 'inset-half' },
+  { keys: ['space', 'enter'], inset: 'inset-one' }
+];
+
+function keyboardType(text) {
+  const start = searchInput.selectionStart, end = searchInput.selectionEnd;
+  const v = searchInput.value;
+  searchInput.value = v.slice(0, start) + text + v.slice(end);
+  const caret = start + text.length;
+  searchInput.setSelectionRange(caret, caret);
+  searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function keyboardBackspace() {
+  const start = searchInput.selectionStart, end = searchInput.selectionEnd;
+  const v = searchInput.value;
+  if (start === end && start === 0) return;
+  const from = start === end ? start - 1 : start;
+  searchInput.value = v.slice(0, from) + v.slice(end);
+  searchInput.setSelectionRange(from, from);
+  searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function showKeyboard() { kioskKeyboard.hidden = false; }
+function hideKeyboard() { kioskKeyboard.hidden = true; }
+
+KEYBOARD_LAYOUT.forEach(row => {
+  const rowEl = document.createElement('div');
+  rowEl.className = 'keyboard-row' + (row.inset ? ' ' + row.inset : '');
+  row.keys.forEach(key => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'keyboard-key';
+    if (key === 'backspace') {
+      btn.textContent = '\u232B';
+      btn.classList.add('key-wide');
+      btn.setAttribute('aria-label', 'Backspace');
+    } else if (key === 'space') {
+      btn.textContent = 'space';
+      btn.classList.add('key-space');
+    } else if (key === 'enter') {
+      btn.textContent = 'enter';
+      btn.classList.add('key-wide', 'key-enter');
+    } else {
+      btn.textContent = key;
+    }
+    btn.dataset.key = key;
+    rowEl.appendChild(btn);
+  });
+  keyboardRows.appendChild(rowEl);
+});
+
+// Keys must not take focus from the search box, or the suggestion list closes
+// under the finger - the same guard the suggestion list itself uses above.
+kioskKeyboard.addEventListener('mousedown', e => e.preventDefault());
+kioskKeyboard.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+
+// A tap on the keyboard is not a tap outside the search box.
+kioskKeyboard.addEventListener('click', e => e.stopPropagation());
+
+keyboardRows.addEventListener('click', e => {
+  const btn = e.target.closest('.keyboard-key');
+  if (!btn) return;
+  const key = btn.dataset.key;
+  searchInput.focus();
+  if (key === 'backspace') keyboardBackspace();
+  else if (key === 'space') keyboardType(' ');
+  else if (key === 'enter') {
+    searchInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+  } else keyboardType(key);
+});
+
+keyboardCloseBtn.addEventListener('click', hideKeyboard);
+
+// Shown on a tap of the search bar - a tap, not any focus, so the clear button
+// refocusing the box does not summon it.
+searchInput.addEventListener('click', showKeyboard);
+
+// Choosing a result is the end of the search, so the keyboard goes with it.
+const chooseSuggestionBase = chooseSuggestion;
+chooseSuggestion = function () {
+  chooseSuggestionBase.apply(this, arguments);
+  hideKeyboard();
+};
