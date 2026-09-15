@@ -1444,12 +1444,14 @@ body, html {
   padding: 10px 18px;
   border: 1px solid var(--danger-color);
   border-radius: 999px;
-  background: var(--surface-card);
-  color: var(--danger-color);
+  background: var(--danger-color);
+  color: var(--map-paper);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   box-shadow: var(--card-shadow-hover);
 }
-.admin-cancel-float:active { background: var(--danger-color); color: var(--map-paper); }
+/* Red at rest, so it reads as the destructive act it is; white under the
+   finger to show the press landed. */
+.admin-cancel-float:active { background: var(--surface-card); color: var(--danger-color); }
 .admin-cancel-float[hidden] { display: none; }
