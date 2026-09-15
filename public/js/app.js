@@ -2088,6 +2088,9 @@ const keyboardCloseBtn = document.getElementById('keyboard-close-btn');
 let keyboardTarget = null;
 let keyboardLayer = 'letters';       // 'letters' | 'symbols'
 let keyboardShift = 'off';           // 'off' | 'once' | 'lock'
+// A field the choices key has handed over to its dropdown. While set, a tap
+// on that field opens the dropdown and does not bring the keyboard back.
+let keyboardChoicesField = null;
 
 const KEYBOARD_TYPES = new Set(['text', 'password', 'number', 'search']);
 function keyboardEligible(el) {
@@ -2276,11 +2279,13 @@ keyboardRows.addEventListener('click', e => {
   }
   if (key === 'choices') {
     // Hand over to the field's own dropdown: keyboard away, list restored,
-    // and the picker opened on the tap that asked for it. showPicker needs a
-    // user gesture, which this is; where it is not supported the field is
-    // focused instead and the next tap on it opens the list natively.
+    // and the field marked so its next tap opens the dropdown rather than
+    // bringing the keyboard back. showPicker opens it on this tap where the
+    // browser supports that; where it does not, the field is focused and one
+    // tap on it does the rest.
     const field = keyboardTarget;
     hideKeyboard();
+    keyboardChoicesField = field;
     try { field.showPicker(); } catch (err) { field.focus(); }
     return;
   }
@@ -2310,7 +2315,8 @@ keyboardCloseBtn.addEventListener('click', hideKeyboard);
 // take it. A field with no keyboard interest is left alone.
 document.addEventListener('pointerdown', e => {
   const input = e.target.closest('input');
-  if (keyboardEligible(input)) holdBackList(input);
+  // Not for a field in dropdown mode: it keeps its list, so this tap opens it.
+  if (keyboardEligible(input) && input !== keyboardChoicesField) holdBackList(input);
   // A dropdown - a floor picker, the location picker - opens its own list on
   // the tap, and that list is drawn over everything, keyboard included. The
   // keyboard goes first, so the choices are what is on screen. Done at
@@ -2320,7 +2326,20 @@ document.addEventListener('pointerdown', e => {
 
 document.addEventListener('click', e => {
   const input = e.target.closest('input');
+  if (input && input === keyboardChoicesField) {
+    // This tap is opening the field's dropdown; the keyboard stays away. The
+    // mode is spent - the tap after this one brings the keyboard as usual.
+    keyboardChoicesField = null;
+    return;
+  }
+  keyboardChoicesField = null;
   if (keyboardEligible(input)) showKeyboardFor(input);
+});
+
+// Choosing from the dropdown ends dropdown mode too, so the field's next tap
+// is a keyboard tap again.
+document.addEventListener('change', e => {
+  if (e.target === keyboardChoicesField) keyboardChoicesField = null;
 });
 
 // Choosing a result is the end of the search, so the keyboard goes with it.
