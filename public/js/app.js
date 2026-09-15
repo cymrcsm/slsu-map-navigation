@@ -2189,9 +2189,12 @@ function hideKeyboard() {
 renderKeyboard();
 
 // Keys must not take focus from the field, or the suggestion list closes under
-// the finger - the same guard the suggestion list itself uses above.
-kioskKeyboard.addEventListener('mousedown', e => e.preventDefault());
-kioskKeyboard.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+// the finger - the same guard the suggestion list itself uses above. Done on
+// pointerdown, which covers a finger and a mouse alike and stops the focus
+// change without stopping the click that follows. (Cancelling touchstart, as
+// this once did, cancels that click as well - on the touch screen itself the
+// keys would never have registered.)
+kioskKeyboard.addEventListener('pointerdown', e => e.preventDefault());
 
 // A tap on the keyboard is not a tap outside the search box.
 kioskKeyboard.addEventListener('click', e => e.stopPropagation());
@@ -2235,9 +2238,13 @@ keyboardCloseBtn.addEventListener('click', hideKeyboard);
 
 // Shown on a tap of any eligible field - a tap, not any focus, so a button that
 // refocuses a field (the search bar's clear button, say) does not summon it.
+// A tap on anything else puts it away: whatever was tapped needs no keyboard,
+// and a phone's behaves the same way. Taps on the keyboard itself never reach
+// here - it stops them above - so pressing a key is not a tap elsewhere.
 document.addEventListener('click', e => {
   const input = e.target.closest('input');
   if (keyboardEligible(input)) showKeyboardFor(input);
+  else if (!kioskKeyboard.hidden) hideKeyboard();
 });
 
 // Choosing a result is the end of the search, so the keyboard goes with it.
