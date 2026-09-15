@@ -2300,9 +2300,10 @@ keyboardCloseBtn.addEventListener('click', hideKeyboard);
 
 // Shown on a tap of any eligible field - a tap, not any focus, so a button that
 // refocuses a field (the search bar's clear button, say) does not summon it.
-// A tap on anything else puts it away: whatever was tapped needs no keyboard,
-// and a phone's behaves the same way. Taps on the keyboard itself never reach
-// here - it stops them above - so pressing a key is not a tap elsewhere.
+// A tap anywhere else leaves it alone: it stays up until its close button is
+// pressed, or one of the few things that put it away on their own - a search
+// result chosen, the admin panel closing, the choices key handing over to a
+// dropdown, or a key pressed for a field that is no longer there.
 // The dropdown opens on the tap itself, before any click handler runs, so a
 // field that has one is held back at pointerdown - the keyboard is about to
 // take it. A field with no keyboard interest is left alone.
@@ -2314,7 +2315,6 @@ document.addEventListener('pointerdown', e => {
 document.addEventListener('click', e => {
   const input = e.target.closest('input');
   if (keyboardEligible(input)) showKeyboardFor(input);
-  else if (!kioskKeyboard.hidden) hideKeyboard();
 });
 
 // Choosing a result is the end of the search, so the keyboard goes with it.
