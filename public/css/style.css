@@ -763,6 +763,44 @@ body, html {
   border-color: var(--border-focus);
 }
 
+/* A dropdown's list the same width as its bar. The browser's own <select>
+   popup grows to fit its widest option, so the location picker - whose entries
+   read "Name - Building" - dropped a list wider than the field it came from.
+   Where the browser lets the picker be styled (Chromium 135 and later) it is
+   pinned to the field's width, with long entries cut to an ellipsis rather
+   than widening it; elsewhere the browser's popup is left exactly as it was.
+   The search suggestions already span their bar, and a <datalist> popup
+   matches its field on its own. */
+@supports (appearance: base-select) {
+  .fld select,
+  .fld select::picker(select) {
+    appearance: base-select;
+  }
+  .fld select::picker(select) {
+    inline-size: anchor-size(self-inline);
+    box-sizing: border-box;
+    margin: 4px 0 0;
+    padding: 4px;
+    max-block-size: 320px;
+    overflow-y: auto;
+    background: var(--surface-box);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    box-shadow: var(--card-shadow-hover);
+  }
+  .fld select option {
+    padding: 9px 11px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .fld select option:checked { background: var(--surface-hover); }
+  .fld select option:active  { background: var(--brand-wash); }
+}
+
 .fld input.invalid {
   border-color: var(--danger-color);
 }
