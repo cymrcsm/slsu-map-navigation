@@ -1299,7 +1299,10 @@ function refreshCategoryCounts() {
 
 // Offered in the building list even when no location uses them yet, so the
 // first pin in a building does not have to be typed from memory.
-const EXTRA_BUILDINGS = ['Student Center'];
+const EXTRA_BUILDINGS = [
+  'Student Center',
+  'Faculty of Computing and Information Sciences (FCIS) Building'
+];
 
 function refreshBuildingOptions() {
   const names = [...new Set(
