@@ -221,6 +221,13 @@
         </div>
       </div>
 
+      <!-- Shown while the admin panel has stepped aside for a task on the map or
+           in the side panel - placing the kiosk, moving a pin, adding a location.
+           One tap abandons the task and brings the panel back. -->
+      <button type="button" id="admin-cancel-float" class="admin-cancel-float" hidden>
+        ✕ Cancel changes
+      </button>
+
       <div id="coord-inspector">Click map to log coordinates</div>
 
       <!-- On-screen keyboard for the touch screen. Shown only when the search
@@ -321,6 +328,7 @@
           </div>
 
           <button type="button" id="edit-submit-btn" class="action-btn directions-btn">Save changes</button>
+          <button type="button" id="edit-cancel-changes-btn" class="action-btn secondary-btn">Cancel changes</button>
 
           <div id="edit-auth" class="auth-row hidden">
             <label class="fld"><span>Authorization code</span>
