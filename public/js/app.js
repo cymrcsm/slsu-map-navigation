@@ -2053,6 +2053,11 @@ syncWithServer = async function () {
 // goes away from its own close button, on its own when a search result is
 // chosen, and when the admin panel closes.
 //
+// Laid out like a phone's: a letters layer with shift, and a symbols layer
+// behind a ?123 key, each with comma, full stop, space and enter along the
+// bottom. Shift is one-shot - the next letter is capitalised and it drops -
+// and a second tap while it is up locks it, as on a phone.
+//
 // It types by dispatching the same input and keydown events a real keyboard
 // would, so the suggestion list, the Enter-to-confirm handlers on the code
 // fields, and everything else already listening on those inputs is reused
@@ -2064,20 +2069,37 @@ const keyboardCloseBtn = document.getElementById('keyboard-close-btn');
 
 // Which field the keys go to. Set on every tap of an eligible input.
 let keyboardTarget = null;
+let keyboardLayer = 'letters';       // 'letters' | 'symbols'
+let keyboardShift = 'off';           // 'off' | 'once' | 'lock'
 
 const KEYBOARD_TYPES = new Set(['text', 'password', 'number', 'search']);
 function keyboardEligible(el) {
   return !!el && el.tagName === 'INPUT' && KEYBOARD_TYPES.has(el.type) && !el.disabled && !el.readOnly;
 }
 
-// Every row totals ten key-widths, so the keys line up column to column.
-const KEYBOARD_LAYOUT = [
-  { keys: '1234567890'.split('') },
-  { keys: 'qwertyuiop'.split('') },
-  { keys: 'asdfghjkl'.split(''), inset: 'inset-half' },
-  { keys: 'zxcvbnm'.split('').concat(['backspace']), inset: 'inset-half' },
-  { keys: ['.', '-', 'space', 'enter'] }
-];
+// A key is a character, or one of the named keys. w is its width in key
+// units; every row totals ten, so the columns line up between rows.
+const K = (k, w, label) => ({ k: k, w: w || 1, label: label });
+const KEYBOARD_LAYERS = {
+  letters: [
+    '1234567890'.split('').map(c => K(c)),
+    'qwertyuiop'.split('').map(c => K(c)),
+    'asdfghjkl'.split('').map(c => K(c)),
+    [K('shift', 1.5, '\u21E7')].concat('zxcvbnm'.split('').map(c => K(c)), [K('backspace', 1.5, '\u232B')]),
+    [K('symbols', 2, '?123'), K(','), K('space', 4, 'space'), K('.'), K('enter', 2, 'enter')]
+  ],
+  symbols: [
+    '1234567890'.split('').map(c => K(c)),
+    '@#$_&-+()/'.split('').map(c => K(c)),
+    '~^|\\[]{}<>'.split('').map(c => K(c)),
+    [K('=')].concat('*"\':;!?'.split('').map(c => K(c)), [K('backspace', 2, '\u232B')]),
+    [K('letters', 2, 'ABC'), K(','), K('space', 4, 'space'), K('.'), K('enter', 2, 'enter')]
+  ]
+};
+// The nine-key letter row is inset half a key each side so it stays aligned.
+// Both layers have five rows, so switching between them does not change the
+// height of the keys.
+const KEYBOARD_INSET = { letters: { 2: 'inset-half' }, symbols: {} };
 
 // A number field has no caret to speak of - selectionStart is null on it - so
 // text goes on the end. Everything else is edited at the caret, as typing would.
@@ -2112,6 +2134,35 @@ function keyboardBackspace() {
   t.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
+function renderKeyboard() {
+  keyboardRows.innerHTML = '';
+  const insets = KEYBOARD_INSET[keyboardLayer] || {};
+  KEYBOARD_LAYERS[keyboardLayer].forEach((row, r) => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'keyboard-row' + (insets[r] ? ' ' + insets[r] : '');
+    row.forEach(key => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'keyboard-key';
+      btn.dataset.key = key.k;
+      btn.style.flex = key.w + ' 1 0';
+      const named = key.label !== undefined;
+      if (named) {
+        btn.textContent = key.label;
+        btn.classList.add('key-named', 'key-' + key.k);
+        if (key.k === 'shift' && keyboardShift !== 'off') btn.classList.add('on');
+        if (key.k === 'shift' && keyboardShift === 'lock') btn.classList.add('locked');
+        if (key.k === 'backspace') btn.setAttribute('aria-label', 'Backspace');
+      } else {
+        const upper = keyboardShift !== 'off' && /^[a-z]$/.test(key.k);
+        btn.textContent = upper ? key.k.toUpperCase() : key.k;
+      }
+      rowEl.appendChild(btn);
+    });
+    keyboardRows.appendChild(rowEl);
+  });
+}
+
 // Over the map, centred, when typing into the side panel. When the field is in
 // the admin dialog the keyboard docks to the bottom of the map card instead and
 // the dialog moves up, because the dialog sits exactly where the keyboard would
@@ -2129,33 +2180,13 @@ function hideKeyboard() {
   kioskKeyboard.classList.remove('docked');
   adminOverlay.classList.remove('keyboard-open');
   keyboardTarget = null;
+  // Next time it opens it starts fresh, as a phone's does.
+  keyboardLayer = 'letters';
+  keyboardShift = 'off';
+  renderKeyboard();
 }
 
-KEYBOARD_LAYOUT.forEach(row => {
-  const rowEl = document.createElement('div');
-  rowEl.className = 'keyboard-row' + (row.inset ? ' ' + row.inset : '');
-  row.keys.forEach(key => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'keyboard-key';
-    if (key === 'backspace') {
-      btn.textContent = '\u232B';
-      btn.classList.add('key-wide');
-      btn.setAttribute('aria-label', 'Backspace');
-    } else if (key === 'space') {
-      btn.textContent = 'space';
-      btn.classList.add('key-space');
-    } else if (key === 'enter') {
-      btn.textContent = 'enter';
-      btn.classList.add('key-wide', 'key-enter');
-    } else {
-      btn.textContent = key;
-    }
-    btn.dataset.key = key;
-    rowEl.appendChild(btn);
-  });
-  keyboardRows.appendChild(rowEl);
-});
+renderKeyboard();
 
 // Keys must not take focus from the field, or the suggestion list closes under
 // the finger - the same guard the suggestion list itself uses above.
@@ -2175,11 +2206,29 @@ keyboardRows.addEventListener('click', e => {
   }
   const key = btn.dataset.key;
   keyboardTarget.focus();
-  if (key === 'backspace') keyboardBackspace();
-  else if (key === 'space') keyboardType(' ');
-  else if (key === 'enter') {
+
+  if (key === 'shift') {
+    // off -> once -> lock -> off
+    keyboardShift = keyboardShift === 'off' ? 'once' : keyboardShift === 'once' ? 'lock' : 'off';
+    renderKeyboard();
+    return;
+  }
+  if (key === 'symbols' || key === 'letters') {
+    keyboardLayer = key;
+    keyboardShift = 'off';
+    renderKeyboard();
+    return;
+  }
+  if (key === 'backspace') { keyboardBackspace(); return; }
+  if (key === 'enter') {
     keyboardTarget.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
-  } else keyboardType(key);
+    return;
+  }
+
+  let text = key === 'space' ? ' ' : key;
+  if (keyboardShift !== 'off' && /^[a-z]$/.test(text)) text = text.toUpperCase();
+  keyboardType(text);
+  if (keyboardShift === 'once') { keyboardShift = 'off'; renderKeyboard(); }
 });
 
 keyboardCloseBtn.addEventListener('click', hideKeyboard);

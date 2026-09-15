@@ -1405,7 +1405,6 @@ body, html {
 }
 /* Shorter rows are inset so every key keeps the same width as the ten-key rows. */
 .keyboard-row.inset-half { padding: 0 5%; }
-.keyboard-row.inset-one  { padding: 0 10%; }
 
 .keyboard-key {
   flex: 1 1 0;
@@ -1421,9 +1420,6 @@ body, html {
   -webkit-tap-highlight-color: transparent;
 }
 .keyboard-key:active { background: var(--surface-hover); transform: scale(0.97); }
-.keyboard-key.key-wide  { flex: 2 1 0; }
-.keyboard-key.key-space { flex: 6 1 0; }
-.keyboard-key.key-enter { background: var(--primary-color); color: var(--map-paper); border-color: var(--primary-color); }
 
 /* Typing into the admin dialog: the dialog sits centred, exactly where the
    keyboard would go, so the keyboard docks to the bottom of the map card and
@@ -1437,3 +1433,12 @@ body, html {
   align-items: flex-start;
   padding-top: 24px;
 }
+
+/* The named keys - shift, ?123 / ABC, backspace, space, enter - read as
+   controls rather than characters. Enter carries the brand navy so the one key
+   that submits stands apart; shift lights up while it is armed and shows a
+   locked state after a second tap, as a phone's does. */
+.keyboard-key.key-named { background: var(--surface-hover); font-size: clamp(12px, 1.3vw, 18px); }
+.keyboard-key.key-enter { background: var(--primary-color); color: var(--map-paper); border-color: var(--primary-color); }
+.keyboard-key.key-shift.on { background: var(--primary-color); color: var(--map-paper); border-color: var(--primary-color); }
+.keyboard-key.key-shift.locked { box-shadow: inset 0 0 0 2px var(--map-paper); }
