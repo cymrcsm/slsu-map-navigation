@@ -1260,7 +1260,6 @@ console.log('SLSU kiosk ready:', PLACES.length, 'locations,',
 
 const addView = document.getElementById('add-view');
 const addLocationBtn = document.getElementById('add-location-btn');
-const backFromAddBtn = document.getElementById('back-from-add-btn');
 const addName = document.getElementById('add-name');
 const addFloor = document.getElementById('add-floor');
 const addBuilding = document.getElementById('add-building');
@@ -1381,11 +1380,6 @@ addLocationBtn.addEventListener('click', () => {
   } else {
     showTutorialView();
   }
-});
-
-backFromAddBtn.addEventListener('click', () => {
-  stopPicking();
-  showTutorialView();
 });
 
 pickSpotBtn.addEventListener('click', () => {
@@ -2178,10 +2172,8 @@ function renderKeyboard() {
   });
 }
 
-// Over the map, centred, when typing into the side panel. When the field is in
-// the admin dialog the keyboard docks to the bottom of the map card instead and
-// the dialog moves up, because the dialog sits exactly where the keyboard would
-// and a keyboard over the field it is typing into is no use to anyone.
+// At the bottom of the map card, whichever field it serves. When the field is
+// in the admin dialog the dialog moves to the top, out of the keyboard's way.
 // A field with a dropdown behind it (a <datalist>) and the keyboard take
 // turns on top, decided by what was tapped last. The browser draws the
 // dropdown above everything, so "keyboard on top" means the dropdown shut:
@@ -2205,9 +2197,8 @@ function giveBackList(input) {
 function showKeyboardFor(input) {
   if (keyboardTarget && keyboardTarget !== input) giveBackList(keyboardTarget);
   keyboardTarget = input;
-  const inAdmin = !!input.closest('#admin-overlay');
-  kioskKeyboard.classList.toggle('docked', inAdmin);
-  adminOverlay.classList.toggle('keyboard-open', inAdmin);
+  // In the admin dialog the dialog moves to the top, out of the keyboard's way.
+  adminOverlay.classList.toggle('keyboard-open', !!input.closest('#admin-overlay'));
   kioskKeyboard.hidden = false;
   renderKeyboard();
 }
@@ -2215,7 +2206,6 @@ function showKeyboardFor(input) {
 function hideKeyboard() {
   giveBackList(keyboardTarget);
   kioskKeyboard.hidden = true;
-  kioskKeyboard.classList.remove('docked');
   adminOverlay.classList.remove('keyboard-open');
   keyboardTarget = null;
   // Next time it opens it starts fresh, as a phone's does.

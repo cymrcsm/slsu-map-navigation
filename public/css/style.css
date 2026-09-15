@@ -1225,7 +1225,17 @@ body, html {
   box-shadow: 0 4px 12px rgba(18, 41, 77, 0.32);
 }
 
-#admin-unlock-btn:hover:not(:disabled) { background: #1A3866; }
+#admin-unlock-btn:active:not(:disabled) { background: #1A3866; }
+
+/* Add New Location wears the same navy as Unlock: the two are the deliberate
+   commits of the admin's work, and they read as such. */
+#add-submit-btn {
+  background: #12294D;
+  color: var(--map-paper);
+  border: none;
+  box-shadow: 0 4px 12px rgba(18, 41, 77, 0.32);
+}
+#add-submit-btn:active:not(:disabled) { background: #1A3866; }
 #admin-unlock-btn:disabled { opacity: 0.6; cursor: default; }
 
 .admin-gate,
@@ -1344,22 +1354,21 @@ body, html {
   cursor: pointer;
 }
 .qr-swap[hidden] { display: none; }
-.qr-swap:hover { color: var(--primary-strong); }
+.qr-swap:active { color: var(--primary-strong); }
 
 /* ==========================================================================
    ON-SCREEN KEYBOARD
 
    The kiosk is a touch screen with no physical keys. This appears when a text
-   field is tapped and goes on a tap anywhere else, and sits over the map
-   card: the card's full width, centred, with a height
+   field is tapped and goes on a tap anywhere else, and sits at the bottom of
+   the map card: the card's full width, with a height
    that follows from the width so the keys stay square-ish at any size.
    ========================================================================== */
 .kiosk-keyboard {
   position: absolute;
   left: 0;
   right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  bottom: 14px;
   /* Above the admin dialog (4000) as well as the map: the keyboard serves the
      dialog's fields too, and must sit over its dimmed backdrop to be tapped. */
   z-index: 4100;
@@ -1406,14 +1415,8 @@ body, html {
 }
 .keyboard-key:active { background: var(--surface-hover); transform: scale(0.97); }
 
-/* Typing into the admin dialog: the dialog sits centred, exactly where the
-   keyboard would go, so the keyboard docks to the bottom of the map card and
-   the dialog moves to the top to stay clear of it. */
-.kiosk-keyboard.docked {
-  top: auto;
-  bottom: 14px;
-  transform: none;
-}
+/* Typing into the admin dialog: the dialog moves to the top, out of the
+   keyboard's way at the bottom. */
 .admin-overlay.keyboard-open {
   align-items: flex-start;
   padding-top: 24px;
@@ -1448,5 +1451,5 @@ body, html {
   cursor: pointer;
   box-shadow: var(--card-shadow-hover);
 }
-.admin-cancel-float:hover { background: var(--danger-color); color: var(--map-paper); }
+.admin-cancel-float:active { background: var(--danger-color); color: var(--map-paper); }
 .admin-cancel-float[hidden] { display: none; }
