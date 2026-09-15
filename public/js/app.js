@@ -2276,7 +2276,11 @@ keyboardRows.addEventListener('click', e => {
   }
   if (key === 'backspace') { keyboardBackspace(); return; }
   if (key === 'enter') {
+    // Enter is what a real keyboard would send - the search box picks its
+    // result on it, the code fields confirm on it - and it is also the end of
+    // using the keyboard for that field, so the keyboard goes.
     keyboardTarget.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+    hideKeyboard();
     return;
   }
 
@@ -2292,8 +2296,9 @@ keyboardCloseBtn.addEventListener('click', hideKeyboard);
 // refocuses a field (the search bar's clear button, say) does not summon it.
 // A tap anywhere else leaves it alone: it stays up until its close button is
 // pressed, or one of the few things that put it away on their own - a search
-// result chosen, the admin panel closing, a floor or location picker opened,
-// or a key pressed for a field that is no longer there.
+// result chosen, Enter pressed, a choice picked from a field's dropdown, a
+// confirm, cancel or unlock button tapped, the admin panel closing, a floor or
+// location picker opened, or a key pressed for a field that is no longer there.
 // The field was tapped, so its dropdown goes on top: the list is given back
 // at pointerdown, ahead of the tap opening it, and it opens over the keyboard
 // as it always did. A tap on a key hands the top back to the keyboard.
@@ -2310,6 +2315,32 @@ document.addEventListener('pointerdown', e => {
 document.addEventListener('click', e => {
   const input = e.target.closest('input');
   if (keyboardEligible(input)) showKeyboardFor(input);
+});
+
+// So is any button that submits what was typed, or abandons it: unlock, the
+// confirm and cancel on each authorization step, the two cancel-changes
+// buttons. Tapping one of those is being done with the keyboard. The buttons
+// that lead on to the code field - Save changes, Add New Location - are not
+// here: the next thing after them is more typing.
+[
+  'admin-unlock-btn',
+  'add-confirm-btn', 'add-cancel-btn',
+  'edit-confirm-btn', 'edit-cancel-btn',
+  'move-confirm-btn', 'move-cancel-btn',
+  'remove-confirm-btn', 'remove-cancel-btn',
+  'edit-cancel-changes-btn', 'admin-cancel-float'
+].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn) btn.addEventListener('click', hideKeyboard);
+});
+
+// Picking from a field's dropdown is the end of using the keyboard for it, so
+// the keyboard goes. The pick reaches us as a change event on the field; the
+// keyboard's own typing does not fire one, so this does not trip mid-word.
+document.addEventListener('change', e => {
+  const t = keyboardTarget;
+  if (!t || e.target !== t) return;
+  if (t.hasAttribute('list') || t.dataset.keyboardList) hideKeyboard();
 });
 
 // Choosing a result is the end of the search, so the keyboard goes with it.
