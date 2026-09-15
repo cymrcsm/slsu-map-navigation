@@ -11,7 +11,7 @@
 //   LOCATIONS   id, name, acronym, building, categories, floor, hours, coords,
 //               textH (label height hint), description
 //
-// 261 locations (2nd Floor: 2, 3rd Floor: 1, Ground Floor: 258),
+// 262 locations (2nd Floor: 3, 3rd Floor: 1, Ground Floor: 258),
 // 16 categories.
 const CATEGORIES = [
   {
@@ -1886,6 +1886,21 @@ const LOCATIONS = [
   ],
   "textH": 0.61,
   "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
+  "id": "ict-201",
+  "custom": true,
+  "name": "ICT-201",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "SLSU Main Campus",
+  "categories": [
+   "classrooms"
+  ],
+  "coords": [
+   134.7,
+   428.4
+  ]
  },
  {
   "id": "ict-3",

@@ -2048,44 +2048,88 @@ syncWithServer = async function () {
 // ON-SCREEN KEYBOARD
 // ==========================================
 // The kiosk is a touch screen with no physical keys. This keyboard appears when
-// the search bar is tapped, and goes away from its own close button or as soon
-// as a search result is chosen. It types into the search box by dispatching the
-// same input and keydown events a real keyboard would, so the suggestion list
-// and the Enter behaviour above are reused rather than repeated.
+// any text field is tapped - the search bar, or a field in the admin panel and
+// its add and edit forms - and types into whichever one was tapped last. It
+// goes away from its own close button, on its own when a search result is
+// chosen, and when the admin panel closes.
+//
+// It types by dispatching the same input and keydown events a real keyboard
+// would, so the suggestion list, the Enter-to-confirm handlers on the code
+// fields, and everything else already listening on those inputs is reused
+// rather than repeated.
 
 const kioskKeyboard = document.getElementById('kiosk-keyboard');
 const keyboardRows = document.getElementById('keyboard-rows');
 const keyboardCloseBtn = document.getElementById('keyboard-close-btn');
 
+// Which field the keys go to. Set on every tap of an eligible input.
+let keyboardTarget = null;
+
+const KEYBOARD_TYPES = new Set(['text', 'password', 'number', 'search']);
+function keyboardEligible(el) {
+  return !!el && el.tagName === 'INPUT' && KEYBOARD_TYPES.has(el.type) && !el.disabled && !el.readOnly;
+}
+
+// Every row totals ten key-widths, so the keys line up column to column.
 const KEYBOARD_LAYOUT = [
   { keys: '1234567890'.split('') },
   { keys: 'qwertyuiop'.split('') },
   { keys: 'asdfghjkl'.split(''), inset: 'inset-half' },
   { keys: 'zxcvbnm'.split('').concat(['backspace']), inset: 'inset-half' },
-  { keys: ['space', 'enter'], inset: 'inset-one' }
+  { keys: ['.', '-', 'space', 'enter'] }
 ];
 
+// A number field has no caret to speak of - selectionStart is null on it - so
+// text goes on the end. Everything else is edited at the caret, as typing would.
 function keyboardType(text) {
-  const start = searchInput.selectionStart, end = searchInput.selectionEnd;
-  const v = searchInput.value;
-  searchInput.value = v.slice(0, start) + text + v.slice(end);
-  const caret = start + text.length;
-  searchInput.setSelectionRange(caret, caret);
-  searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+  const t = keyboardTarget;
+  if (!t) return;
+  if (t.selectionStart === null || t.selectionStart === undefined) {
+    t.value = t.value + text;
+  } else {
+    const start = t.selectionStart, end = t.selectionEnd;
+    const v = t.value;
+    t.value = v.slice(0, start) + text + v.slice(end);
+    const caret = start + text.length;
+    t.setSelectionRange(caret, caret);
+  }
+  t.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 function keyboardBackspace() {
-  const start = searchInput.selectionStart, end = searchInput.selectionEnd;
-  const v = searchInput.value;
-  if (start === end && start === 0) return;
-  const from = start === end ? start - 1 : start;
-  searchInput.value = v.slice(0, from) + v.slice(end);
-  searchInput.setSelectionRange(from, from);
-  searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+  const t = keyboardTarget;
+  if (!t) return;
+  if (t.selectionStart === null || t.selectionStart === undefined) {
+    t.value = t.value.slice(0, -1);
+  } else {
+    const start = t.selectionStart, end = t.selectionEnd;
+    const v = t.value;
+    if (start === end && start === 0) return;
+    const from = start === end ? start - 1 : start;
+    t.value = v.slice(0, from) + v.slice(end);
+    t.setSelectionRange(from, from);
+  }
+  t.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-function showKeyboard() { kioskKeyboard.hidden = false; }
-function hideKeyboard() { kioskKeyboard.hidden = true; }
+// Over the map, centred, when typing into the side panel. When the field is in
+// the admin dialog the keyboard docks to the bottom of the map card instead and
+// the dialog moves up, because the dialog sits exactly where the keyboard would
+// and a keyboard over the field it is typing into is no use to anyone.
+function showKeyboardFor(input) {
+  keyboardTarget = input;
+  const inAdmin = !!input.closest('#admin-overlay');
+  kioskKeyboard.classList.toggle('docked', inAdmin);
+  adminOverlay.classList.toggle('keyboard-open', inAdmin);
+  kioskKeyboard.hidden = false;
+}
+
+function hideKeyboard() {
+  kioskKeyboard.hidden = true;
+  kioskKeyboard.classList.remove('docked');
+  adminOverlay.classList.remove('keyboard-open');
+  keyboardTarget = null;
+}
 
 KEYBOARD_LAYOUT.forEach(row => {
   const rowEl = document.createElement('div');
@@ -2113,8 +2157,8 @@ KEYBOARD_LAYOUT.forEach(row => {
   keyboardRows.appendChild(rowEl);
 });
 
-// Keys must not take focus from the search box, or the suggestion list closes
-// under the finger - the same guard the suggestion list itself uses above.
+// Keys must not take focus from the field, or the suggestion list closes under
+// the finger - the same guard the suggestion list itself uses above.
 kioskKeyboard.addEventListener('mousedown', e => e.preventDefault());
 kioskKeyboard.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
 
@@ -2124,24 +2168,39 @@ kioskKeyboard.addEventListener('click', e => e.stopPropagation());
 keyboardRows.addEventListener('click', e => {
   const btn = e.target.closest('.keyboard-key');
   if (!btn) return;
+  // The field may have gone - a form reset, a panel closed - since it was tapped.
+  if (!keyboardTarget || !keyboardTarget.isConnected || keyboardTarget.offsetParent === null) {
+    hideKeyboard();
+    return;
+  }
   const key = btn.dataset.key;
-  searchInput.focus();
+  keyboardTarget.focus();
   if (key === 'backspace') keyboardBackspace();
   else if (key === 'space') keyboardType(' ');
   else if (key === 'enter') {
-    searchInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+    keyboardTarget.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
   } else keyboardType(key);
 });
 
 keyboardCloseBtn.addEventListener('click', hideKeyboard);
 
-// Shown on a tap of the search bar - a tap, not any focus, so the clear button
-// refocusing the box does not summon it.
-searchInput.addEventListener('click', showKeyboard);
+// Shown on a tap of any eligible field - a tap, not any focus, so a button that
+// refocuses a field (the search bar's clear button, say) does not summon it.
+document.addEventListener('click', e => {
+  const input = e.target.closest('input');
+  if (keyboardEligible(input)) showKeyboardFor(input);
+});
 
 // Choosing a result is the end of the search, so the keyboard goes with it.
 const chooseSuggestionBase = chooseSuggestion;
 chooseSuggestion = function () {
   chooseSuggestionBase.apply(this, arguments);
+  hideKeyboard();
+};
+
+// Closing the admin panel takes its fields with it, and the keyboard too.
+const closeAdminPanelBase = closeAdminPanel;
+closeAdminPanel = function () {
+  closeAdminPanelBase.apply(this, arguments);
   hideKeyboard();
 };

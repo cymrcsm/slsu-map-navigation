@@ -1361,7 +1361,9 @@ body, html {
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 1002;
+  /* Above the admin dialog (4000) as well as the map: the keyboard serves the
+     dialog's fields too, and must sit over its dimmed backdrop to be tapped. */
+  z-index: 4100;
   aspect-ratio: 5 / 2;
   padding: 44px 14px 14px;
   display: flex;
@@ -1422,3 +1424,16 @@ body, html {
 .keyboard-key.key-wide  { flex: 2 1 0; }
 .keyboard-key.key-space { flex: 6 1 0; }
 .keyboard-key.key-enter { background: var(--primary-color); color: var(--map-paper); border-color: var(--primary-color); }
+
+/* Typing into the admin dialog: the dialog sits centred, exactly where the
+   keyboard would go, so the keyboard docks to the bottom of the map card and
+   the dialog moves to the top to stay clear of it. */
+.kiosk-keyboard.docked {
+  top: auto;
+  bottom: 14px;
+  transform: none;
+}
+.admin-overlay.keyboard-open {
+  align-items: flex-start;
+  padding-top: 24px;
+}
