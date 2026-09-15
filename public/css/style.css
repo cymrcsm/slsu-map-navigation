@@ -1455,9 +1455,20 @@ body, html {
 
 /* Typing into the admin dialog: the dialog moves to the top, out of the
    keyboard's way at the bottom. */
+/* A shorter keyboard for a field in the admin dialog: 30% of the card's width
+   tall rather than 40%, so the dialog keeps more of the screen. */
+.kiosk-keyboard.for-dialog { aspect-ratio: 10 / 3; }
+
+/* The dialog is told how tall the keyboard is (--keyboard-height, set as the
+   keyboard opens) and is confined to the room above it, scrolling inside
+   itself, so the field being typed into is never behind the keys. */
 .admin-overlay.keyboard-open {
   align-items: flex-start;
   padding-top: 24px;
+  padding-bottom: calc(var(--keyboard-height, 0px) + 24px);
+}
+.admin-overlay.keyboard-open .admin-card {
+  max-height: calc(100vh - 48px - var(--keyboard-height, 0px));
 }
 
 /* The named keys - shift, ?123 / ABC, backspace, space, enter - read as

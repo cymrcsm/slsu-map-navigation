@@ -2200,16 +2200,29 @@ function giveBackList(input) {
 function showKeyboardFor(input) {
   if (keyboardTarget && keyboardTarget !== input) giveBackList(keyboardTarget);
   keyboardTarget = input;
-  // In the admin dialog the dialog moves to the top, out of the keyboard's way.
-  adminOverlay.classList.toggle('keyboard-open', !!input.closest('#admin-overlay'));
+  const inDialog = !!input.closest('#admin-overlay');
+  // For a field in the admin dialog the keyboard is shorter, the dialog moves
+  // to the top and is told how much room the keyboard takes, so the dialog
+  // fits above it and scrolls inside itself rather than running underneath -
+  // and the field just tapped is scrolled into that visible part. Without
+  // this the code field and the building field, low in the edit form, sat
+  // behind the keys while being typed into.
+  kioskKeyboard.classList.toggle('for-dialog', inDialog);
+  adminOverlay.classList.toggle('keyboard-open', inDialog);
   kioskKeyboard.hidden = false;
   renderKeyboard();
+  if (inDialog) {
+    adminOverlay.style.setProperty('--keyboard-height', kioskKeyboard.offsetHeight + 'px');
+    input.scrollIntoView({ block: 'nearest' });
+  }
 }
 
 function hideKeyboard() {
   giveBackList(keyboardTarget);
   kioskKeyboard.hidden = true;
+  kioskKeyboard.classList.remove('for-dialog');
   adminOverlay.classList.remove('keyboard-open');
+  adminOverlay.style.removeProperty('--keyboard-height');
   keyboardTarget = null;
   // Next time it opens it starts fresh, as a phone's does.
   keyboardLayer = 'letters';
