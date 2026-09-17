@@ -1272,6 +1272,7 @@ console.log('SLSU kiosk ready:', PLACES.length, 'locations,',
 const addView = document.getElementById('add-view');
 const addLocationBtn = document.getElementById('add-location-btn');
 const addName = document.getElementById('add-name');
+const addAcronym = document.getElementById('add-acronym');
 const addFloor = document.getElementById('add-floor');
 const addBuilding = document.getElementById('add-building');
 const addCategories = document.getElementById('add-categories');
@@ -1364,6 +1365,7 @@ function populateFloorSelects() {
 
 function resetAddForm() {
   addName.value = '';
+  addAcronym.value = '';
   // Default to the floor on screen: a pin dropped while viewing 2F belongs to 2F.
   addFloor.value = LEVELS[activeLevel] || LEVELS[0];
   addBuilding.value = '';
@@ -1426,7 +1428,7 @@ function validateAdd() {
   return {
     id: slugFor(name),
     name: name,
-    acronym: '',
+    acronym: addAcronym.value.trim(),
     building: addBuilding.value.trim() || 'SLSU Main Campus',
     categories: readCategories([], addCategories),
     floor: addFloor.value,
