@@ -11,7 +11,7 @@
 //   LOCATIONS   id, name, acronym, building, categories, floor, hours, coords,
 //               textH (label height hint), description
 //
-// 264 locations (2nd Floor: 5, 3rd Floor: 1, Ground Floor: 258),
+// 268 locations (2nd Floor: 9, 3rd Floor: 1, Ground Floor: 258),
 // 16 categories.
 const CATEGORIES = [
   {
@@ -824,6 +824,21 @@ const LOCATIONS = [
   ],
   "textH": 0.67,
   "description": "Comfort room and hygiene facility."
+ },
+ {
+  "id": "comfort-room-cr",
+  "custom": true,
+  "name": "Comfort Room(CR)",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "Student Center",
+  "categories": [
+   "comfort-rooms"
+  ],
+  "coords": [
+   141.9,
+   350.1
+  ]
  },
  {
   "id": "comfort-rooms",
@@ -1763,6 +1778,21 @@ const LOCATIONS = [
   ],
   "textH": 0.47,
   "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
+  "id": "htm-202",
+  "custom": true,
+  "name": "HTM-202",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "SLSU Main Campus",
+  "categories": [
+   "classrooms"
+  ],
+  "coords": [
+   154.4,
+   476.1
+  ]
  },
  {
   "id": "html-office",
@@ -3977,6 +4007,36 @@ const LOCATIONS = [
   ],
   "textH": 0.87,
   "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
+  "id": "room-e-201",
+  "custom": true,
+  "name": "Room E-201",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "Engineering Building",
+  "categories": [
+   "classrooms"
+  ],
+  "coords": [
+   78.5,
+   338.2
+  ]
+ },
+ {
+  "id": "room-e-202",
+  "custom": true,
+  "name": "Room E-202",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "Engineering Building",
+  "categories": [
+   "classrooms"
+  ],
+  "coords": [
+   78.7,
+   343.6
+  ]
  },
  {
   "id": "rs-101",
