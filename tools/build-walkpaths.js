@@ -13,15 +13,17 @@
  * Every routable line is a <path> keyed by its stroke. Each floor's drawing
  * has its own palette (see FLOORS below): one colour for that floor's
  * walkway and three for the stair chain that climbs up to it from the floor
- * below. The ground walkway is the one colour every drawing shares.
+ * below. The ground walkway is the one colour every drawing shares; the
+ * stair colours happen to be shared too, which is fine - which two floors a
+ * chain joins is decided by the file it is in, not by its colour.
  *
  *   ground   #1E1E1E walkway
  *   2nd      #B9B30C walkway   #047319 START > #BB7CBD stairs > #171AC5 FINISH
- *   3rd      #C4B50C walkway   #0A15DA START > #8E0891 stairs > #05930E FINISH
+ *   3rd      #960609 walkway   #047319 START > #BB7CBD stairs > #171AC5 FINISH
  *
  * So a ground-to-third route reads:
  *   #1E1E1E > #047319 > #BB7CBD > #171AC5 > #B9B30C
- *           > #0A15DA > #8E0891 > #05930E > #C4B50C
+ *           > #047319 > #BB7CBD > #171AC5 > #960609
  *
  * A stroke that is not in the palette of the drawing it appears in is ignored
  * - so an older storey left behind in a higher floor's export, in a colour
@@ -66,8 +68,8 @@ const FLOORS = [
   { file: 'groundFloor_layer.svg', name: 'Ground Floor', walkway: '#1E1E1E' },
   { file: 'secondFloor_layer.svg', name: '2nd Floor',    walkway: '#B9B30C',
     start: '#047319', stairs: '#BB7CBD', finish: '#171AC5' },
-  { file: 'thirdFloor_layer.svg',  name: '3rd Floor',    walkway: '#C4B50C',
-    start: '#0A15DA', stairs: '#8E0891', finish: '#05930E' }
+  { file: 'thirdFloor_layer.svg',  name: '3rd Floor',    walkway: '#960609',
+    start: '#047319', stairs: '#BB7CBD', finish: '#171AC5' }
 ];
 
 // What a stroke means in a given drawing. A file carries every walkway from

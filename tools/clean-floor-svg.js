@@ -23,7 +23,7 @@
  *
  * WHAT IT WILL NOT DO
  * An export missing a colour is reported, not repaired. A third-floor drawing
- * with no #C4B50C walkway or no #8E0891 stairs has lost the layer it needs, and
+ * with no #960609 walkway or no #BB7CBD stairs has lost the layer it needs, and
  * building the network from it would silently delete that floor - re-export it
  * with every routing layer visible instead.
  */
@@ -37,20 +37,21 @@ const ASSETS = path.join(ROOT, 'public', 'assets');
 const FLOORS = ['groundFloor_layer.svg', 'secondFloor_layer.svg', 'thirdFloor_layer.svg'];
 
 // Same palettes as build-walkpaths.js, flattened: any of these is a guide
-// line wherever it appears, so it is hidden in every drawing. #860808 is the
-// second floor's former walkway colour; the third-floor export still carries
-// a copy, and it stays invisible too.
+// line wherever it appears, so it is hidden in every drawing. The retired
+// colours are earlier exports' walkways and stair chains; a later export may
+// still carry a copy, and it stays invisible too.
 const ROUTING = {
   '1E1E1E': 'ground walkway',
   'B9B30C': '2nd-floor walkway',
-  '047319': '2nd-floor stair START',
-  'BB7CBD': '2nd-floor stairs / ramp',
-  '171AC5': '2nd-floor stair FINISH',
-  'C4B50C': '3rd-floor walkway',
-  '0A15DA': '3rd-floor stair START',
-  '8E0891': '3rd-floor stairs / ramp',
-  '05930E': '3rd-floor stair FINISH',
-  '860808': 'retired 2nd-floor walkway'
+  '960609': '3rd-floor walkway',
+  '047319': 'stair START',
+  'BB7CBD': 'stairs / ramp',
+  '171AC5': 'stair FINISH',
+  '860808': 'retired 2nd-floor walkway',
+  'C4B50C': 'retired 3rd-floor walkway',
+  '0A15DA': 'retired stair START',
+  '8E0891': 'retired stairs / ramp',
+  '05930E': 'retired stair FINISH'
 };
 
 // What each drawing must carry to be worth building from. The ground floor is
@@ -59,7 +60,7 @@ const ROUTING = {
 const EXPECTED = {
   'groundFloor_layer.svg': ['1E1E1E'],
   'secondFloor_layer.svg': ['1E1E1E', 'B9B30C', 'BB7CBD', '047319', '171AC5'],
-  'thirdFloor_layer.svg': ['1E1E1E', 'C4B50C', '8E0891', '0A15DA', '05930E']
+  'thirdFloor_layer.svg': ['1E1E1E', 'B9B30C', '960609', 'BB7CBD', '047319', '171AC5']
 };
 
 const args = process.argv.slice(2);
