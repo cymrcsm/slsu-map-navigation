@@ -485,6 +485,10 @@ function createMarker(loc) {
     riseOnHover: true
   });
   marker.on('click', () => {
+    // While a location is being added, the pins are scenery: opening one would
+    // swap the form out from under the user, and a tap meant for the spot
+    // picker next to a pin must not land on the pin instead.
+    if (!addView.classList.contains('hidden')) return;
     showLocationDetails(PLACES.find(p => p.id === loc.id) || loc);
   });
   markerFor.set(loc.id, marker);
