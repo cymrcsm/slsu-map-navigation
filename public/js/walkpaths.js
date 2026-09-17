@@ -9,7 +9,9 @@
 //
 // Each level holds its own nodes, so lines on different floors that overlap on
 // the page are unconnected. The links below are the only crossings, so the
-// only way up is  walkway > START > stairs > FINISH > walkway on the floor above.
+// only way up is  walkway > START > stairs > FINISH > walkway on the floor the
+// stair arrives at - normally the next one up; a stair drawn straight from the
+// ground to the third floor is one link that skips the second.
 //
 //   levels  display names; node[2] indexes into this
 //   nodes   [x, y, level] in map units

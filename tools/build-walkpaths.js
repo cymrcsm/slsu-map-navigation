@@ -349,8 +349,49 @@ function main() {
     }
   };
 
+  // Nearest point on a walkway line of one level to a point: the distance a
+  // stair mouth has to reach, measured to the corridor itself rather than its
+  // corners (see the mouth pass below for why that matters).
+  const walkwayEdges = () => edges.filter(([a, b]) => fromWalkway.has(a) && fromWalkway.has(b));
+  function nearestWalkway(P, level, skip) {
+    let best = null;
+    walkwayEdges().forEach(([a, b]) => {
+      if (nodes[a][2] !== level || a === skip || b === skip) return;
+      const x1 = nodes[a][0], y1 = nodes[a][1];
+      const dx = nodes[b][0] - x1, dy = nodes[b][1] - y1;
+      const len2 = dx * dx + dy * dy;
+      let t = len2 ? ((P[0] - x1) * dx + (P[1] - y1) * dy) / len2 : 0;
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const c = [x1 + t * dx, y1 + t * dy];
+      const d = dist(P, c);
+      if (!best || d < best.d) best = { d: d, at: c };
+    });
+    return best;
+  }
+
+  // Which floor a stair leaves from. A chain in a file arrives at that file's
+  // floor and departs from the highest floor below whose walkway is within
+  // reach of its foot - normally the floor immediately below. The nearest
+  // corridor cannot decide it: the third-floor drawing repeats the second
+  // floor's stairwells exactly, so every foot sits dead on a ground corridor
+  // as well as beside a second-floor one, and those stairs continue up from
+  // the second floor. A stair drawn straight from the ground to the third
+  // floor is the one with no second-floor walkway anywhere near its foot; it
+  // then links the ground to the third directly - ground walkway > START >
+  // stairs > FINISH > third-floor walkway, no second-floor walkway between.
+  // When no floor is within reach, the floor below is assumed and the mouth
+  // pass reports the stair as stranded.
+  function departureFloor(bottomPt, above) {
+    for (let lv = above - 1; lv >= 0; lv--) {
+      const near = nearestWalkway(bottomPt, lv);
+      if (near && near.d <= MAX_SNAP) return lv;
+    }
+    return above - 1;
+  }
+
+  const perPair = {};
   for (let fi = 1; fi < FLOORS.length; fi++) {
-    const below = fi - 1, above = fi;
+    const above = fi;
     const mine = all.filter(p => p.fi === fi);
     const starts = mine.filter(p => p.role === 'START');
     const finishes = mine.filter(p => p.role === 'FINISH');
@@ -376,6 +417,7 @@ function main() {
       const useFwd = fwd <= bwd;
       const bottomPt = useFwd ? A : B;
       const topPt = useFwd ? B : A;
+      const below = departureFloor(bottomPt, above);
       const startStub = useFwd ? sA.stub : sB.stub;
       const finishStub = useFwd ? fB.stub : fA.stub;
 
@@ -390,15 +432,20 @@ function main() {
       // stays one edge for the router; this is only what it looks like.
       const along = (useFwd ? run.pts : run.pts.slice().reverse())
         .map(q => [+q[0].toFixed(2), +q[1].toFixed(2)]);
+      // A stair that skips a floor climbs two storeys, and costs both.
+      const storeys = above - below;
       links.push([foot, head, isRamp ? 'ramp' : 'stair',
-                  isRamp ? RAMP_COST : STAIR_COST, run.id, along]);
+                  (isRamp ? RAMP_COST : STAIR_COST) * storeys, run.id, along]);
+      const pair = 'L' + below + ' -> L' + above;
+      perPair[pair] = (perPair[pair] || 0) + 1;
       made++;
     });
 
     console.log('');
-    console.log('Stairs in %s  ->  links level %d to %d', FLOORS[fi].file, below, above);
+    console.log('Stairs in %s  ->  links arriving at level %d', FLOORS[fi].file, above);
     console.log('  %d stairs polylines, %d became links', runs.length, made);
   }
+  console.log('  by floors joined: %s', Object.keys(perPair).map(k => perPair[k] + ' x ' + k).join(', ') || 'none');
 
   if (skipped.length) {
     console.log('');
@@ -422,26 +469,13 @@ function main() {
   // and an edge across to it; noding then splits the corridor at that node.
   let bridged = 0;
   const stranded = [];
-  const walkwayEdges = edges.filter(([a, b]) => fromWalkway.has(a) && fromWalkway.has(b));
 
   const mouths = [];
   links.forEach(l => { mouths.push(l[0]); mouths.push(l[1]); });
 
   [...new Set(mouths)].forEach(i => {
     const level = nodes[i][2];
-    const P = nodes[i];
-    let best = null;
-    walkwayEdges.forEach(([a, b]) => {
-      if (nodes[a][2] !== level || a === i || b === i) return;
-      const x1 = nodes[a][0], y1 = nodes[a][1];
-      const dx = nodes[b][0] - x1, dy = nodes[b][1] - y1;
-      const len2 = dx * dx + dy * dy;
-      let t = len2 ? ((P[0] - x1) * dx + (P[1] - y1) * dy) / len2 : 0;
-      t = t < 0 ? 0 : t > 1 ? 1 : t;
-      const c = [x1 + t * dx, y1 + t * dy];
-      const d = dist(P, c);
-      if (!best || d < best.d) best = { d: d, at: c };
-    });
+    const best = nearestWalkway(nodes[i], level, i);
     if (!best || best.d > MAX_SNAP) {
       stranded.push({ i: i, d: best ? best.d : Infinity, level: level });
       return;
@@ -684,7 +718,9 @@ ${FLOORS.map(f => '//   ' + f.name.padEnd(13) + f.walkway + ' walkway' +
 //
 // Each level holds its own nodes, so lines on different floors that overlap on
 // the page are unconnected. The links below are the only crossings, so the
-// only way up is  walkway > START > stairs > FINISH > walkway on the floor above.
+// only way up is  walkway > START > stairs > FINISH > walkway on the floor the
+// stair arrives at - normally the next one up; a stair drawn straight from the
+// ground to the third floor is one link that skips the second.
 //
 //   levels  display names; node[2] indexes into this
 //   nodes   [x, y, level] in map units
