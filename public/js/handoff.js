@@ -3,8 +3,8 @@
 // ==========================================
 // The "Take this on my phone" button (shown only once directions are on screen,
 // toggled from app.js) opens a modal with ONE QR at a time:
-//   web    <webUrl>/?d=<slug>&from=<x>,<y>   — public copy, needs phone internet
-//   local  <localUrl>/go/<slug>?from=<x>,<y> — this kiosk, over its Wi-Fi
+//   web    <webUrl>/?d=<slug>&from=<x>,<y>,<level>   — public copy, needs phone internet
+//   local  <localUrl>/go/<slug>?from=<x>,<y>,<level> — this kiosk, over its Wi-Fi
 // A link under the code swaps between them. Both URLs come from /api/config.
 // Loaded after app.js, so it reads app.js's script-scope state directly.
 
@@ -23,7 +23,9 @@
   fetch('api/config').then(r => r.json()).then(c => { cfg = c; }).catch(() => { /* offline dev */ });
 
   const clean = u => (u || '').replace(/\/+$/, '');
-  const from = () => kioskCoords[0] + ',' + kioskCoords[1];
+  // x,y and the floor the kiosk stands on; the phone page treats a missing
+  // third value as the ground floor.
+  const from = () => kioskCoords[0] + ',' + kioskCoords[1] + ',' + kioskLevel;
 
   function webUrlFor(loc) {
     const b = clean(cfg.webUrl);

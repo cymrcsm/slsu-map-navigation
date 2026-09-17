@@ -1,5 +1,5 @@
 // ==========================================
-// PHONE HAND-OFF  —  /go/<slug>?from=<x>,<y>[&sim=1]
+// PHONE HAND-OFF  —  /go/<slug>?from=<x>,<y>[,<level>][&sim=1]
 // ==========================================
 // A walking copy of the campus map for a visitor's phone: the chosen
 // destination pinned, the route from the kiosk, and a live GPS dot that follows
@@ -36,8 +36,13 @@ const slug = decodeURIComponent(
   params.get('d') || (location.pathname.split('/go/')[1] || '').split(/[/?#]/)[0] || ''
 );
 const ON_KIOSK = !!document.querySelector('meta[name="kiosk-hosted"]');
+// from=<x>,<y>[,<level>] - where the kiosk stands. The level is the floor it
+// is on (0 = ground); older codes carry only x,y and mean the ground floor.
 const fromParam = (params.get('from') || '').split(',').map(Number);
-let originXY = (fromParam.length === 2 && fromParam.every(Number.isFinite)) ? fromParam : null;
+let originXY = ((fromParam.length === 2 || fromParam.length === 3) && fromParam.every(Number.isFinite))
+  ? [fromParam[0], fromParam[1]] : null;
+const originLevel = (originXY && fromParam.length === 3 && Number.isInteger(fromParam[2]) && fromParam[2] >= 0)
+  ? fromParam[2] : 0;
 const SIM = params.get('sim') === '1';
 
 const statusEl = document.getElementById('status');
@@ -176,7 +181,7 @@ function applyFloorVisibility() {
     if (!want && map.hasLayer(layer)) map.removeLayer(layer);
   };
   show(destMarker, destLevel);
-  show(originMarker, 0);
+  show(originMarker, originLevel);
   show(meMarker, 0);
   show(meCircle, 0);
 }
@@ -242,7 +247,7 @@ function render() {
       icon: L.divIcon({ className: '', html: '<div class="kiosk-pin">' + PIN_TACK_ICON + '</div>', iconSize: [20, 20], iconAnchor: [10, 19] }),
       interactive: false
     }).addTo(map).bindTooltip('Kiosk', { direction: 'top' });
-    drawRoute(originXY, 'on foot from the kiosk');
+    drawRoute(originXY, 'on foot from the kiosk', originLevel);
     fitRoute();
   } else {
     map.setView(svgToLatLng(dest.coords), Z_FOLLOW);
@@ -257,10 +262,12 @@ function render() {
 }
 
 // --- routing -----------------------------------------------------------
-function drawRoute(fromXY, tail) {
+// fromLevel is the floor the start is on: the kiosk's own floor for the first
+// route, the ground floor for every GPS fix after it (the walker is outdoors).
+function drawRoute(fromXY, tail, fromLevel = 0) {
   routeGroup.clearLayers();
   routeParts = [];
-  const path = WalkRouting.findPath(fromXY, dest.coords, 0, destLevel);
+  const path = WalkRouting.findPath(fromXY, dest.coords, fromLevel, destLevel);
   currentPath = path;
 
   if (!path.length) {
@@ -282,7 +289,7 @@ function drawRoute(fromXY, tail) {
 
   const startGap = WalkRouting.dist(fromXY, path[0]);
   const endGap = WalkRouting.dist(path[path.length - 1], dest.coords);
-  [[fromXY, path[0], startGap, 0],
+  [[fromXY, path[0], startGap, fromLevel],
    [path[path.length - 1], dest.coords, endGap, destLevel]].forEach(hop => {
     if (hop[2] > 0.4 && hop[2] <= OFFPATH_LIMIT) {
       const layer = L.polyline([hop[0], hop[1]].map(svgToLatLng), {
@@ -294,7 +301,7 @@ function drawRoute(fromXY, tail) {
   applyRouteEmphasis();
 
   const walked = [];
-  if (startGap <= OFFPATH_LIMIT) walked.push([fromXY[0], fromXY[1], 0]);
+  if (startGap <= OFFPATH_LIMIT) walked.push([fromXY[0], fromXY[1], fromLevel]);
   path.forEach(p => walked.push(p));
   if (endGap <= OFFPATH_LIMIT) walked.push([dest.coords[0], dest.coords[1], destLevel]);
   const metres = Math.round(WalkRouting.walkMetres(walked, GEOREF.metresPerUnit));
@@ -421,7 +428,7 @@ document.addEventListener('visibilitychange', () => {
 // --- simulation: walk a synthetic point along the route --------------
 function startSim() {
   const seed = originXY || dest.coords;
-  const path = WalkRouting.findPath(seed, dest.coords, 0, destLevel);
+  const path = WalkRouting.findPath(seed, dest.coords, originXY ? originLevel : destLevel, destLevel);
   const line = (path.length ? [seed].concat(path, [dest.coords]) : [seed, dest.coords])
     .filter(p => WalkRouting.levelOf(p) === 0)
     .map(p => [p[0], p[1]]);

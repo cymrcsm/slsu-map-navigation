@@ -353,8 +353,16 @@ function readStoredKioskCoords() {
 }
 
 let kioskCoords = readStoredKioskCoords() || DEFAULT_KIOSK_COORDS;
-// The kiosk is installed on the ground floor; routes start there.
-const KIOSK_LEVEL = 0;
+
+// The floor the kiosk stands on: whichever floor was showing when its position
+// was set. Routes start there, so a kiosk placed on the second floor sends
+// people down the stairs to a ground-floor room - walkway > FINISH > stairs >
+// START > ground walkway - the same chain walked the other way.
+function readStoredKioskLevel() {
+  const n = Number(localStorage.getItem('kiosk_level'));
+  return Number.isInteger(n) && n >= 0 && n < FLOOR_ASSETS.length ? n : 0;
+}
+let kioskLevel = readStoredKioskLevel();
 let isSettingKioskLocation = false;
 let kioskMarker = null;
 
@@ -379,7 +387,7 @@ function renderKioskMarker() {
                             { permanent: true, direction: 'top', offset: [0, -12] });
   }
   // "You are here" is only true on the floor the kiosk stands on.
-  const shouldShow = activeLevel === KIOSK_LEVEL;
+  const shouldShow = activeLevel === kioskLevel;
   if (shouldShow && !map.hasLayer(kioskMarker)) kioskMarker.addTo(map);
   if (!shouldShow && map.hasLayer(kioskMarker)) map.removeLayer(kioskMarker);
 }
@@ -990,7 +998,7 @@ function drawRoute(destination, followDestination = false, refit = true) {
   if (followDestination && destLevel !== activeLevel) {
     setActiveLevel(destLevel, false);
   }
-  const path = findWalkingPath(kioskCoords, destination.coords, KIOSK_LEVEL, destLevel);
+  const path = findWalkingPath(kioskCoords, destination.coords, kioskLevel, destLevel);
 
   if (!path.length) {
     inspector.innerText = destination.name + ' — no drawn path reaches it';
@@ -1020,7 +1028,7 @@ function drawRoute(destination, followDestination = false, refit = true) {
   // The hops on and off the network belong to a floor as much as the walk does,
   // so they fade with it - otherwise the stub at the kiosk stays bright over a
   // ground-floor leg that has been dimmed down to a third of it.
-  [[kioskCoords, path[0], startGap, KIOSK_LEVEL],
+  [[kioskCoords, path[0], startGap, kioskLevel],
    [path[path.length - 1], destination.coords, endGap, destLevel]].forEach(hop => {
     if (hop[2] > 0.4 && hop[2] <= OFFPATH_LIMIT) {
       activeRouteLayers.push(L.polyline([hop[0], hop[1]].map(toLeafletCoords), {
@@ -1031,7 +1039,7 @@ function drawRoute(destination, followDestination = false, refit = true) {
   });
 
   const walked = [];
-  if (startGap <= OFFPATH_LIMIT) walked.push([kioskCoords[0], kioskCoords[1], KIOSK_LEVEL]);
+  if (startGap <= OFFPATH_LIMIT) walked.push([kioskCoords[0], kioskCoords[1], kioskLevel]);
   path.filter(p => p[3] !== 'stair').forEach(p => walked.push(p));
   if (endGap <= OFFPATH_LIMIT) walked.push([destination.coords[0], destination.coords[1], destLevel]);
 
@@ -1121,11 +1129,14 @@ map.on('click', (e) => {
 
   if (isSettingKioskLocation) {
     kioskCoords = [x, y];
+    // The floor on screen is the floor the kiosk is being placed on.
+    kioskLevel = activeLevel;
     localStorage.setItem('kiosk_coords', JSON.stringify(kioskCoords));
+    localStorage.setItem('kiosk_level', String(kioskLevel));
     renderKioskMarker();
     isSettingKioskLocation = false;
     setKioskBtn.classList.remove('active-placement');
-    inspector.innerText = `Kiosk position updated to: [${x}, ${y}]`;
+    inspector.innerText = `Kiosk position updated to: [${x}, ${y}] on ${LEVELS[kioskLevel] || 'this floor'}`;
     if (activeRouteLayers.length && activeSelectedLocation) drawRoute(activeSelectedLocation);
     return;
   }
