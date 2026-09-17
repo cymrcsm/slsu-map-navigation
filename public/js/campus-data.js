@@ -11,7 +11,7 @@
 //   LOCATIONS   id, name, acronym, building, categories, floor, hours, coords,
 //               textH (label height hint), description
 //
-// 268 locations (2nd Floor: 9, 3rd Floor: 1, Ground Floor: 258),
+// 269 locations (2nd Floor: 9, 3rd Floor: 2, Ground Floor: 258),
 // 16 categories.
 const CATEGORIES = [
   {
@@ -3269,6 +3269,21 @@ const LOCATIONS = [
   ],
   "textH": 0.73,
   "description": "Campus location."
+ },
+ {
+  "id": "open-space",
+  "custom": true,
+  "name": "Open Space",
+  "acronym": "",
+  "floor": "3rd Floor",
+  "building": "SLSU Main Campus",
+  "categories": [
+   "sports-recreation"
+  ],
+  "coords": [
+   243.1,
+   66
+  ]
  },
  {
   "id": "parking-area",
