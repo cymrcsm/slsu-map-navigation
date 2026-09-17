@@ -36,14 +36,21 @@ const ASSETS = path.join(ROOT, 'public', 'assets');
 
 const FLOORS = ['groundFloor_layer.svg', 'secondFloor_layer.svg', 'thirdFloor_layer.svg'];
 
-// Same scheme as build-walkpaths.js.
+// Same palettes as build-walkpaths.js, flattened: any of these is a guide
+// line wherever it appears, so it is hidden in every drawing. #860808 is the
+// second floor's former walkway colour; the third-floor export still carries
+// a copy, and it stays invisible too.
 const ROUTING = {
   '1E1E1E': 'ground walkway',
-  '860808': '2nd-floor walkway',
+  'B9B30C': '2nd-floor walkway',
+  '047319': '2nd-floor stair START',
+  'BB7CBD': '2nd-floor stairs / ramp',
+  '171AC5': '2nd-floor stair FINISH',
   'C4B50C': '3rd-floor walkway',
-  '0A15DA': 'stair START',
-  '8E0891': 'stairs / ramp',
-  '05930E': 'stair FINISH'
+  '0A15DA': '3rd-floor stair START',
+  '8E0891': '3rd-floor stairs / ramp',
+  '05930E': '3rd-floor stair FINISH',
+  '860808': 'retired 2nd-floor walkway'
 };
 
 // What each drawing must carry to be worth building from. The ground floor is
@@ -51,8 +58,8 @@ const ROUTING = {
 // drawn in the file above, which is the file that owns that link.
 const EXPECTED = {
   'groundFloor_layer.svg': ['1E1E1E'],
-  'secondFloor_layer.svg': ['860808', '8E0891', '0A15DA', '05930E'],
-  'thirdFloor_layer.svg': ['C4B50C', '8E0891', '0A15DA', '05930E']
+  'secondFloor_layer.svg': ['1E1E1E', 'B9B30C', 'BB7CBD', '047319', '171AC5'],
+  'thirdFloor_layer.svg': ['1E1E1E', 'C4B50C', '8E0891', '0A15DA', '05930E']
 };
 
 const args = process.argv.slice(2);
@@ -114,8 +121,10 @@ targets.forEach(name => {
 
   if (CHECK_ONLY) { console.log(''); return; }
 
-  svg = svg.replace(/<rect(\s+width="320"\s+height="570"\s+)fill="(?!none)[^"]*"\s*\/>/g,
-                    (m, gap) => '<rect' + gap + 'fill="none"/>');
+  // The frame fill may carry a pattern image at half opacity, so any attributes
+  // after the fill are kept; only the fill itself is turned off.
+  svg = svg.replace(/<rect(\s+width="320"\s+height="570"\s+)fill="(?!none)[^"]*"([^>]*)\/>/g,
+                    (m, gap, rest) => '<rect' + gap + 'fill="none"' + rest + '/>');
   svg = svg.replace(/<path\b[^>]*>/g, tag => {
     const m = /stroke="#([0-9A-Fa-f]{6})"/.exec(tag);
     if (!m || !ROUTING[m[1].toUpperCase()]) return tag;

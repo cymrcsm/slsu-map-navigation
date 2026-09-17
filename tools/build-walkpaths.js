@@ -10,21 +10,26 @@
  *   public/assets/thirdFloor_layer.svg    level 2
  *
  * THE COLOUR SCHEME
- * Every routable line is a <path> keyed by its stroke. Walkways carry one
- * colour per floor; the three stair colours describe the journey between two
- * floors and are reused on every storey:
+ * Every routable line is a <path> keyed by its stroke. Each floor's drawing
+ * has its own palette (see FLOORS below): one colour for that floor's
+ * walkway and three for the stair chain that climbs up to it from the floor
+ * below. The ground walkway is the one colour every drawing shares.
  *
- *   #1E1E1E  ground walkway        #0A15DA  stair START  (walkway -> stairs)
- *   #860808  second-floor walkway  #8E0891  stairs / ramp
- *   #C4B50C  third-floor walkway   #05930E  stair FINISH (stairs -> walkway)
+ *   ground   #1E1E1E walkway
+ *   2nd      #B9B30C walkway   #047319 START > #BB7CBD stairs > #171AC5 FINISH
+ *   3rd      #C4B50C walkway   #0A15DA START > #8E0891 stairs > #05930E FINISH
  *
  * So a ground-to-third route reads:
- *   #1E1E1E > #0A15DA > #8E0891 > #05930E > #860808
+ *   #1E1E1E > #047319 > #BB7CBD > #171AC5 > #B9B30C
  *           > #0A15DA > #8E0891 > #05930E > #C4B50C
  *
+ * A stroke that is not in the palette of the drawing it appears in is ignored
+ * - so an older storey left behind in a higher floor's export, in a colour
+ * that floor no longer uses, cannot leak into the network.
+ *
  * WHICH TWO FLOORS A STAIR JOINS
- * The stair colours cannot say, because they are identical on every storey,
- * and the floors are drawn stacked on one coordinate plane so a stub near a
+ * The stair colours cannot say on their own - a palette may be reused - and
+ * the floors are drawn stacked on one coordinate plane so a stub near a
  * stairwell sits within a unit of all three floors' walkways at once. The
  * source file decides instead: each floor's drawing carries the chain that
  * ARRIVES at that floor, so a chain found in thirdFloor_layer.svg links
@@ -54,25 +59,30 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const OUT = path.join(ROOT, 'public', 'js', 'walkpaths.js');
 
+// Each floor's palette. `walkway` is that floor's corridor colour; start,
+// stairs and finish are the chain that arrives at this floor from the one
+// below, so the ground floor has none.
 const FLOORS = [
   { file: 'groundFloor_layer.svg', name: 'Ground Floor', walkway: '#1E1E1E' },
-  { file: 'secondFloor_layer.svg', name: '2nd Floor',    walkway: '#860808' },
-  { file: 'thirdFloor_layer.svg',  name: '3rd Floor',    walkway: '#C4B50C' }
+  { file: 'secondFloor_layer.svg', name: '2nd Floor',    walkway: '#B9B30C',
+    start: '#047319', stairs: '#BB7CBD', finish: '#171AC5' },
+  { file: 'thirdFloor_layer.svg',  name: '3rd Floor',    walkway: '#C4B50C',
+    start: '#0A15DA', stairs: '#8E0891', finish: '#05930E' }
 ];
 
-const STAIR_START  = '#0A15DA';
-const STAIR_RUN    = '#8E0891';
-const STAIR_FINISH = '#05930E';
-
-const WALKWAY_LEVEL = {};
-FLOORS.forEach((f, i) => { WALKWAY_LEVEL[f.walkway] = i; });
-
-const ROLE = {};
-ROLE[STAIR_START] = 'START';
-ROLE[STAIR_RUN] = 'STAIRS';
-ROLE[STAIR_FINISH] = 'FINISH';
-
-const KNOWN = new Set(Object.keys(WALKWAY_LEVEL).concat(Object.keys(ROLE)));
+// What a stroke means in a given drawing. A file carries every walkway from
+// the ground up to its own floor (each export is the one below it plus the
+// new storey) and only its own stair chain. Anything else is not routing.
+function meaningIn(fi, stroke) {
+  for (let j = 0; j <= fi; j++) {
+    if (FLOORS[j].walkway === stroke) return { level: j };
+  }
+  const f = FLOORS[fi];
+  if (stroke === f.start) return { role: 'START' };
+  if (stroke === f.stairs) return { role: 'STAIRS' };
+  if (stroke === f.finish) return { role: 'FINISH' };
+  return null;
+}
 
 // Two points this close are the same junction, and a line passing this close to
 // a point is noded into it. Figma rarely lands endpoints on exactly the same
@@ -200,7 +210,8 @@ function readAll() {
     while ((m = re.exec(svg)) !== null) {
       const a = m[1];
       const stroke = (attr(a, 'stroke') || '').toUpperCase();
-      if (!KNOWN.has(stroke)) continue;
+      const meaning = meaningIn(fi, stroke);
+      if (!meaning) continue;
 
       const d = attr(a, 'd');
       if (!d) continue;
@@ -212,7 +223,7 @@ function readAll() {
       // Walkways are compared building-wide, stair chains only against the
       // rest of their own file, so a re-exported stairwell survives to serve
       // the storey above as well.
-      const scope = ROLE[stroke] ? fi + '|' : '';
+      const scope = meaning.role ? fi + '|' : '';
 
       subpaths(d).forEach(pts => {
         const round = pts.map(p => [+p[0].toFixed(2), +p[1].toFixed(2)]);
@@ -220,7 +231,8 @@ function readAll() {
         const rev = scope + stroke + '|' + JSON.stringify(round.slice().reverse());
         if (seen.has(fwd) || seen.has(rev)) { dup++; return; }
         seen.add(fwd);
-        out.push({ fi: fi, file: floor.file, id: id, stroke: stroke, pts: pts });
+        out.push({ fi: fi, file: floor.file, id: id, stroke: stroke, pts: pts,
+                   level: meaning.level, role: meaning.role });
         kept++;
       });
     }
@@ -290,8 +302,8 @@ function main() {
   const fromWalkway = new Set();
 
   const perLevel = FLOORS.map(() => 0);
-  all.filter(p => WALKWAY_LEVEL[p.stroke] !== undefined).forEach(p => {
-    const level = WALKWAY_LEVEL[p.stroke];
+  all.filter(p => p.level !== undefined).forEach(p => {
+    const level = p.level;
     perLevel[level]++;
     let prev = nodeFor(p.pts[0], level);
     fromWalkway.add(prev);
@@ -328,9 +340,9 @@ function main() {
   for (let fi = 1; fi < FLOORS.length; fi++) {
     const below = fi - 1, above = fi;
     const mine = all.filter(p => p.fi === fi);
-    const starts = mine.filter(p => p.stroke === STAIR_START);
-    const finishes = mine.filter(p => p.stroke === STAIR_FINISH);
-    const runs = mine.filter(p => p.stroke === STAIR_RUN);
+    const starts = mine.filter(p => p.role === 'START');
+    const finishes = mine.filter(p => p.role === 'FINISH');
+    const runs = mine.filter(p => p.role === 'STAIRS');
 
     const nearestStub = (pt, list) => {
       let best = Infinity, hit = null;
@@ -385,27 +397,48 @@ function main() {
   // ---- tie each stair mouth to its floor's walkway ------------------------
   // A START or FINISH stub is drawn towards the corridor it serves but does not
   // always reach it, which would leave the stair a two-node island. Bridge each
-  // mouth to the nearest walkway node on its own floor. MAX_SNAP bounds how far
-  // that reach may be, so a stair drawn nowhere near a corridor is reported
-  // rather than wired to whatever happened to be closest.
+  // mouth to the nearest point on a walkway line on its own floor. MAX_SNAP
+  // bounds how far that reach may be, so a stair drawn nowhere near a corridor
+  // is reported rather than wired to whatever happened to be closest.
+  //
+  // Measured to the line, not to its corners. A corridor is one long segment
+  // between the points where it turns, so a stair foot sitting right on it is
+  // usually many units from either end - measured corner-to-corner that foot
+  // read as stranded and the stair was thrown away. A mouth within SNAP of the
+  // line needs nothing here: the noding pass below splits the corridor at it.
+  // One further out gets a node placed on the corridor where it is nearest,
+  // and an edge across to it; noding then splits the corridor at that node.
   let bridged = 0;
   const stranded = [];
-  const walkwayNodes = [];
-  nodes.forEach((n, i) => { if (fromWalkway.has(i)) walkwayNodes.push(i); });
+  const walkwayEdges = edges.filter(([a, b]) => fromWalkway.has(a) && fromWalkway.has(b));
 
   const mouths = [];
   links.forEach(l => { mouths.push(l[0]); mouths.push(l[1]); });
 
   [...new Set(mouths)].forEach(i => {
     const level = nodes[i][2];
-    let best = -1, bestD = Infinity;
-    walkwayNodes.forEach(w => {
-      if (nodes[w][2] !== level || w === i) return;
-      const d = dist(nodes[w], nodes[i]);
-      if (d < bestD) { bestD = d; best = w; }
+    const P = nodes[i];
+    let best = null;
+    walkwayEdges.forEach(([a, b]) => {
+      if (nodes[a][2] !== level || a === i || b === i) return;
+      const x1 = nodes[a][0], y1 = nodes[a][1];
+      const dx = nodes[b][0] - x1, dy = nodes[b][1] - y1;
+      const len2 = dx * dx + dy * dy;
+      let t = len2 ? ((P[0] - x1) * dx + (P[1] - y1) * dy) / len2 : 0;
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const c = [x1 + t * dx, y1 + t * dy];
+      const d = dist(P, c);
+      if (!best || d < best.d) best = { d: d, at: c };
     });
-    if (best < 0 || bestD > MAX_SNAP) { stranded.push({ i: i, d: bestD, level: level }); return; }
-    if (bestD > SNAP) { addEdge(i, best); bridged++; }
+    if (!best || best.d > MAX_SNAP) {
+      stranded.push({ i: i, d: best ? best.d : Infinity, level: level });
+      return;
+    }
+    if (best.d <= SNAP) return;
+    const on = nodeFor(best.at, level);
+    fromWalkway.add(on);
+    addEdge(i, on);
+    bridged++;
   });
 
   console.log('');
@@ -632,11 +665,10 @@ function main() {
   const out = `// GENERATED FILE - do not edit by hand.
 // Built by tools/build-walkpaths.js from the floor artwork.
 //
-// Walkable lines are <path> elements keyed by stroke:
+// Walkable lines are <path> elements keyed by stroke, one palette per floor:
 //
-//   #1E1E1E  ground walkway        #0A15DA  stair START  (walkway -> stairs)
-//   #860808  second-floor walkway  #8E0891  stairs / ramp
-//   #C4B50C  third-floor walkway   #05930E  stair FINISH (stairs -> walkway)
+${FLOORS.map(f => '//   ' + f.name.padEnd(13) + f.walkway + ' walkway' +
+    (f.start ? '   ' + f.start + ' START > ' + f.stairs + ' stairs > ' + f.finish + ' FINISH' : '')).join('\n')}
 //
 // Each level holds its own nodes, so lines on different floors that overlap on
 // the page are unconnected. The links below are the only crossings, so the
