@@ -11,7 +11,7 @@
 //   LOCATIONS   id, name, acronym, building, categories, floor, hours, coords,
 //               textH (label height hint), description
 //
-// 263 locations (2nd Floor: 4, 3rd Floor: 1, Ground Floor: 258),
+// 264 locations (2nd Floor: 5, 3rd Floor: 1, Ground Floor: 258),
 // 16 categories.
 const CATEGORIES = [
   {
@@ -1857,7 +1857,7 @@ const LOCATIONS = [
   "id": "ict-1",
   "name": "ICT-1",
   "acronym": "ICT-1",
-  "building": "SLSU Main Campus",
+  "building": "Faculty of Computing and Information Sciences (FCIS) Building",
   "categories": [
    "classrooms"
   ],
@@ -1865,7 +1865,7 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    157.5,
-   427.8
+   427.9
   ],
   "textH": 0.58,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1874,7 +1874,7 @@ const LOCATIONS = [
   "id": "ict-2",
   "name": "ICT-2",
   "acronym": "ICT-2",
-  "building": "SLSU Main Campus",
+  "building": "Faculty of Computing and Information Sciences (FCIS) Building",
   "categories": [
    "classrooms"
   ],
@@ -1882,7 +1882,7 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    163.8,
-   427.8
+   427.9
   ],
   "textH": 0.61,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1891,14 +1891,14 @@ const LOCATIONS = [
   "id": "ict-201",
   "custom": true,
   "name": "ICT-201",
-  "acronym": "",
+  "acronym": "ICT-201",
   "floor": "2nd Floor",
-  "building": "SLSU Main Campus",
+  "building": "Faculty of Computing and Information Sciences (FCIS) Building",
   "categories": [
    "classrooms"
   ],
   "coords": [
-   134.7,
+   134.6,
    428.4
   ]
  },
@@ -3579,6 +3579,21 @@ const LOCATIONS = [
   ],
   "textH": 0.38,
   "description": "Parking bay or transit waiting area."
+ },
+ {
+  "id": "pascom-office",
+  "custom": true,
+  "name": "PASCOM office",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "Administration Building",
+  "categories": [
+   "admin-offices"
+  ],
+  "coords": [
+   200.4,
+   428.3
+  ]
  },
  {
   "id": "pe-room",
