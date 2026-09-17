@@ -1099,6 +1099,7 @@
 <path id="Vector 175" d="M180.5 351V352" stroke="#047319" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 176" d="M178.5 353V352" stroke="#171AC5" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 177" d="M178.5 352V348" stroke="#B9B30C" stroke-opacity="0"/>
+<path id="Vector 203" d="M178.5 352H180.5" stroke="#B9B30C" stroke-opacity="0"/>
 <path id="Vector 178" d="M91 151L84 150" stroke="#BB7CBD" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 179" d="M91.5 151L88 150.5" stroke="#047319" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 180" d="M85 150H84V149" stroke="#171AC5" stroke-width="0.5" stroke-opacity="0"/>
@@ -1113,6 +1114,7 @@
 <path id="Vector 189" d="M255.5 65V64" stroke="#047319" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 190" d="M256.5 67V68" stroke="#171AC5" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 191" d="M229 68.5H257H257.5M258 68.5H257.5M257.5 68.5V70" stroke="#B9B30C" stroke-opacity="0"/>
+<path id="Vector 202" d="M229.5 68.5V63" stroke="#B9B30C" stroke-opacity="0"/>
 <path id="Vector 192" d="M262 277.5H266.5V275.5H261" stroke="#BB7CBD" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 193" d="M262 277.5H263" stroke="#047319" stroke-width="0.5" stroke-opacity="0"/>
 <path id="Vector 194" d="M261 275.5H260" stroke="#171AC5" stroke-width="0.5" stroke-opacity="0"/>
