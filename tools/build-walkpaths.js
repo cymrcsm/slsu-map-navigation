@@ -309,16 +309,9 @@ function main() {
     edges.push([a, b]);
   };
 
-  // Which nodes are corridor, as opposed to stair stub, and which edges. A
-  // stair mouth is only allowed to reach for one of these.
-  //
-  // The edges are tracked by name rather than worked out from the nodes: once
-  // a stub is noded into a corridor, the corridor is two edges each with one
-  // stub end, and testing "both ends are corridor nodes" would stop seeing it
-  // as a corridor at all. The pieces inherit the whole.
+  // Which nodes are corridor, as opposed to stair stub. A stair mouth is only
+  // allowed to reach for one of these.
   const fromWalkway = new Set();
-  const walkwayEdge = new Set();
-  const edgeKey = (a, b) => (a < b ? a + ':' + b : b + ':' + a);
 
   const perLevel = FLOORS.map(() => 0);
   all.filter(p => p.level !== undefined).forEach(p => {
@@ -330,7 +323,6 @@ function main() {
       const cur = nodeFor(p.pts[i], level);
       fromWalkway.add(cur);
       addEdge(prev, cur);
-      walkwayEdge.add(edgeKey(prev, cur));
       prev = cur;
     }
   });
@@ -342,9 +334,6 @@ function main() {
   // ---- stair chains: START > STAIRS > FINISH ------------------------------
   const links = [];
   const skipped = [];
-  // Enough about each link to recognise the same drawn stairwell in the file
-  // above: its run, rounded, either way round.
-  const madeLinks = [];
 
   // A stub is walkable on the floor it serves: the START leads off the lower
   // walkway to the foot of the stairs, the FINISH leads from the head of the
@@ -363,7 +352,7 @@ function main() {
   // Nearest point on a walkway line of one level to a point: the distance a
   // stair mouth has to reach, measured to the corridor itself rather than its
   // corners (see the mouth pass below for why that matters).
-  const walkwayEdges = () => edges.filter(([a, b]) => walkwayEdge.has(edgeKey(a, b)));
+  const walkwayEdges = () => edges.filter(([a, b]) => fromWalkway.has(a) && fromWalkway.has(b));
   // A walkway line the mouth is already an endpoint of counts, and counts as
   // zero: a stair whose foot is drawn on the end of a walkway spur needs no
   // bridge, and skipping those edges made it look adrift - the nearest OTHER
@@ -454,10 +443,6 @@ function main() {
                   (isRamp ? RAMP_COST : STAIR_COST) * storeys, run.id, along]);
       const pair = 'L' + below + ' -> L' + above;
       perPair[pair] = (perPair[pair] || 0) + 1;
-      const fwdKey = JSON.stringify(along);
-      const revKey = JSON.stringify(along.slice().reverse());
-      madeLinks.push({ foot: foot, head: head, below: below, above: above,
-                       run: fwdKey < revKey ? fwdKey : revKey });
       made++;
     });
 
@@ -467,155 +452,50 @@ function main() {
   }
   console.log('  by floors joined: %s', Object.keys(perPair).map(k => perPair[k] + ' x ' + k).join(', ') || 'none');
 
-  // ---- the landing a stairwell passes through ----------------------------
-  // A stairwell drawn once serves every storey it passes: the same symbol is
-  // the flight from the ground to the second floor and again from the second
-  // to the third. On the second floor, then, the lower flight arrives at the
-  // head of the run and the upper flight leaves from its foot - two ends of
-  // one drawn stair, a few units apart in plan, with no line between them,
-  // because the artwork draws the stairwell once rather than once per storey.
-  //
-  // They are joined here, on that floor. Without it every upper flight looks
-  // adrift - its foot is out in the stairwell, nowhere near that floor's
-  // corridor - and the stair-mouth pass invents a line across the floor to
-  // the nearest corridor instead. This is the stairwell's own geometry, not a
-  // new line: the two ends belong to the same drawn run.
-  let landings = 0;
-  madeLinks.forEach(lower => {
-    madeLinks.forEach(upper => {
-      if (lower === upper || lower.run !== upper.run) return;
-      if (lower.above !== upper.below) return;
-      if (lower.head === upper.foot) return;
-      addEdge(lower.head, upper.foot);
-      landings++;
-    });
-  });
-  if (landings) {
-    console.log('');
-    console.log('%d stairwell(s) joined across the floor they pass through', landings);
-  }
-
   if (skipped.length) {
     console.log('');
     console.log('  %d stairs polylines had no START/FINISH pair within %d units', skipped.length, CHAIN_GAP);
     console.log('    (these are the treads drawn inside each stair symbol - correctly ignored)');
   }
 
-  // ---- node the segments -------------------------------------------------
-  // Corridors in the artwork meet mid-segment as often as at a shared vertex,
-  // and a stair stub almost always lands partway along the walkway it joins.
-  // Snapping vertex-to-vertex cannot see those crossings, so the two lines
-  // touch on the page and stay strangers in the graph. Split every segment
-  // that passes within SNAP of a node on its own level.
-  //
-  // Run before the stair-mouth pass, so that pass can see which stubs the
-  // drawing has already joined to a corridor, and again after it, so a
-  // corridor is split at whatever that pass had to add.
-  function nodeSegments(label) {
-    const byLevel = {};
-    nodes.forEach((n, i) => { (byLevel[n[2]] = byLevel[n[2]] || []).push(i); });
-
-    const split = [];
-    edges.forEach(([a, b]) => {
-      const A = nodes[a], B = nodes[b];
-      const dx = B[0] - A[0], dy = B[1] - A[1];
-      const len2 = dx * dx + dy * dy;
-      if (!len2) { split.push([a, b]); return; }
-
-      const hits = [];
-      (byLevel[A[2]] || []).forEach(i => {
-        if (i === a || i === b) return;
-        const P = nodes[i];
-        const t = ((P[0] - A[0]) * dx + (P[1] - A[1]) * dy) / len2;
-        if (t <= 0 || t >= 1) return;
-        if (Math.hypot(P[0] - (A[0] + t * dx), P[1] - (A[1] + t * dy)) > SNAP) return;
-        hits.push({ i: i, t: t });
-      });
-
-      if (!hits.length) { split.push([a, b]); return; }
-      hits.sort((p, q) => p.t - q.t);
-      const wasWalkway = walkwayEdge.has(edgeKey(a, b));
-      const piece = (x, y) => {
-        split.push([x, y]);
-        if (wasWalkway) { walkwayEdge.add(edgeKey(x, y)); fromWalkway.add(x); fromWalkway.add(y); }
-      };
-      let prev = a;
-      hits.forEach(h => { piece(prev, h.i); prev = h.i; });
-      piece(prev, b);
-    });
-
-    const before = edges.length;
-    edges.length = 0;
-    edgeSeen.clear();
-    split.forEach(([a, b]) => addEdge(a, b));
-      console.log('Noding %s: %d segments -> %d after splitting at touch points',
-                label, before, edges.length);
-  }
-
-  console.log('');
-  nodeSegments('the drawn lines');
   // ---- tie each stair mouth to its floor's walkway ------------------------
-  // A START or FINISH stub is drawn towards the corridor it serves, and the
-  // noding pass above has just joined it wherever it touches one. A mouth
-  // that reaches a walkway that way needs nothing here, however far the stair
-  // head itself is from the corridor - the walk goes along the stub, which is
-  // a drawn line. Measuring from the head instead was what put an invented
-  // line beside half the stairs on campus: the head sits a unit or two back
-  // from the corridor its stub already reaches, and that gap looked like a
-  // stair adrift.
+  // A START or FINISH stub is drawn towards the corridor it serves but does not
+  // always reach it, which would leave the stair a two-node island. Bridge each
+  // mouth to the nearest point on a walkway line on its own floor. MAX_SNAP
+  // bounds how far that reach may be, so a stair drawn nowhere near a corridor
+  // is reported rather than wired to whatever happened to be closest.
   //
-  // Only a stair the drawing genuinely leaves adrift is bridged, and then
-  // from the end of its own stub - the point drawn towards the corridor - by
-  // the shortest line that reaches one, within MAX_SNAP. Anything further is
-  // reported, and its link dropped, rather than wired to whatever was closest.
+  // Measured to the line, not to its corners. A corridor is one long segment
+  // between the points where it turns, so a stair foot sitting right on it is
+  // usually many units from either end - measured corner-to-corner that foot
+  // read as stranded and the stair was thrown away. A mouth within SNAP of the
+  // line needs nothing here: the noding pass below splits the corridor at it.
+  // One further out gets a node placed on the corridor where it is nearest,
+  // and an edge across to it; noding then splits the corridor at that node.
   let bridged = 0;
   const stranded = [];
-
-  const adjEdges = nodes.map(() => []);
-  edges.forEach(([a, b]) => { adjEdges[a].push(b); adjEdges[b].push(a); });
-  const nbrs = i => adjEdges[i] || (adjEdges[i] = []);
-
-  // Everything the drawn lines join to this node. Edges never change level,
-  // so a group is always one floor; only links cross, and they are not here.
-  function drawnGroup(start) {
-    const seen = new Set([start]);
-    const stack = [start];
-    while (stack.length) {
-      const c = stack.pop();
-      nbrs(c).forEach(k => { if (!seen.has(k)) { seen.add(k); stack.push(k); } });
-    }
-    return seen;
-  }
 
   const mouths = [];
   links.forEach(l => { mouths.push(l[0]); mouths.push(l[1]); });
 
   [...new Set(mouths)].forEach(i => {
     const level = nodes[i][2];
-    const group = drawnGroup(i);
-    for (const n of group) if (fromWalkway.has(n)) return;
-
-    let best = null;
-    group.forEach(n => {
-      const near = nearestWalkway(nodes[n], level);
-      if (near && (!best || near.d < best.d)) best = { d: near.d, at: near.at, from: n };
-    });
+    const best = nearestWalkway(nodes[i], level);
     if (!best || best.d > MAX_SNAP) {
       stranded.push({ i: i, d: best ? best.d : Infinity, level: level });
       return;
     }
+    if (best.d <= SNAP) return;
     const on = nodeFor(best.at, level);
     fromWalkway.add(on);
-    addEdge(best.from, on);
-    walkwayEdge.add(edgeKey(best.from, on));
-    nbrs(best.from).push(on);
-    nbrs(on).push(best.from);
+    addEdge(i, on);
     bridged++;
   });
 
   console.log('');
-  console.log('Stair mouths: %d needed a line the drawing does not have, %d stranded beyond %d units',
+  console.log('Stair mouths: %d bridged to a walkway, %d stranded beyond %d units',
               bridged, stranded.length, MAX_SNAP);
+
   // ---- drop the storeys a stairwell does not actually serve ---------------
   // Every stairwell is offered to the floor above, because the drawings repeat
   // it. Only the ones the floor above answers with a walkway are real: a mouth
@@ -640,8 +520,45 @@ function main() {
   stranded.forEach(s => console.warn('  ! stair mouth on L%d is %s units from any walkway',
                                      s.level, s.d === Infinity ? 'inf' : s.d.toFixed(1)));
 
+  // ---- node the segments -------------------------------------------------
+  // Corridors in the artwork meet mid-segment as often as at a shared vertex,
+  // and a stair stub almost always lands partway along the walkway it joins.
+  // Snapping vertex-to-vertex cannot see those crossings, so the two lines
+  // touch on the page and stay strangers in the graph. Split every segment
+  // that passes within SNAP of a node on its own level.
+  const byLevel = {};
+  nodes.forEach((n, i) => { (byLevel[n[2]] = byLevel[n[2]] || []).push(i); });
 
-  nodeSegments('after bridging');
+  const split = [];
+  edges.forEach(([a, b]) => {
+    const A = nodes[a], B = nodes[b];
+    const dx = B[0] - A[0], dy = B[1] - A[1];
+    const len2 = dx * dx + dy * dy;
+    if (!len2) { split.push([a, b]); return; }
+
+    const hits = [];
+    (byLevel[A[2]] || []).forEach(i => {
+      if (i === a || i === b) return;
+      const P = nodes[i];
+      const t = ((P[0] - A[0]) * dx + (P[1] - A[1]) * dy) / len2;
+      if (t <= 0 || t >= 1) return;
+      if (Math.hypot(P[0] - (A[0] + t * dx), P[1] - (A[1] + t * dy)) > SNAP) return;
+      hits.push({ i: i, t: t });
+    });
+
+    if (!hits.length) { split.push([a, b]); return; }
+    hits.sort((p, q) => p.t - q.t);
+    let prev = a;
+    hits.forEach(h => { split.push([prev, h.i]); prev = h.i; });
+    split.push([prev, b]);
+  });
+
+  const before = edges.length;
+  edges.length = 0;
+  edgeSeen.clear();
+  split.forEach(([a, b]) => addEdge(a, b));
+  console.log('');
+  console.log('Noding: %d segments -> %d after splitting at touch points', before, edges.length);
 
   // ---- report fragments the drawing left short ----------------------------
   // Noding joins lines that touch. A corridor drawn a metre shy of the one it
