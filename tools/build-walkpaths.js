@@ -353,10 +353,15 @@ function main() {
   // stair mouth has to reach, measured to the corridor itself rather than its
   // corners (see the mouth pass below for why that matters).
   const walkwayEdges = () => edges.filter(([a, b]) => fromWalkway.has(a) && fromWalkway.has(b));
-  function nearestWalkway(P, level, skip) {
+  // A walkway line the mouth is already an endpoint of counts, and counts as
+  // zero: a stair whose foot is drawn on the end of a walkway spur needs no
+  // bridge, and skipping those edges made it look adrift - the nearest OTHER
+  // corridor was six units off, close enough to bridge, and the route then cut
+  // across open ground to the stair instead of walking the spur.
+  function nearestWalkway(P, level) {
     let best = null;
     walkwayEdges().forEach(([a, b]) => {
-      if (nodes[a][2] !== level || a === skip || b === skip) return;
+      if (nodes[a][2] !== level) return;
       const x1 = nodes[a][0], y1 = nodes[a][1];
       const dx = nodes[b][0] - x1, dy = nodes[b][1] - y1;
       const len2 = dx * dx + dy * dy;
@@ -475,7 +480,7 @@ function main() {
 
   [...new Set(mouths)].forEach(i => {
     const level = nodes[i][2];
-    const best = nearestWalkway(nodes[i], level, i);
+    const best = nearestWalkway(nodes[i], level);
     if (!best || best.d > MAX_SNAP) {
       stranded.push({ i: i, d: best ? best.d : Infinity, level: level });
       return;
