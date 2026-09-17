@@ -95,8 +95,14 @@ function meaningIn(fi, stroke) {
 // running through y=476.5, [161,204] against one at y=204.5, and so on. At 0.35
 // every one of those missed, and the drawing looked joined while the network
 // came apart in eight pieces. It is a tolerance for how precisely the lines are
-// drawn, not licence to cross a gap: half a unit is half a metre.
-const SNAP = 0.5;
+// drawn, not licence to cross a gap.
+//
+// Three quarters, not a half: a stub laid over the end of its corridor can
+// stop 0.6 off it - [189,390.5] against a corridor ending at 189.6, [66,418.5]
+// against one at 66.6 - and on the page, with the stroke width, the two are
+// one line. At a full unit distinct parallel corridors a unit apart start to
+// merge, so this is as wide as it can go.
+const SNAP = 0.75;
 
 // How near a stub must sit to a stairs end to count as that stair's mouth.
 const CHAIN_GAP = 4;
@@ -110,7 +116,11 @@ const CHAIN_GAP = 4;
 // towards a corridor it does not quite touch is still unambiguously the way
 // into that stairwell. Walkway to walkway has no such warrant and is only
 // reported; see the stranded-fragment pass below.
-const MAX_SNAP = 8;
+//
+// Twelve units because the stair at [263,341] is drawn with its START ten
+// units short of the corridor at x=273 and is, by the owner's account, the
+// way up to the corridor around [231-250, 323-340] - nothing else reaches it.
+const MAX_SNAP = 12;
 
 
 // Climbing a floor costs more than the few metres it covers in plan. Vertical
