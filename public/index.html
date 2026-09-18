@@ -135,7 +135,6 @@
 
         <!-- 4. ADD VIEW: CREATE A NEW PINNED LOCATION -->
         <div id="add-view" class="info-view hidden">
-          <button id="back-from-add-btn" class="back-btn">&larr; Back</button>
           <div class="panel-section-label">Add Location</div>
           <div class="category-view-header">
             <h3>New pinned location</h3>
@@ -145,6 +144,10 @@
           <div class="add-form">
             <label class="fld"><span>Name</span>
               <input type="text" id="add-name" placeholder="e.g. Registrar Annex" autocomplete="off">
+            </label>
+
+            <label class="fld"><span>Acronym</span>
+              <input type="text" id="add-acronym" placeholder="optional, e.g. ICT-201" autocomplete="off">
             </label>
 
             <label class="fld"><span>Floor level</span>
@@ -171,7 +174,7 @@
               <p id="add-coords" class="form-hint">No spot chosen yet</p>
             </div>
 
-            <button type="button" id="add-submit-btn" class="action-btn directions-btn">Add New Location</button>
+            <button type="button" id="add-submit-btn" class="action-btn">Add New Location</button>
 
             <div id="add-auth" class="auth-row hidden">
               <label class="fld"><span>Authorization code</span>
@@ -221,7 +224,21 @@
         </div>
       </div>
 
+      <!-- Shown while the admin panel has stepped aside for a task on the map or
+           in the side panel - placing the kiosk, moving a pin, adding a location.
+           One tap abandons the task and brings the panel back. -->
+      <button type="button" id="admin-cancel-float" class="admin-cancel-float" hidden>
+        ✕ Cancel changes
+      </button>
+
       <div id="coord-inspector">Click map to log coordinates</div>
+
+      <!-- On-screen keyboard for the touch screen. Shown when a text field is
+           tapped, gone on a tap anywhere else; sits over the map card at its
+           full width. -->
+      <div id="kiosk-keyboard" class="kiosk-keyboard" hidden aria-label="On-screen keyboard">
+        <div id="keyboard-rows" class="keyboard-rows"></div>
+      </div>
     </main>
 
     <aside class="panel panel-right">
@@ -314,6 +331,7 @@
           </div>
 
           <button type="button" id="edit-submit-btn" class="action-btn directions-btn">Save changes</button>
+          <button type="button" id="edit-cancel-changes-btn" class="action-btn secondary-btn">Cancel changes</button>
 
           <div id="edit-auth" class="auth-row hidden">
             <label class="fld"><span>Authorization code</span>

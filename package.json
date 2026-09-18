@@ -12,7 +12,8 @@
     "install-cert": "node tools/install-cert.mjs",
     "smoke": "node tools/smoke.mjs",
     "build:data": "node tools/build-data.js",
-    "build:paths": "node tools/build-walkpaths.js"
+    "build:paths": "node tools/build-walkpaths.js",
+    "clean:svg": "node tools/clean-floor-svg.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

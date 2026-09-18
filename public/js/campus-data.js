@@ -11,7 +11,7 @@
 //   LOCATIONS   id, name, acronym, building, categories, floor, hours, coords,
 //               textH (label height hint), description
 //
-// 260 locations (2nd Floor: 2, Ground Floor: 258),
+// 269 locations (2nd Floor: 9, 3rd Floor: 2, Ground Floor: 258),
 // 16 categories.
 const CATEGORIES = [
   {
@@ -824,6 +824,21 @@ const LOCATIONS = [
   ],
   "textH": 0.67,
   "description": "Comfort room and hygiene facility."
+ },
+ {
+  "id": "comfort-room-cr",
+  "custom": true,
+  "name": "Comfort Room(CR)",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "Student Center",
+  "categories": [
+   "comfort-rooms"
+  ],
+  "coords": [
+   141.9,
+   350.1
+  ]
  },
  {
   "id": "comfort-rooms",
@@ -1765,6 +1780,21 @@ const LOCATIONS = [
   "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
+  "id": "htm-202",
+  "custom": true,
+  "name": "HTM-202",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "SLSU Main Campus",
+  "categories": [
+   "classrooms"
+  ],
+  "coords": [
+   154.4,
+   476.1
+  ]
+ },
+ {
   "id": "html-office",
   "name": "HTML Office",
   "acronym": "HTML",
@@ -1857,7 +1887,7 @@ const LOCATIONS = [
   "id": "ict-1",
   "name": "ICT-1",
   "acronym": "ICT-1",
-  "building": "SLSU Main Campus",
+  "building": "Faculty of Computing and Information Sciences (FCIS) Building",
   "categories": [
    "classrooms"
   ],
@@ -1865,7 +1895,7 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    157.5,
-   427.8
+   427.9
   ],
   "textH": 0.58,
   "description": "Classroom or lecture space used for scheduled instruction."
@@ -1874,7 +1904,7 @@ const LOCATIONS = [
   "id": "ict-2",
   "name": "ICT-2",
   "acronym": "ICT-2",
-  "building": "SLSU Main Campus",
+  "building": "Faculty of Computing and Information Sciences (FCIS) Building",
   "categories": [
    "classrooms"
   ],
@@ -1882,10 +1912,40 @@ const LOCATIONS = [
   "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
   "coords": [
    163.8,
-   427.8
+   427.9
   ],
   "textH": 0.61,
   "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
+  "id": "ict-201",
+  "custom": true,
+  "name": "ICT-201",
+  "acronym": "ICT-201",
+  "floor": "2nd Floor",
+  "building": "Faculty of Computing and Information Sciences (FCIS) Building",
+  "categories": [
+   "classrooms"
+  ],
+  "coords": [
+   134.6,
+   428.4
+  ]
+ },
+ {
+  "id": "ict-203",
+  "custom": true,
+  "name": "ICT-203",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "SLSU Main Campus",
+  "categories": [
+   "classrooms"
+  ],
+  "coords": [
+   158,
+   428.3
+  ]
  },
  {
   "id": "ict-3",
@@ -3211,6 +3271,21 @@ const LOCATIONS = [
   "description": "Campus location."
  },
  {
+  "id": "open-space",
+  "custom": true,
+  "name": "Open Space",
+  "acronym": "",
+  "floor": "3rd Floor",
+  "building": "SLSU Main Campus",
+  "categories": [
+   "sports-recreation"
+  ],
+  "coords": [
+   243.1,
+   66
+  ]
+ },
+ {
   "id": "parking-area",
   "name": "Parking Area",
   "acronym": "PA",
@@ -3549,6 +3624,21 @@ const LOCATIONS = [
   ],
   "textH": 0.38,
   "description": "Parking bay or transit waiting area."
+ },
+ {
+  "id": "pascom-office",
+  "custom": true,
+  "name": "PASCOM office",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "Administration Building",
+  "categories": [
+   "admin-offices"
+  ],
+  "coords": [
+   200.4,
+   428.3
+  ]
  },
  {
   "id": "pe-room",
@@ -3932,6 +4022,36 @@ const LOCATIONS = [
   ],
   "textH": 0.87,
   "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
+  "id": "room-e-201",
+  "custom": true,
+  "name": "Room E-201",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "Engineering Building",
+  "categories": [
+   "classrooms"
+  ],
+  "coords": [
+   78.5,
+   338.2
+  ]
+ },
+ {
+  "id": "room-e-202",
+  "custom": true,
+  "name": "Room E-202",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "Engineering Building",
+  "categories": [
+   "classrooms"
+  ],
+  "coords": [
+   78.7,
+   343.6
+  ]
  },
  {
   "id": "rs-101",
@@ -4349,6 +4469,23 @@ const LOCATIONS = [
   "coords": [
    149.5,
    344.8
+  ]
+ },
+ {
+  "id": "training-hall-2",
+  "custom": true,
+  "name": "Training Hall",
+  "acronym": "",
+  "floor": "3rd Floor",
+  "building": "Research, Innovation and Extension Services (RIES) Building",
+  "categories": [
+   "admin-offices",
+   "laboratories",
+   "libraries"
+  ],
+  "coords": [
+   171.5,
+   348.6
   ]
  },
  {

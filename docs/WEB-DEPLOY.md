@@ -4,8 +4,8 @@ The phone hand-off has two delivery paths:
 
 | QR on the kiosk | Opens | Needs |
 |---|---|---|
-| **primary** (big) | `<web-url>/?d=<slug>&from=<x>,<y>` — a static copy on GitHub Pages | the phone to have internet |
-| **fallback** (small) | `<kiosk>/go/<slug>?from=<x>,<y>` — the kiosk itself | the phone on the kiosk Wi-Fi |
+| **primary** (big) | `<web-url>/?d=<slug>&from=<x>,<y>,<level>` — a static copy on GitHub Pages | the phone to have internet |
+| **fallback** (small) | `<kiosk>/go/<slug>?from=<x>,<y>,<level>` — the kiosk itself | the phone on the kiosk Wi-Fi |
 
 The primary works for **any phone, any network** (cellular included) with no cert
 or DNS work. The fallback covers a phone with no mobile data. `docs/KIOSK-DEPLOY.md`

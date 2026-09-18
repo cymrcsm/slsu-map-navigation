@@ -1,5 +1,5 @@
 // ==========================================
-// PHONE HAND-OFF  —  /go/<slug>?from=<x>,<y>[&sim=1]
+// PHONE HAND-OFF  —  /go/<slug>?from=<x>,<y>[,<level>][&sim=1]
 // ==========================================
 // A walking copy of the campus map for a visitor's phone: the chosen
 // destination pinned, the route from the kiosk, and a live GPS dot that follows
@@ -18,7 +18,10 @@ const Z_MIN = GEO_ZOOM_SHIFT + 0.5;
 const Z_MAX = GEO_ZOOM_SHIFT + 7;
 const Z_FOLLOW = GEO_ZOOM_SHIFT + 3.4;
 
-const OFFPATH_LIMIT = 3;   // map units ≈ metres — matches app.js
+const OFFPATH_LIMIT = 2;   // map units ≈ metres — matches app.js
+// Both the legs and the off-path hops are drawn in this; --route in
+// mobile.html carries the same value for anything styled in CSS.
+const ROUTE_COLOUR = '#12294D';
 const SNAP_LIMIT = 12;     // pull the live dot onto a walkway within this
 const REROUTE_MOVE = 6;    // recompute the route after moving this far
 const ARRIVE_M = 15;       // "you have arrived" inside this
@@ -33,8 +36,13 @@ const slug = decodeURIComponent(
   params.get('d') || (location.pathname.split('/go/')[1] || '').split(/[/?#]/)[0] || ''
 );
 const ON_KIOSK = !!document.querySelector('meta[name="kiosk-hosted"]');
+// from=<x>,<y>[,<level>] - where the kiosk stands. The level is the floor it
+// is on (0 = ground); older codes carry only x,y and mean the ground floor.
 const fromParam = (params.get('from') || '').split(',').map(Number);
-let originXY = (fromParam.length === 2 && fromParam.every(Number.isFinite)) ? fromParam : null;
+let originXY = ((fromParam.length === 2 || fromParam.length === 3) && fromParam.every(Number.isFinite))
+  ? [fromParam[0], fromParam[1]] : null;
+const originLevel = (originXY && fromParam.length === 3 && Number.isInteger(fromParam[2]) && fromParam[2] >= 0)
+  ? fromParam[2] : 0;
 const SIM = params.get('sim') === '1';
 
 const statusEl = document.getElementById('status');
@@ -68,14 +76,37 @@ let homeFloor = 0;   // what this page is about; where it returns to
 // stops moving the picker under them.
 let floorPinned = false;
 
+// One overlay per floor, built the first time that floor is asked for and kept
+// afterwards. Each drawing is a multi-megabyte SVG: building a fresh one on
+// every tap makes the browser decode it again, so a fast run along GF/2F/3F
+// leaves the map blank between floors while images that are already in hand
+// are re-read. Reusing them makes a switch a detach and an attach.
+const overlays = [];
+function overlayFor(level) {
+  if (!overlays[level]) {
+    overlays[level] = new GeoImageOverlay(FLOOR_ASSETS[level] || FLOOR_ASSETS[0], {
+      canvasWidth: W, canvasHeight: H, bearingDeg: GEOREF.bearingDeg, opacity: 0.85
+    });
+  }
+  return overlays[level];
+}
+
+// The three drawings share the 320x570 frame and one georeference, so the
+// bounds are the same whichever floor is up. Setting them inside showFloor re-ran
+// Leaflet's panInsideBounds on every switch, and that pulls the centre back
+// inside the bounds - on a map panned toward the edge of campus it reads as the
+// floor button recentring the map. Set once, from the ground drawing.
+map.setMaxBounds(overlayFor(0).getBounds().pad(0.4));
+
+// Switching floors swaps a layer and restyles what is drawn. It does not move
+// the map: the walker chose the view they are looking at.
 function showFloor(level) {
   shownFloor = level;
+  const next = overlayFor(level);
+  if (overlay === next) return;
   if (overlay) map.removeLayer(overlay);
-  overlay = new GeoImageOverlay(FLOOR_ASSETS[level] || FLOOR_ASSETS[0], {
-    canvasWidth: W, canvasHeight: H, bearingDeg: GEOREF.bearingDeg, opacity: 0.85
-  });
+  overlay = next;
   overlay.addTo(map);
-  map.setMaxBounds(overlay.getBounds().pad(0.4));
   paintFloorButtons();
   applyFloorVisibility();
   applyRouteEmphasis();
@@ -150,7 +181,7 @@ function applyFloorVisibility() {
     if (!want && map.hasLayer(layer)) map.removeLayer(layer);
   };
   show(destMarker, destLevel);
-  show(originMarker, 0);
+  show(originMarker, originLevel);
   show(meMarker, 0);
   show(meCircle, 0);
 }
@@ -216,7 +247,7 @@ function render() {
       icon: L.divIcon({ className: '', html: '<div class="kiosk-pin">' + PIN_TACK_ICON + '</div>', iconSize: [20, 20], iconAnchor: [10, 19] }),
       interactive: false
     }).addTo(map).bindTooltip('Kiosk', { direction: 'top' });
-    drawRoute(originXY, 'on foot from the kiosk');
+    drawRoute(originXY, 'on foot from the kiosk', originLevel);
     fitRoute();
   } else {
     map.setView(svgToLatLng(dest.coords), Z_FOLLOW);
@@ -231,10 +262,12 @@ function render() {
 }
 
 // --- routing -----------------------------------------------------------
-function drawRoute(fromXY, tail) {
+// fromLevel is the floor the start is on: the kiosk's own floor for the first
+// route, the ground floor for every GPS fix after it (the walker is outdoors).
+function drawRoute(fromXY, tail, fromLevel = 0) {
   routeGroup.clearLayers();
   routeParts = [];
-  const path = WalkRouting.findPath(fromXY, dest.coords, 0, destLevel);
+  const path = WalkRouting.findPath(fromXY, dest.coords, fromLevel, destLevel);
   currentPath = path;
 
   if (!path.length) {
@@ -249,18 +282,18 @@ function drawRoute(fromXY, tail) {
   WalkRouting.splitByLevel(path).forEach(run => {
     if (run.pts.length < 2) return;
     const layer = L.polyline(run.pts.map(svgToLatLng), {
-      color: '#0F7A87', lineCap: 'round', lineJoin: 'round'
+      color: ROUTE_COLOUR, lineCap: 'round', lineJoin: 'round'
     }).addTo(routeGroup);
     routeParts.push({ layer: layer, level: run.level });
   });
 
   const startGap = WalkRouting.dist(fromXY, path[0]);
   const endGap = WalkRouting.dist(path[path.length - 1], dest.coords);
-  [[fromXY, path[0], startGap, 0],
+  [[fromXY, path[0], startGap, fromLevel],
    [path[path.length - 1], dest.coords, endGap, destLevel]].forEach(hop => {
     if (hop[2] > 0.4 && hop[2] <= OFFPATH_LIMIT) {
       const layer = L.polyline([hop[0], hop[1]].map(svgToLatLng), {
-        color: '#0F7A87', dashArray: '3 6'
+        color: ROUTE_COLOUR, dashArray: '3 6'
       }).addTo(routeGroup);
       routeParts.push({ layer: layer, level: hop[3], connector: true });
     }
@@ -268,7 +301,7 @@ function drawRoute(fromXY, tail) {
   applyRouteEmphasis();
 
   const walked = [];
-  if (startGap <= OFFPATH_LIMIT) walked.push([fromXY[0], fromXY[1], 0]);
+  if (startGap <= OFFPATH_LIMIT) walked.push([fromXY[0], fromXY[1], fromLevel]);
   path.forEach(p => walked.push(p));
   if (endGap <= OFFPATH_LIMIT) walked.push([dest.coords[0], dest.coords[1], destLevel]);
   const metres = Math.round(WalkRouting.walkMetres(walked, GEOREF.metresPerUnit));
@@ -395,7 +428,7 @@ document.addEventListener('visibilitychange', () => {
 // --- simulation: walk a synthetic point along the route --------------
 function startSim() {
   const seed = originXY || dest.coords;
-  const path = WalkRouting.findPath(seed, dest.coords, 0, destLevel);
+  const path = WalkRouting.findPath(seed, dest.coords, originXY ? originLevel : destLevel, destLevel);
   const line = (path.length ? [seed].concat(path, [dest.coords]) : [seed, dest.coords])
     .filter(p => WalkRouting.levelOf(p) === 0)
     .map(p => [p[0], p[1]]);

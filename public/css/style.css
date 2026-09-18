@@ -31,9 +31,18 @@
   --on-brand-edge:   rgba(237, 231, 220, 0.22);
 
   /* --- warm action colour, from the OSM clay in the tiles --- */
-  --warm-amber:      #B0691E;  /*         pins and the route line            */
+  --warm-amber:      #B0691E;  /*         the filled action buttons          */
   --warm-amber-deep: #8F5216;  /*  6.09:1 with white text on it              */
   --warm-amber-dark: #74410F;  /*         pressed                            */
+
+  /* --- the walking route ---
+     The brand's deep navy, matched by the phone page (--route in mobile.html)
+     so a walk handed over by QR does not change colour on the way. Kept as its
+     own token rather than folded into the warm action colour, because the route
+     is not an action: it is the answer, and it should not restyle when a button
+     palette changes. Named for the role, not the hue - this is the second
+     colour it has worn. */
+  --route-line:      var(--slsu-navy-deep);   /* #12294D */
 
   /* Translucent tints, declared beside the colours they derive from so the two
      can never drift apart. Named by role, not hue, so a future palette change
@@ -754,6 +763,44 @@ body, html {
   border-color: var(--border-focus);
 }
 
+/* A dropdown's list the same width as its bar. The browser's own <select>
+   popup grows to fit its widest option, so the location picker - whose entries
+   read "Name - Building" - dropped a list wider than the field it came from.
+   Where the browser lets the picker be styled (Chromium 135 and later) it is
+   pinned to the field's width, with long entries cut to an ellipsis rather
+   than widening it; elsewhere the browser's popup is left exactly as it was.
+   The search suggestions already span their bar, and a <datalist> popup
+   matches its field on its own. */
+@supports (appearance: base-select) {
+  .fld select,
+  .fld select::picker(select) {
+    appearance: base-select;
+  }
+  .fld select::picker(select) {
+    inline-size: anchor-size(self-inline);
+    box-sizing: border-box;
+    margin: 4px 0 0;
+    padding: 4px;
+    max-block-size: 320px;
+    overflow-y: auto;
+    background: var(--surface-box);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    box-shadow: var(--card-shadow-hover);
+  }
+  .fld select option {
+    padding: 9px 11px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .fld select option:checked { background: var(--surface-hover); }
+  .fld select option:active  { background: var(--brand-wash); }
+}
+
 .fld input.invalid {
   border-color: var(--danger-color);
 }
@@ -1051,7 +1098,7 @@ body, html {
 }
 
 .leaflet-interactive.route-line {
-  stroke: var(--accent-color);
+  stroke: var(--route-line);
   stroke-dasharray: 10, 10;
   paint-order: stroke;
   animation: dash 1s linear infinite;
@@ -1062,7 +1109,9 @@ body, html {
 }
 
 .leaflet-interactive.route-connector {
-  stroke: var(--accent-strong);
+  /* The phone page draws its off-path hops in the same colour as the legs and
+     separates them by dash alone, so this follows rather than going darker. */
+  stroke: var(--route-line);
   stroke-dasharray: 3, 7;
   opacity: 0.85;
   animation: dash 1.4s linear infinite;
@@ -1126,7 +1175,6 @@ body, html {
   -webkit-mask: url('../assets/info-circle-outline.svg') center / contain no-repeat;
   mask: url('../assets/info-circle-outline.svg') center / contain no-repeat;
 }
-
 
 /* ==========================================================================
    ADMINISTRATOR PANEL
@@ -1215,7 +1263,17 @@ body, html {
   box-shadow: 0 4px 12px rgba(18, 41, 77, 0.32);
 }
 
-#admin-unlock-btn:hover:not(:disabled) { background: #1A3866; }
+#admin-unlock-btn:active:not(:disabled) { background: #1A3866; }
+
+/* Add New Location wears the same navy as Unlock: the two are the deliberate
+   commits of the admin's work, and they read as such. */
+#add-submit-btn {
+  background: #12294D;
+  color: var(--map-paper);
+  border: none;
+  box-shadow: 0 4px 12px rgba(18, 41, 77, 0.32);
+}
+#add-submit-btn:active:not(:disabled) { background: #1A3866; }
 #admin-unlock-btn:disabled { opacity: 0.6; cursor: default; }
 
 .admin-gate,
@@ -1334,4 +1392,115 @@ body, html {
   cursor: pointer;
 }
 .qr-swap[hidden] { display: none; }
-.qr-swap:hover { color: var(--primary-strong); }
+.qr-swap:active { color: var(--primary-strong); }
+
+/* ==========================================================================
+   ON-SCREEN KEYBOARD
+
+   The kiosk is a touch screen with no physical keys. This appears when a text
+   field is tapped and goes on a tap anywhere else, and sits at the bottom of
+   the map card: the card's full width, with a height
+   that follows from the width so the keys stay square-ish at any size.
+   ========================================================================== */
+.kiosk-keyboard {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  /* Above the admin dialog (4000) as well as the map: the keyboard serves the
+     dialog's fields too, and must sit over its dimmed backdrop to be tapped. */
+  z-index: 4100;
+  aspect-ratio: 5 / 2;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  box-shadow: var(--card-shadow-hover);
+}
+.kiosk-keyboard[hidden] { display: none; }
+
+
+.keyboard-rows {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.keyboard-row {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 8px;
+}
+/* Shorter rows are inset so every key keeps the same width as the ten-key rows. */
+.keyboard-row.inset-half { padding: 0 5%; }
+
+.keyboard-key {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--map-paper);
+  color: var(--text-dark);
+  font-size: clamp(14px, 1.7vw, 24px);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.keyboard-key:active { background: var(--surface-hover); transform: scale(0.97); }
+
+/* Typing into the admin dialog: the dialog moves to the top, out of the
+   keyboard's way at the bottom. */
+/* A shorter keyboard for a field in the admin dialog: 30% of the card's width
+   tall rather than 40%, so the dialog keeps more of the screen. */
+.kiosk-keyboard.for-dialog { aspect-ratio: 10 / 3; }
+
+/* The dialog is told how tall the keyboard is (--keyboard-height, set as the
+   keyboard opens) and is confined to the room above it, scrolling inside
+   itself, so the field being typed into is never behind the keys. */
+.admin-overlay.keyboard-open {
+  align-items: flex-start;
+  padding-top: 24px;
+  padding-bottom: calc(var(--keyboard-height, 0px) + 24px);
+}
+.admin-overlay.keyboard-open .admin-card {
+  max-height: calc(100vh - 48px - var(--keyboard-height, 0px));
+}
+
+/* The named keys - shift, ?123 / ABC, backspace, space, enter - read as
+   controls rather than characters. Enter carries the brand navy so the one key
+   that submits stands apart; shift lights up while it is armed and shows a
+   locked state after a second tap, as a phone's does. */
+.keyboard-key.key-named { background: var(--surface-hover); font-size: clamp(12px, 1.3vw, 18px); }
+.keyboard-key.key-enter { background: var(--primary-color); color: var(--map-paper); border-color: var(--primary-color); }
+.keyboard-key.key-shift.on { background: var(--primary-color); color: var(--map-paper); border-color: var(--primary-color); }
+.keyboard-key.key-shift.locked { box-shadow: inset 0 0 0 2px var(--map-paper); }
+
+/* "Cancel changes", floating over the map while the admin panel has stepped
+   aside for a task - placing the kiosk, moving a pin, filling the add form.
+   Top centre, clear of the control strip on the right, the inspector at the
+   bottom left, and a docked keyboard at the bottom. */
+.admin-cancel-float {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  padding: 10px 18px;
+  border: 1px solid var(--danger-color);
+  border-radius: 999px;
+  background: var(--danger-color);
+  color: var(--map-paper);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--card-shadow-hover);
+}
+/* Red at rest, so it reads as the destructive act it is; white under the
+   finger to show the press landed. */
+.admin-cancel-float:active { background: var(--surface-card); color: var(--danger-color); }
+.admin-cancel-float[hidden] { display: none; }
