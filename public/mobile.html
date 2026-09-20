@@ -94,10 +94,61 @@
       width:20px; height:20px; color:var(--teal-deep); opacity:.85;
       filter:drop-shadow(0 1px 2px rgba(0,0,0,.3));
     }
+
+    /* "Which floor are you on?" - the public copy asks this before it draws
+       the route, because the route starts on that floor and the phone cannot
+       tell. It covers the map: nothing behind it is right until answered. */
+    .ask {
+      position:absolute; inset:0; z-index:2000;
+      background:var(--paper); overflow-y:auto;
+      display:flex; align-items:center; justify-content:center;
+      padding:24px 20px calc(24px + env(safe-area-inset-bottom));
+    }
+    .ask[hidden] { display:none; }
+    .ask-card { width:100%; max-width:360px; }
+    .ask-kicker { color:#63726A; font-size:.82rem; text-transform:uppercase; letter-spacing:.05em; }
+    .ask-card h2 { font-size:1.35rem; line-height:1.25; margin-top:4px; }
+    .ask-q { font-size:1.05rem; font-weight:600; margin-top:28px; }
+    .ask-floors { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+    .ask-floor {
+      width:100%; min-height:56px; border:2px solid var(--teal); border-radius:12px;
+      background:#fff; color:var(--teal-deep); font-size:1.05rem; font-weight:700;
+    }
+    .ask-floor:active { background:var(--teal); color:#fff; }
+    .ask-floor:disabled { opacity:.35; }
+    .ask-hint { margin-top:16px; font-size:.9rem; color:#63726A; }
+    .ask-hint[hidden] { display:none; }
+
+    /* The floor the walker said they are on, and the way to say otherwise
+       once they have gone up or down. */
+    .my-floor {
+      margin-top:10px; padding:0; border:none; background:transparent;
+      font:inherit; font-size:.88rem; color:var(--teal-deep);
+      text-decoration:underline; text-underline-offset:2px;
+    }
+    .my-floor[hidden] { display:none; }
   </style>
 </head>
 <body>
   <div id="map"></div>
+
+  <!-- Asked first on the public copy (mobile.js shows it): which floor the
+       walker is standing on. The route starts there, so someone upstairs is
+       taken to the stairs before anything else. -->
+  <div class="ask" id="floor-ask" role="dialog" aria-labelledby="ask-q" hidden>
+    <div class="ask-card">
+      <p class="ask-kicker">Walking directions to</p>
+      <h2 id="ask-dest"></h2>
+      <p class="sub" id="ask-dest-sub"></p>
+      <p class="ask-q" id="ask-q">Which floor are you on right now?</p>
+      <div class="ask-floors">
+        <button type="button" class="ask-floor" data-floor="0">Ground Floor</button>
+        <button type="button" class="ask-floor" data-floor="1">2nd Floor</button>
+        <button type="button" class="ask-floor" data-floor="2">3rd Floor</button>
+      </div>
+      <p class="ask-hint" id="ask-hint" hidden></p>
+    </div>
+  </div>
 
   <div class="floors" id="floor-picker" role="group" aria-label="Floor">
     <button type="button" class="floor-btn" data-floor="0">GF</button>
@@ -114,6 +165,7 @@
     <p class="sub" id="dest-sub"></p>
     <div class="meta" id="dest-meta"></div>
     <div class="status" id="status">Preparing your route…</div>
+    <button type="button" class="my-floor" id="my-floor-btn" hidden></button>
   </section>
 
   <script src="vendor/leaflet/leaflet.js"></script>
