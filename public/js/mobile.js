@@ -7,6 +7,10 @@
 // same geographic Leaflet map the kiosk uses - cached OSM tiles under
 // public/tiles with the campus drawing georeferenced on top (js/georef.js).
 //
+// The public copy first asks which floor the walker is standing on, and the
+// route starts from that floor: down the stairs first for a ground-floor room
+// from upstairs, up them for an upstairs room from the ground.
+//
 // Loads after: vendor/leaflet, js/georef.js, js/geo-overlay.js,
 //              js/campus-data.js, js/walkpaths.js, js/routing.js
 
@@ -45,6 +49,17 @@ const originLevel = (originXY && fromParam.length === 3 && Number.isInteger(from
   ? fromParam[2] : 0;
 const SIM = params.get('sim') === '1';
 
+// The public copy asks the walker which floor they are on before it draws
+// anything, because the route has to start on that floor and a phone cannot
+// tell floors apart by itself: GPS altitude is coarser than a storey and the
+// browser has no barometer. The kiosk-hosted copy is opened standing at the
+// kiosk, so the kiosk's own floor is the answer there and it is not asked.
+const ASKS_FLOOR = !ON_KIOSK;
+// The floor the walker is on. The kiosk's until they say otherwise; every
+// route - the first one from the kiosk and each one from a GPS fix - starts
+// on it, and the live dot is snapped to its walkways.
+let myLevel = originLevel;
+
 const statusEl = document.getElementById('status');
 function setStatus(text, cls) {
   statusEl.textContent = text;
@@ -72,8 +87,8 @@ let overlay = null;
 let shownFloor = 0;
 let homeFloor = 0;   // what this page is about; where it returns to
 // Set once the walker taps a floor themselves. The page still opens on the
-// ground and still jumps to the room's floor on arrival, but after a tap it
-// stops moving the picker under them.
+// floor they said they are on and still jumps to the room's floor on arrival,
+// but after a tap it stops moving the picker under them.
 let floorPinned = false;
 
 // One overlay per floor, built the first time that floor is asked for and kept
@@ -169,8 +184,8 @@ function paintFloorButtons() {
 }
 
 // A marker belongs to one floor, so on any other it would be pointing at a
-// room that is not there. The walker and the kiosk are both outdoors, which is
-// the ground floor's drawing.
+// room that is not there. The kiosk is on the floor it stands on and the
+// walker on the floor they said they are on.
 function applyFloorVisibility() {
   // Without a picker there is no way back, so nothing is taken away.
   if (!HAS_FLOOR_PICKER) return;
@@ -182,8 +197,8 @@ function applyFloorVisibility() {
   };
   show(destMarker, destLevel);
   show(originMarker, originLevel);
-  show(meMarker, 0);
-  show(meCircle, 0);
+  show(meMarker, myLevel);
+  show(meCircle, myLevel);
 }
 
 // --- destination --------------------------------------------------------
@@ -211,21 +226,38 @@ let destMarker = null, originMarker = null, routeGroup = L.featureGroup().addTo(
 let routeParts = [];   // { layer, level } for every leg and connector drawn
 let currentPath = [];
 
+// Which floor this page is about: where it opens, and where it returns to.
+//
+// On the kiosk-hosted copy it is the room's own floor. That page is opened
+// over the kiosk's http, where the browser refuses geolocation, so there is
+// no dot to follow outdoors - it is a drawing of one route, and the room is
+// what was asked for. A second-floor room opens on the second-floor plan.
+//
+// The public copy opens on the floor the walker said they are on: the first
+// leg of the route is there, and so is the live dot. It has the picker for
+// the rest, and follows the room's floor on arrival.
+function homeFloorFor() {
+  const want = HAS_FLOOR_PICKER ? myLevel : destLevel;
+  return FLOOR_ASSETS[want] ? want : 0;
+}
+
+// What the first route is measured from. It starts at the kiosk's position;
+// when the walker is on another floor than the kiosk, that position is only a
+// place on the plan, and the route begins at the nearest walkway to it on
+// their floor - so it is not called a walk from the kiosk.
+function startTail() {
+  return myLevel === originLevel ? 'on foot from the kiosk' : 'on foot';
+}
+
+let started = false;   // render() has run once
+
 function render() {
+  started = true;
   destLevel = WalkRouting.levelOfFloor(dest.floor);
 
-  // Which floor this page is about.
-  //
-  // On the kiosk-hosted copy it is the room's own floor. That page is opened
-  // over the kiosk's http, where the browser refuses geolocation, so there is
-  // no dot to follow outdoors - it is a drawing of one route, and the room is
-  // what was asked for. A second-floor room opens on the second-floor plan.
-  //
-  // The public copy opens on the ground, because there the live dot does work
-  // and the walk to the building is what is happening first. It has the picker
-  // for the rest, and follows the room's floor on arrival.
-  homeFloor = (!HAS_FLOOR_PICKER && FLOOR_ASSETS[destLevel]) ? destLevel : 0;
+  homeFloor = homeFloorFor();
   showFloor(homeFloor);
+  paintMyFloor();
 
   document.getElementById('dest-name').textContent = dest.name;
   document.getElementById('dest-sub').textContent =
@@ -247,7 +279,7 @@ function render() {
       icon: L.divIcon({ className: '', html: '<div class="kiosk-pin">' + PIN_TACK_ICON + '</div>', iconSize: [20, 20], iconAnchor: [10, 19] }),
       interactive: false
     }).addTo(map).bindTooltip('Kiosk', { direction: 'top' });
-    drawRoute(originXY, 'on foot from the kiosk', originLevel);
+    drawRoute(originXY, startTail(), myLevel);
     fitRoute();
   } else {
     map.setView(svgToLatLng(dest.coords), Z_FOLLOW);
@@ -262,8 +294,11 @@ function render() {
 }
 
 // --- routing -----------------------------------------------------------
-// fromLevel is the floor the start is on: the kiosk's own floor for the first
-// route, the ground floor for every GPS fix after it (the walker is outdoors).
+// fromLevel is the floor the start is on - the walker's floor (myLevel) for
+// both the first route from the kiosk and every GPS fix after it. The router
+// is the same either way: on a floor above the room it runs walkway > stair
+// FINISH > down the stairs > START > walkway below, and the other way round
+// for a room upstairs; a stair that skips a floor is taken when it is shorter.
 function drawRoute(fromXY, tail, fromLevel = 0) {
   routeGroup.clearLayers();
   routeParts = [];
@@ -308,14 +343,23 @@ function drawRoute(fromXY, tail, fromLevel = 0) {
 
   let note = 'About ' + metres + ' m ' + (tail || 'to go');
   const runs = WalkRouting.splitByLevel(path);
-  if (runs.length > 1) {
-    note += ', then take the stairs up to ' + (WalkRouting.levels[destLevel] || 'the next floor');
-  }
+  if (runs.length > 1) note += ', then ' + stairsPhrase(runs, fromLevel, destLevel);
   if (endGap > OFFPATH_LIMIT) {
     note += ' — ends ' + Math.round(endGap * GEOREF.metresPerUnit) + ' m from the nearest walkway';
   }
   setStatus(note + '.');
   return metres;
+}
+
+// How the stairs figure in the directions: which way, and to which floor. A
+// route that changes floor and comes back to the one it left (two buildings
+// whose upper floors do not join) is named by the way back.
+function stairsPhrase(runs, fromLevel, toLevel) {
+  const to = WalkRouting.levels[toLevel] || 'the next floor';
+  if (toLevel > fromLevel) return 'take the stairs up to the ' + to;
+  if (toLevel < fromLevel) return 'take the stairs down to the ' + to;
+  const dips = runs.some(r => r.level < fromLevel);
+  return 'take the stairs ' + (dips ? 'down and back up' : 'up and back down') + ' to the ' + to;
 }
 
 function fitRoute() {
@@ -325,6 +369,7 @@ function fitRoute() {
 
 // --- live position (GPS or simulated) ----------------------------------
 let meMarker = null, meCircle = null, following = true, lastRouteFrom = null, arrived = false;
+let lastFix = null;   // the latest position given, replayed when the walker changes floor
 const recenterBtn = document.getElementById('recenter-btn');
 
 function startPositioning() {
@@ -352,9 +397,11 @@ function onGeoError(err) {
 }
 
 function onPosition(rawXY, accuracyM, headingDeg) {
-  // Snap to the nearest ground-floor walkway when we're close to one; GPS drifts
-  // 5-20 m and this keeps the dot reading as "on the path" like Google Maps.
-  const proj = WalkRouting.projectOntoNetwork(rawXY, 0);
+  lastFix = { xy: rawXY, acc: accuracyM, heading: headingDeg };
+  // Snap to the nearest walkway on the walker's floor when we're close to one;
+  // GPS drifts 5-20 m and this keeps the dot reading as "on the path" like
+  // Google Maps.
+  const proj = WalkRouting.projectOntoNetwork(rawXY, myLevel);
   const onPath = proj && proj.d <= SNAP_LIMIT;
   const meXY = onPath ? [proj.p[0], proj.p[1]] : rawXY;
   const ll = svgToLatLng(meXY);
@@ -363,11 +410,13 @@ function onPosition(rawXY, accuracyM, headingDeg) {
   drawMe(ll, accUnits, headingDeg);
 
   if (!lastRouteFrom || WalkRouting.dist(meXY, lastRouteFrom) > REROUTE_MOVE) {
-    const left = drawRoute(meXY, 'to go');
+    const left = drawRoute(meXY, 'to go', myLevel);
     lastRouteFrom = meXY;
     if (typeof left === 'number' && left <= ARRIVE_M && !arrived) {
       arrived = true;
-      const up = destLevel > 0 ? ' Take the stairs up to ' + (WalkRouting.levels[destLevel] || 'the next floor') + '.' : '';
+      const up = destLevel !== myLevel
+        ? ' Take the stairs ' + (destLevel > myLevel ? 'up' : 'down') + ' to the ' + (WalkRouting.levels[destLevel] || 'next floor') + '.'
+        : '';
       // Arrived: the outdoor walk is done and the room is the question now, so
       // the drawing switches to the floor it is on.
       if (!floorPinned && destLevel !== shownFloor && FLOOR_ASSETS[destLevel]) showFloor(destLevel);
@@ -428,9 +477,11 @@ document.addEventListener('visibilitychange', () => {
 // --- simulation: walk a synthetic point along the route --------------
 function startSim() {
   const seed = originXY || dest.coords;
-  const path = WalkRouting.findPath(seed, dest.coords, originXY ? originLevel : destLevel, destLevel);
-  const line = (path.length ? [seed].concat(path, [dest.coords]) : [seed, dest.coords])
-    .filter(p => WalkRouting.levelOf(p) === 0)
+  const path = WalkRouting.findPath(seed, dest.coords, originXY ? myLevel : destLevel, destLevel);
+  const ends = [[seed[0], seed[1], myLevel], [dest.coords[0], dest.coords[1], destLevel]];
+  // The dot is on the walker's floor, so the leg walked is the one there.
+  const line = (path.length ? [ends[0]].concat(path, [ends[1]]) : ends)
+    .filter(p => WalkRouting.levelOf(p) === myLevel)
     .map(p => [p[0], p[1]]);
   if (line.length < 2) { setStatus('Nothing to simulate.', 'warn'); return; }
 
@@ -463,9 +514,75 @@ function bearingDeg(a, b) {
   return (Math.atan2(dLng, dLat) * 180 / Math.PI + 360) % 360;
 }
 
+// --- "which floor are you on?" ------------------------------------------
+const askEl = document.getElementById('floor-ask');
+const myFloorBtn = document.getElementById('my-floor-btn');
+
+function askFloor() {
+  if (!askEl) return;
+  document.getElementById('ask-dest').textContent = dest.name;
+  document.getElementById('ask-dest-sub').textContent =
+    dest.floor + (dest.building && dest.building !== dest.name ? ' · ' + dest.building : '');
+  const hint = document.getElementById('ask-hint');
+  // A code from the kiosk says which floor the kiosk is on - a help to someone
+  // who has just scanned it and is not sure what the building calls this floor.
+  if (originXY && fromParam.length === 3 && WalkRouting.levels[originLevel]) {
+    hint.textContent = 'The kiosk you scanned is on the ' + WalkRouting.levels[originLevel] + '.';
+    hint.hidden = false;
+  }
+  askEl.hidden = false;
+}
+
+// Floors are named as the walk network names them; one with no drawing behind
+// it cannot be routed from, so it cannot be chosen.
+[].slice.call(document.querySelectorAll('#floor-ask .ask-floor')).forEach(btn => {
+  const level = parseInt(btn.dataset.floor, 10);
+  if (WalkRouting.levels[level]) btn.textContent = WalkRouting.levels[level];
+  if (!FLOOR_ASSETS[level] || !WalkRouting.levels[level]) {
+    btn.disabled = true;
+    return;
+  }
+  btn.addEventListener('click', () => setMyLevel(level));
+});
+if (myFloorBtn) myFloorBtn.addEventListener('click', askFloor);
+
+// The sheet says which floor the route is being drawn from, and is the way
+// to say otherwise after going up or down. The kiosk copy never asked, so it
+// has nothing to change.
+function paintMyFloor() {
+  if (!myFloorBtn || !ASKS_FLOOR) return;
+  myFloorBtn.textContent = 'You are on the ' + (WalkRouting.levels[myLevel] || 'ground floor') + ' · change floor';
+  myFloorBtn.hidden = false;
+}
+
+// The walker's answer. The first lets the page draw. A later one - they have
+// gone up or down since - restarts the route from the new floor, from the
+// last position the phone gave or, failing that, from the kiosk again, and
+// puts that floor's drawing up.
+function setMyLevel(level) {
+  myLevel = level;
+  if (askEl) askEl.hidden = true;
+  if (!started) { render(); return; }
+  homeFloor = homeFloorFor();
+  floorPinned = false;
+  arrived = false;
+  lastRouteFrom = null;
+  showFloor(homeFloor);
+  paintMyFloor();
+  if (lastFix) {
+    onPosition(lastFix.xy, lastFix.acc, lastFix.heading);
+  } else if (originXY) {
+    drawRoute(originXY, startTail(), myLevel);
+    fitRoute();
+  }
+  applyFloorVisibility();
+}
+
 // --- go --------------------------------------------------------------------
-// Draw straight away; if an admin edit is on record, apply it and redraw.
-render();
+// The public copy draws once the walker has said which floor they are on; the
+// kiosk copy draws straight away. If an admin edit is on record, apply it and
+// redraw.
+if (ASKS_FLOOR) askFloor(); else render();
 
 // Runtime admin edits live on the kiosk server. The public copy is static, so
 // skip the fetch there - its data snapshot is refreshed on every deploy.
