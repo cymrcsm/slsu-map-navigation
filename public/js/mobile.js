@@ -173,13 +173,16 @@ function applyRouteEmphasis() {
     if (!part.layer || !part.layer.setStyle) return;
     const here = part.level === shownFloor;
     // A leg on another floor is dashed on both copies, but only faded where a
-    // picker can bring it back. Without one, the walk from the kiosk to the
-    // building is on the 'other' floor for any upstairs room - and that is the
-    // part still to be walked, so it stays legible.
-    const faded = here ? 1 : (HAS_FLOOR_PICKER ? 0.3 : 0.75);
+    // picker can bring it back. Without one the whole route is on screen at
+    // once, and the walk from the kiosk to the building is on the 'other'
+    // floor for any upstairs room - the part still to be walked - so the
+    // kiosk copy draws every leg and hop on every floor at full opacity, and
+    // the dashing alone tells the floors apart.
+    const solid = !HAS_FLOOR_PICKER;
+    const faded = here ? 1 : 0.3;
     part.layer.setStyle(part.connector
-      ? { weight: 4, opacity: .8 * faded }
-      : { weight: here ? 6 : 4, opacity: .9 * faded, dashArray: here ? null : '4 8' });
+      ? { weight: 4, opacity: solid ? 1 : .8 * faded }
+      : { weight: here ? 6 : 4, opacity: solid ? 1 : .9 * faded, dashArray: here ? null : '4 8' });
   });
 }
 
