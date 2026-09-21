@@ -26,6 +26,13 @@ const OFFPATH_LIMIT = 2;   // map units ≈ metres — matches app.js
 // Both the legs and the off-path hops are drawn in this; --route in
 // mobile.html carries the same value for anything styled in CSS.
 const ROUTE_COLOUR = '#12294D';
+// The kiosk's palette for what is drawn on the map from here (the CSS
+// tokens in mobile.html carry the rest): the seal's sky blue for the
+// walker's own position, the warm clay amber for a line that only points,
+// and the kiosk's colour for a location with no category.
+const ME_COLOUR = '#3E7CB1';          // --slsu-sky
+const BEELINE_COLOUR = '#B0691E';     // --warm-amber
+const UNCATEGORISED_COLOUR = '#7C736A';   // UNCATEGORISED_COLOR in app.js
 const SNAP_LIMIT = 12;     // pull the live dot onto a walkway within this
 // Farther than this from every line of an upper floor, the walker is not on
 // it. The corridors drawn for a floor run through the whole of each building
@@ -217,6 +224,14 @@ function resolveDestination(id) {
   const base = LOCATIONS.find(l => l.id === id);
   return base ? Object.assign({}, base) : null;
 }
+
+// The pin's colour is the destination's category colour, the same rule the
+// kiosk map draws it by, so the room is marked alike on both screens.
+function destColour() {
+  const id = dest.categories && dest.categories[0];
+  const cat = id && CATEGORIES.find(c => c.id === id);
+  return cat && cat.color ? cat.color : UNCATEGORISED_COLOUR;
+}
 const dest = resolveDestination(slug);
 
 if (!dest) {
@@ -281,7 +296,7 @@ function render() {
 
   if (destMarker) map.removeLayer(destMarker);
   destMarker = L.marker(svgToLatLng(dest.coords), {
-    icon: L.divIcon({ className: '', html: '<div class="dest-pin">' + DEST_ICON + '</div>', iconSize: [30, 30], iconAnchor: [15, 28] })
+    icon: L.divIcon({ className: '', html: '<div class="dest-pin" style="color:' + destColour() + '">' + DEST_ICON + '</div>', iconSize: [30, 30], iconAnchor: [15, 28] })
   }).addTo(map).bindTooltip(dest.name, { direction: 'top', offset: [0, -22] });
 
   if (originXY) {
@@ -379,7 +394,7 @@ function drawRoute(fromXY, tail, fromLevel = 0) {
 // draw. It still shows which way the room lies.
 function drawBeeline(fromXY) {
   L.polyline([fromXY, dest.coords].map(svgToLatLng), {
-    weight: 4, opacity: .8, color: '#C4622C', dashArray: '6 8'
+    weight: 4, opacity: .8, color: BEELINE_COLOUR, dashArray: '6 8'
   }).addTo(routeGroup);
 }
 
@@ -473,7 +488,7 @@ function drawMe(ll, radiusUnits, headingDeg) {  // eslint-disable-line no-unused
   const anchor = [11, 21];
   if (!meMarker) {
     meMarker = L.marker(ll, { icon: L.divIcon({ className: '', html: html, iconSize: size, iconAnchor: anchor }), zIndexOffset: 2000 }).addTo(map);
-    meCircle = L.circle(ll, { radius: radiusUnits, color: '#1a73e8', weight: 1, opacity: .5, fillOpacity: .12 }).addTo(map);
+    meCircle = L.circle(ll, { radius: radiusUnits, color: ME_COLOUR, weight: 1, opacity: .5, fillOpacity: .12 }).addTo(map);
     if (following) map.setView(ll, Z_FOLLOW);
   } else {
     meMarker.setIcon(L.divIcon({ className: '', html: html, iconSize: size, iconAnchor: anchor }));
