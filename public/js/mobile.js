@@ -26,7 +26,22 @@ const OFFPATH_LIMIT = 2;   // map units ≈ metres — matches app.js
 // Both the legs and the off-path hops are drawn in this; --route in
 // mobile.html carries the same value for anything styled in CSS.
 const ROUTE_COLOUR = '#12294D';
+// The kiosk's palette for what is drawn on the map from here (the CSS
+// tokens in mobile.html carry the rest): the seal's sky blue for the
+// walker's own position, the warm clay amber for a line that only points,
+// and the kiosk's colour for a location with no category.
+const ME_COLOUR = '#3E7CB1';          // --slsu-sky
+const BEELINE_COLOUR = '#B0691E';     // --warm-amber
+const UNCATEGORISED_COLOUR = '#7C736A';   // UNCATEGORISED_COLOR in app.js
 const SNAP_LIMIT = 12;     // pull the live dot onto a walkway within this
+// Farther than this from every line of an upper floor, the walker is not on
+// it. The corridors drawn for a floor run through the whole of each building
+// that has them, so a fix inside lands within a few metres of one even after
+// the 10-20 m GPS drifts indoors; beyond this they are in a building with no
+// such floor drawn, or outside - most often someone who said "2nd Floor" and
+// has come down since. The ground floor has no limit: open ground between
+// its paths is walkable, so a route from the nearest path is right there.
+const PLACE_LIMIT = 25;
 const REROUTE_MOVE = 6;    // recompute the route after moving this far
 const ARRIVE_M = 15;       // "you have arrived" inside this
 const FLOOR_ASSETS = ['assets/groundFloor_layer.svg', 'assets/secondFloor_layer.svg',
@@ -165,13 +180,16 @@ function applyRouteEmphasis() {
     if (!part.layer || !part.layer.setStyle) return;
     const here = part.level === shownFloor;
     // A leg on another floor is dashed on both copies, but only faded where a
-    // picker can bring it back. Without one, the walk from the kiosk to the
-    // building is on the 'other' floor for any upstairs room - and that is the
-    // part still to be walked, so it stays legible.
-    const faded = here ? 1 : (HAS_FLOOR_PICKER ? 0.3 : 0.75);
+    // picker can bring it back. Without one the whole route is on screen at
+    // once, and the walk from the kiosk to the building is on the 'other'
+    // floor for any upstairs room - the part still to be walked - so the
+    // kiosk copy draws every leg and hop on every floor at full opacity, and
+    // the dashing alone tells the floors apart.
+    const solid = !HAS_FLOOR_PICKER;
+    const faded = here ? 1 : 0.3;
     part.layer.setStyle(part.connector
-      ? { weight: 4, opacity: .8 * faded }
-      : { weight: here ? 6 : 4, opacity: .9 * faded, dashArray: here ? null : '4 8' });
+      ? { weight: 4, opacity: solid ? 1 : .8 * faded }
+      : { weight: here ? 6 : 4, opacity: solid ? 1 : .9 * faded, dashArray: here ? null : '4 8' });
   });
 }
 
@@ -205,6 +223,14 @@ function applyFloorVisibility() {
 function resolveDestination(id) {
   const base = LOCATIONS.find(l => l.id === id);
   return base ? Object.assign({}, base) : null;
+}
+
+// The pin's colour is the destination's category colour, the same rule the
+// kiosk map draws it by, so the room is marked alike on both screens.
+function destColour() {
+  const id = dest.categories && dest.categories[0];
+  const cat = id && CATEGORIES.find(c => c.id === id);
+  return cat && cat.color ? cat.color : UNCATEGORISED_COLOUR;
 }
 const dest = resolveDestination(slug);
 
@@ -270,7 +296,7 @@ function render() {
 
   if (destMarker) map.removeLayer(destMarker);
   destMarker = L.marker(svgToLatLng(dest.coords), {
-    icon: L.divIcon({ className: '', html: '<div class="dest-pin">' + DEST_ICON + '</div>', iconSize: [30, 30], iconAnchor: [15, 28] })
+    icon: L.divIcon({ className: '', html: '<div class="dest-pin" style="color:' + destColour() + '">' + DEST_ICON + '</div>', iconSize: [30, 30], iconAnchor: [15, 28] })
   }).addTo(map).bindTooltip(dest.name, { direction: 'top', offset: [0, -22] });
 
   if (originXY) {
@@ -306,11 +332,25 @@ function drawRoute(fromXY, tail, fromLevel = 0) {
   currentPath = path;
 
   if (!path.length) {
-    L.polyline([fromXY, dest.coords].map(svgToLatLng), {
-      weight: 4, opacity: .8, color: '#C4622C', dashArray: '6 8'
-    }).addTo(routeGroup);
+    drawBeeline(fromXY);
     setStatus('About ' + Math.round(WalkRouting.dist(fromXY, dest.coords) * GEOREF.metresPerUnit) +
       ' m away — no drawn path connects it, follow the dashed line.', 'warn');
+    return;
+  }
+
+  // The router joins the start to the nearest line on its floor however far
+  // off that is. On an upper floor that is a route only when the line is
+  // near: from farther away it would set out from some corridor across
+  // campus with nothing joining the walker to it, and its distance would be
+  // measured from there. So it is not drawn, and the status says why - the
+  // fix is the walker's, by naming the floor they are really on.
+  const startGap = WalkRouting.dist(fromXY, path[0]);
+  if (fromLevel > 0 && startGap > PLACE_LIMIT) {
+    currentPath = [];
+    drawBeeline(fromXY);
+    setStatus('No ' + (WalkRouting.levels[fromLevel] || 'upper-floor') +
+      ' walkway is drawn near you, so the route cannot start here.' +
+      (ASKS_FLOOR ? ' If you have gone to another floor, tap “change floor” below.' : ''), 'warn');
     return;
   }
 
@@ -322,7 +362,6 @@ function drawRoute(fromXY, tail, fromLevel = 0) {
     routeParts.push({ layer: layer, level: run.level });
   });
 
-  const startGap = WalkRouting.dist(fromXY, path[0]);
   const endGap = WalkRouting.dist(path[path.length - 1], dest.coords);
   [[fromXY, path[0], startGap, fromLevel],
    [path[path.length - 1], dest.coords, endGap, destLevel]].forEach(hop => {
@@ -349,6 +388,14 @@ function drawRoute(fromXY, tail, fromLevel = 0) {
   }
   setStatus(note + '.');
   return metres;
+}
+
+// A straight dashed line to the destination, for when there is no route to
+// draw. It still shows which way the room lies.
+function drawBeeline(fromXY) {
+  L.polyline([fromXY, dest.coords].map(svgToLatLng), {
+    weight: 4, opacity: .8, color: BEELINE_COLOUR, dashArray: '6 8'
+  }).addTo(routeGroup);
 }
 
 // How the stairs figure in the directions: which way, and to which floor. A
@@ -441,7 +488,7 @@ function drawMe(ll, radiusUnits, headingDeg) {  // eslint-disable-line no-unused
   const anchor = [11, 21];
   if (!meMarker) {
     meMarker = L.marker(ll, { icon: L.divIcon({ className: '', html: html, iconSize: size, iconAnchor: anchor }), zIndexOffset: 2000 }).addTo(map);
-    meCircle = L.circle(ll, { radius: radiusUnits, color: '#1a73e8', weight: 1, opacity: .5, fillOpacity: .12 }).addTo(map);
+    meCircle = L.circle(ll, { radius: radiusUnits, color: ME_COLOUR, weight: 1, opacity: .5, fillOpacity: .12 }).addTo(map);
     if (following) map.setView(ll, Z_FOLLOW);
   } else {
     meMarker.setIcon(L.divIcon({ className: '', html: html, iconSize: size, iconAnchor: anchor }));

@@ -4,54 +4,75 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>SLSU Campus — Walking Directions</title>
+  <meta name="theme-color" content="#1B3A6B">
   <!-- served by the kiosk at /go/<slug>; both lines are stripped for the public
        static build (tools/build-web.mjs), which is a flat site. -->
   <meta name="kiosk-hosted" content="1" />
   <base href="/" />
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
   <style>
+    /* The kiosk's palette (public/css/style.css), the part this page uses,
+       under the kiosk's own token names: SLSU navy on the warm OSM paper the
+       tiles are drawn in, the seal's sky blue for the walker, the clay amber
+       for a line that only points. A colour changed there is changed here. */
     :root {
-      --ink:#22312F; --paper:#FEFDF9; --teal:#0F7A87; --teal-deep:#0A5B66;
-      --rufous:#C4622C; --danger:#9E2B22; --me:#1a73e8;
+      --slsu-navy:       #1B3A6B;
+      --slsu-navy-deep:  #12294D;
+      --slsu-sky:        #3E7CB1;
+      --slsu-ink:        #1E2A33;
+      --on-brand:        #EDE7DC;
+      --warm-amber:      #B0691E;
+      --map-paper:       #FEFDF9;
+      --text-color:      #33393D;
+      --text-muted:      #6E6459;
+      --border-subtle:   #C9BDB0;
+      --danger-color:    #96261F;
+      --card-shadow:       0 4px 14px rgba(70, 58, 46, 0.10);
+      --card-shadow-hover: 0 6px 20px rgba(70, 58, 46, 0.16);
       /* The walking route, matched to --route-line on the kiosk so a walk
          handed over by QR does not change colour on the way. */
-      --route:#12294D;
+      --route: var(--slsu-navy-deep);
     }
     * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html, body { height:100%; font-family:-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:#aab7ad; }
-    #map { position:absolute; inset:0; background:#aab7ad; }
-    .leaflet-container { background:#aab7ad; }
+    html, body { height:100%; font-family:-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--text-color); background:var(--map-paper); }
+    #map { position:absolute; inset:0; background:var(--map-paper); }
+    .leaflet-container { background:var(--map-paper); }
 
     .sheet {
       position:absolute; left:0; right:0; bottom:0; z-index:1000;
-      background:var(--paper); border-radius:18px 18px 0 0;
-      box-shadow:0 -6px 24px rgba(0,0,0,.20);
+      background:var(--map-paper); border-radius:18px 18px 0 0;
+      box-shadow:0 -6px 24px rgba(70,58,46,.22);
       padding:14px 16px calc(16px + env(safe-area-inset-bottom));
       max-height:42vh; overflow-y:auto;
     }
-    .sheet h1 { font-size:1.15rem; line-height:1.25; }
-    .sheet .sub { color:#63726A; font-size:.9rem; margin-top:2px; }
+    .sheet h1 { font-size:1.15rem; line-height:1.25; color:var(--slsu-ink); }
+    .sheet .sub { color:var(--text-muted); font-size:.9rem; margin-top:2px; }
     .sheet .meta { margin-top:10px; font-size:.9rem; }
     .sheet .meta div { padding:3px 0; }
-    .sheet .meta strong { color:#4b5a54; font-weight:600; }
+    .sheet .meta strong { color:var(--text-muted); font-weight:600; }
+    /* The one line being read: navy chrome with the kiosk panel's warm
+       off-white on it, as the kiosk's own panel is. */
     .status {
       margin-top:11px; font-size:.92rem; font-weight:600; padding:9px 11px;
-      border-radius:9px; background:var(--teal); color:#fff;
+      border-radius:9px; background:var(--slsu-navy); color:var(--on-brand);
     }
-    .status.warn { background:#FBECE8; color:#8a3a2b; }
+    .status.warn { background:var(--map-paper); color:var(--danger-color); border:1px solid var(--danger-color); }
     .status.big  { font-size:1.05rem; }
 
+    /* Map controls: paper groups with the kiosk's subtle border and shadow;
+       a pressed or active one goes deep navy under paper text, as the kiosk's
+       floor buttons do. */
     .fab {
       position:absolute; right:12px; z-index:1000;
       bottom:calc(42vh + 14px);
       display:flex; flex-direction:column; gap:10px;
     }
     .fab button {
-      width:46px; height:46px; border-radius:50%; border:none;
-      background:var(--paper); box-shadow:0 2px 10px rgba(0,0,0,.28);
-      font-size:1.25rem; color:var(--teal-deep); display:grid; place-items:center;
+      width:46px; height:46px; border-radius:50%; border:1px solid var(--border-subtle);
+      background:var(--map-paper); box-shadow:var(--card-shadow-hover);
+      font-size:1.25rem; color:var(--slsu-ink); display:grid; place-items:center;
     }
-    .fab button.on { background:var(--teal); color:#fff; }
+    .fab button.on { background:var(--slsu-navy-deep); color:var(--map-paper); border-color:var(--slsu-navy-deep); }
 
     /* Floor picker. One stacked group like the kiosk's, sitting above the
        follow button so both thumb targets stay in the same corner. */
@@ -59,39 +80,48 @@
       position:absolute; right:12px; z-index:1000;
       bottom:calc(42vh + 74px);
       display:flex; flex-direction:column;
-      border-radius:12px; overflow:hidden;
-      background:var(--paper); box-shadow:0 2px 10px rgba(0,0,0,.28);
+      border-radius:10px; overflow:hidden; border:1px solid var(--border-subtle);
+      background:var(--map-paper); box-shadow:var(--card-shadow-hover);
     }
     .floors button {
       width:46px; height:40px; border:none; background:transparent;
-      color:var(--teal-deep); font-size:.9rem; font-weight:700;
+      color:var(--slsu-ink); font-size:.9rem; font-weight:700;
       display:grid; place-items:center;
     }
-    .floors button + button { border-top:1px solid rgba(34,49,47,.12); }
-    .floors button.on { background:var(--teal); color:#fff; }
+    .floors button + button { border-top:1px solid var(--border-subtle); }
+    .floors button.on { background:var(--slsu-navy-deep); color:var(--map-paper); }
     .floors button:disabled { opacity:.35; }
     /* display:flex above would otherwise beat the hidden attribute the kiosk
        copy sets on this group. */
     .floors[hidden] { display:none; }
     .fab button[hidden] { display:none; }
 
-    /* Both markers are inline SVG that inherits colour from these rules, so the
-       phone shows the destination warm and the walker blue, as the map does. */
+    /* Tooltips as the kiosk draws them: paper, subtle edge, dark text. */
+    .leaflet-tooltip {
+      background:var(--map-paper); border:1px solid var(--border-subtle); color:var(--slsu-ink);
+      font-size:12px; font-weight:600; border-radius:8px; padding:6px 10px; box-shadow:var(--card-shadow);
+    }
+    .leaflet-tooltip-top:before { border-top-color:var(--map-paper); }
+
+    /* All three markers are inline SVG that inherits colour from these rules.
+       The destination wears its category's colour, set inline by mobile.js -
+       the colour its pin has on the kiosk map; the walker is the seal's sky
+       blue; the kiosk is the deep navy of the kiosk's own marker. */
     .dest-pin, .me-pin, .kiosk-pin { display:block; }
     .dest-pin svg, .me-pin svg, .kiosk-pin svg { width:100%; height:100%; display:block; }
     .dest-pin {
-      width:30px; height:30px; color:var(--rufous);
-      filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));
+      width:30px; height:30px; color:#7C736A;
+      filter:drop-shadow(0 2px 3px rgba(51,51,51,.35));
     }
     .me-pin {
-      width:22px; height:22px; color:var(--me);
+      width:22px; height:22px; color:var(--slsu-sky);
       filter:drop-shadow(0 1px 2px rgba(0,0,0,.45));
     }
-    /* Where the walk started. Same tack as the walker, in the structural teal
-       and a size down, so the two read as related without competing - the
-       blue one is you, this one is the kiosk you left. */
+    /* Where the walk started. Same tack as the walker, in the kiosk marker's
+       deep navy and a size down, so the two read as related without
+       competing - the sky-blue one is you, this one is the kiosk you left. */
     .kiosk-pin {
-      width:20px; height:20px; color:var(--teal-deep); opacity:.85;
+      width:20px; height:20px; color:var(--slsu-navy-deep); opacity:.9;
       filter:drop-shadow(0 1px 2px rgba(0,0,0,.3));
     }
 
@@ -100,30 +130,30 @@
        tell. It covers the map: nothing behind it is right until answered. */
     .ask {
       position:absolute; inset:0; z-index:2000;
-      background:var(--paper); overflow-y:auto;
+      background:var(--map-paper); overflow-y:auto;
       display:flex; align-items:center; justify-content:center;
       padding:24px 20px calc(24px + env(safe-area-inset-bottom));
     }
     .ask[hidden] { display:none; }
     .ask-card { width:100%; max-width:360px; }
-    .ask-kicker { color:#63726A; font-size:.82rem; text-transform:uppercase; letter-spacing:.05em; }
-    .ask-card h2 { font-size:1.35rem; line-height:1.25; margin-top:4px; }
-    .ask-q { font-size:1.05rem; font-weight:600; margin-top:28px; }
+    .ask-kicker { color:var(--text-muted); font-size:.82rem; text-transform:uppercase; letter-spacing:.05em; }
+    .ask-card h2 { font-size:1.35rem; line-height:1.25; margin-top:4px; color:var(--slsu-ink); }
+    .ask-q { font-size:1.05rem; font-weight:600; margin-top:28px; color:var(--slsu-ink); }
     .ask-floors { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
     .ask-floor {
-      width:100%; min-height:56px; border:2px solid var(--teal); border-radius:12px;
-      background:#fff; color:var(--teal-deep); font-size:1.05rem; font-weight:700;
+      width:100%; min-height:56px; border:2px solid var(--slsu-navy); border-radius:12px;
+      background:var(--map-paper); color:var(--slsu-navy-deep); font-size:1.05rem; font-weight:700;
     }
-    .ask-floor:active { background:var(--teal); color:#fff; }
+    .ask-floor:active { background:var(--slsu-navy-deep); color:var(--map-paper); border-color:var(--slsu-navy-deep); }
     .ask-floor:disabled { opacity:.35; }
-    .ask-hint { margin-top:16px; font-size:.9rem; color:#63726A; }
+    .ask-hint { margin-top:16px; font-size:.9rem; color:var(--text-muted); }
     .ask-hint[hidden] { display:none; }
 
     /* The floor the walker said they are on, and the way to say otherwise
        once they have gone up or down. */
     .my-floor {
       margin-top:10px; padding:0; border:none; background:transparent;
-      font:inherit; font-size:.88rem; color:var(--teal-deep);
+      font:inherit; font-size:.88rem; color:var(--slsu-navy);
       text-decoration:underline; text-underline-offset:2px;
     }
     .my-floor[hidden] { display:none; }
