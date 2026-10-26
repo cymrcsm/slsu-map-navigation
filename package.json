@@ -13,7 +13,8 @@
     "smoke": "node tools/smoke.mjs",
     "build:data": "node tools/build-data.js",
     "build:paths": "node tools/build-walkpaths.js",
-    "clean:svg": "node tools/clean-floor-svg.js"
+    "clean:svg": "node tools/clean-floor-svg.js",
+    "build:tiles": "node tools/build-floor-tiles.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",

@@ -279,6 +279,11 @@ app.get('/go/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'mobile.html'));
 });
 
+// Floor tiles that would be fully transparent are never written
+// (tools/build-floor-tiles.mjs), so asking for one is a plain 404 rather
+// than the app page; the kiosk draws nothing there.
+app.use('/floor-tiles', (req, res) => res.status(404).end());
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

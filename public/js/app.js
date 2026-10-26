@@ -218,38 +218,101 @@ const basemap = L.tileLayer('tiles/{z}/{x}/{y}.png', {
 const FLOOR_ASSETS = ['assets/groundFloor_layer.svg',
                       'assets/secondFloor_layer.svg',
                       'assets/thirdFloor_layer.svg'];
+
+// The same drawings cut into map tiles by tools/build-floor-tiles.mjs - what
+// the kiosk normally draws. As one SVG image, a floor zoomed in to read a room
+// is ~17,000 x 31,000 px, and the Raspberry Pi repainted the 14 MB drawing on
+// every pan and zoom: the map lagged. As tiles, like the street map, only the
+// squares on screen are loaded, at the zoom on screen. The tiles are cut for
+// georef.js's default placement, so a calibration saved in this browser
+// (calibrate.html) brings the SVGs back - they follow it, the tiles cannot.
+// Re-run the tool after re-exporting a floor, or the kiosk shows the old one.
+const FLOOR_TILES = ['floor-tiles/ground', 'floor-tiles/second', 'floor-tiles/third'];
+const FLOOR_TILE_MIN_ZOOM = 18;   // build-floor-tiles.mjs --zmin
+const FLOOR_TILE_MAX_ZOOM = 23;   // build-floor-tiles.mjs --zmax
+const USE_FLOOR_TILES = !GEOREF_IS_CALIBRATED;
 let activeLevel = 0;
 
 // Only the floor being viewed is drawn. The other floors used to stay faint
 // underneath it so the building kept its shape between switches, but on the
-// Raspberry Pi 4 redrawing three stacked plans on every zoom and pan made the
-// map lag. They stay on the map - hidden, not removed - so switching floors
-// does not reload the drawings. Set SHOW_INACTIVE_FLOORS to true for the old
-// look. The floor a route happens to end on does not decide which floor shows -
-// the floor the user is looking at does.
+// Raspberry Pi 4 drawing three stacked plans on every zoom and pan made the map
+// lag. Set SHOW_INACTIVE_FLOORS to true for the old look. The floor a route
+// happens to end on does not decide which floor shows - the floor the user is
+// looking at does.
 const SHOW_INACTIVE_FLOORS = false;
 const INACTIVE_FLOOR_OPACITY = 0.18;
 
-const floorOverlays = FLOOR_ASSETS.map(url => new GeoImageOverlay(url, {
-  canvasWidth: MAP_WIDTH,
-  canvasHeight: MAP_HEIGHT,
-  bearingDeg: GEOREF.bearingDeg,
-  className: 'campus-overlay'
-}));
+// Floors sit over the street map and under routes and pins: a pane of their
+// own, between the tile pane (200) and the overlay pane (400) routes draw in.
+map.createPane('floorPane').style.zIndex = 350;
 
-// Bounds are identical across floors, so any one of them speaks for all.
-const campusOverlay = floorOverlays[0];
-const bounds = campusOverlay.getBounds();
+// Fully transparent tiles are never written, and the server answers for them
+// with a 404 (server.js); Leaflet then puts this in place of a broken image.
+const BLANK_TILE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+// The frame's corners - the same for every floor, tiles or SVG.
+const bounds = L.latLngBounds(canvasCornersLatLng(MAP_WIDTH, MAP_HEIGHT));
 map.setMaxBounds(bounds.pad(0.25));
+
+// Between whole zoom levels Leaflet scales tiles by a fraction and the browser
+// softens the edges of each one; with zoomSnap: 0 nearly every zoom is in
+// between. Where two softened edges meet, a hairline shows - a faint grid over
+// the drawing. So floor tiles are 257 px images laid 256 px apart: the extra
+// row and column is the neighbour's real first row and column
+// (build-floor-tiles.mjs), so every seam pixel has drawing under it. Leaflet
+// blends tiles with plus-lighter, which would add that overlap up into a
+// bright line instead, so floor tiles blend normally.
+const FloorTileLayer = L.TileLayer.extend({
+  _initTile: function (tile) {
+    L.TileLayer.prototype._initTile.call(this, tile);
+    const size = this.getTileSize();
+    tile.style.width = (size.x + 1) + 'px';
+    tile.style.height = (size.y + 1) + 'px';
+    tile.style.mixBlendMode = 'normal';
+  }
+});
+
+const floorOverlays = USE_FLOOR_TILES
+  ? FLOOR_TILES.map(dir => new FloorTileLayer(dir + '/{z}/{x}/{y}.webp', {
+      pane: 'floorPane',
+      minNativeZoom: FLOOR_TILE_MIN_ZOOM,
+      maxNativeZoom: FLOOR_TILE_MAX_ZOOM,
+      // Leaflet rounds the zoom before comparing it with maxZoom, so a limit of
+      // MAX_ZOOM itself (23.73) would hide the floor above zoom 23.5.
+      maxZoom: Math.ceil(MAX_ZOOM),
+      bounds: bounds,
+      errorTileUrl: BLANK_TILE,
+      // Mid-pinch, scale the tiles already loaded rather than fetch every level
+      // passed through; the right ones load when the fingers lift.
+      updateWhenZooming: false,
+      className: 'campus-overlay'
+    }))
+  : FLOOR_ASSETS.map(url => new GeoImageOverlay(url, {
+      pane: 'floorPane',
+      canvasWidth: MAP_WIDTH,
+      canvasHeight: MAP_HEIGHT,
+      bearingDeg: GEOREF.bearingDeg,
+      className: 'campus-overlay'
+    }));
 
 function applyFloorOpacity() {
   const front = basemapVisible ? OVERLAY_OPACITY_OVER_BASEMAP : 1;
   floorOverlays.forEach((ov, i) => {
     const isActive = i === activeLevel;
+    const show = isActive || SHOW_INACTIVE_FLOORS;
     ov.setOpacity(isActive ? front : INACTIVE_FLOOR_OPACITY);
     if (ov.setZIndex) ov.setZIndex(isActive ? 2 : 1);
-    const el = ov.getElement();
-    if (el) el.style.display = (isActive || SHOW_INACTIVE_FLOORS) ? '' : 'none';
+    if (USE_FLOOR_TILES) {
+      // A tile layer keeps fetching tiles on every pan and zoom while it is on
+      // the map, seen or not, so a hidden floor leaves the map.
+      if (show && !map.hasLayer(ov)) ov.addTo(map);
+      else if (!show && map.hasLayer(ov)) map.removeLayer(ov);
+    } else {
+      // A hidden SVG stays on the map - display: none - so switching back to it
+      // does not decode the 14 MB drawing again.
+      const el = ov.getElement();
+      if (el) el.style.display = show ? '' : 'none';
+    }
   });
 }
 
@@ -266,7 +329,9 @@ function applyBasemap(on) {
   }
 }
 
-floorOverlays.forEach(ov => ov.addTo(map));
+// Tile floors go on in applyFloorOpacity(), the active one only; the SVG
+// floors all go on now and are hidden there.
+if (!USE_FLOOR_TILES) floorOverlays.forEach(ov => ov.addTo(map));
 applyBasemap(true);
 
 const CAMPUS_CENTER = toLeafletCoords([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
