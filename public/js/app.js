@@ -204,12 +204,13 @@ const basemapBtn = document.getElementById('basemap-btn');
 // boundary padded to match setMaxBounds() below, at z15-19. Nothing here
 // reaches the network, so the street map works with the kiosk offline.
 // The OpenStreetMap credit stays: it is an ODbL licence condition and does not
-// lapse because the tiles are served locally.
+// lapse because the tiles are served locally. It is text, not a link: on the
+// kiosk a tap on a link would leave the app, and kiosk mode has no back button.
 const basemap = L.tileLayer('tiles/{z}/{x}/{y}.png', {
   minNativeZoom: 15,
   maxNativeZoom: 19,
   maxZoom: MAX_ZOOM,
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  attribution: '&copy; OpenStreetMap contributors'
 });
 
 // One drawing per level, in the same order as WALK_PATHS.levels. They share the
@@ -2100,3 +2101,11 @@ lockAdmin = function () {
   adminCancelFloat.hidden = true;
   lockAdminBase.apply(this, arguments);
 };
+
+// ==========================================
+// KIOSK LOCK-DOWN
+// ==========================================
+// A long press on the touch screen opens the browser's own menu - Back, Save
+// as, Print, Inspect - and every one of those leads out of the kiosk. Nothing
+// in the app uses that menu, so it never opens.
+document.addEventListener('contextmenu', e => e.preventDefault());

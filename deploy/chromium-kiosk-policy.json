@@ -1,0 +1,11 @@
+{
+  "DeveloperToolsAvailability": 2,
+  "DownloadRestrictions": 3,
+  "PrintingEnabled": false,
+  "PasswordManagerEnabled": false,
+  "TranslateEnabled": false,
+  "BrowserSignin": 0,
+  "SyncDisabled": true,
+  "URLBlocklist": ["*"],
+  "URLAllowlist": ["127.0.0.1", "localhost"]
+}

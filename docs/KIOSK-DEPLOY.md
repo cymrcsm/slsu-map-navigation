@@ -122,8 +122,28 @@ belt-and-braces override.)
 
 ## Part E — the kiosk browser
 
-Point Chromium in kiosk mode at `http://localhost` (the touchscreen uses plain
-HTTP on the box itself, which is fine). The "📱 Take this on my phone" QR it
+On the Pi, after Part D:
+
+```bash
+cd ~/thesis-map-navigation
+bash deploy/install-kiosk.sh
+sudo reboot
+```
+
+From then on the Pi boots straight to the desktop and opens the app fullscreen
+in Chromium (`deploy/kiosk-browser.sh`), reopening it two seconds after it is
+ever closed. Chromium is locked down by `deploy/chromium-kiosk-policy.json`: no
+developer tools, downloads or printing, and no site but the kiosk's own. The
+script also turns the touch screen's mouse emulation off, which pinch-to-zoom
+needs. Keep the display on the same micro-HDMI port: the touch input is mapped
+to that output.
+
+For maintenance over SSH, `pkill -f kiosk-browser.sh; pkill -x chromium` stops
+the kiosk until the next reboot; the undo steps are at the top of
+`install-kiosk.sh`.
+
+The kiosk browser uses plain HTTP on the box itself (`http://127.0.0.1`), which
+is fine. The "📱 Take this on my phone" QR it
 draws will already carry `https://slsu-kiosk.duckdns.org/go/…` — `install-cert`
 recorded the hostname from the certificate.
 
