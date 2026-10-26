@@ -41,7 +41,7 @@ Express: static `public/`, captive-portal probes, `/api/*` (locations, search, c
 
 ### Front end
 
-- `public/js/app.js` (~2400 lines, numbered sections in comment banners: 4 map, 6 kiosk position, 8 markers, 9 detail panel, 10 search, 11 routing, 12 events, 14–16 add/move/edit pins, then admin cancel/return-to-panel and the on-screen keyboard at the end). Reads `PLACES` = `campus-data.js` layered with the server's overrides snapshot (`buildPlaces()` drops base entries a custom row also covers).
+- `public/js/app.js` (~2400 lines, numbered sections in comment banners: 4 map, 6 kiosk position, 8 markers, 9 detail panel, 10 search, 11 routing, 12 events, 14–16 add/move/edit pins, then admin cancel/return-to-panel at the end). Reads `PLACES` = `campus-data.js` layered with the server's overrides snapshot (`buildPlaces()` drops base entries a custom row also covers).
 - `public/js/mobile.js` + `mobile.html` — the phone page. `ON_KIOSK` (from `<meta name="kiosk-hosted">`) distinguishes the kiosk-served copy from the GitHub Pages build; `HAS_FLOOR_PICKER = !ON_KIOSK`. `tools/build-web.mjs` strips that meta and the `<base>` when assembling `web/`.
 - `public/js/routing.js` (`WalkRouting`) is the phone's A\* router; **app.js section 11 carries its own inline copy** (`findWalkingPath`, `projectOntoNetwork`, `splitByLevel`, `drawRoute`). Any change to routing rules (OFFPATH_LIMIT, stair-run expansion, snapping) must be made in both.
 - `public/js/georef.js` — the single drawing-units ↔ lat/lng transform. Drawing space is the 320×570 `FRAME`, 1 unit ≈ 1 m, y down. `geo-overlay.js` is the custom Leaflet `GeoImageOverlay` for the floor SVGs.
