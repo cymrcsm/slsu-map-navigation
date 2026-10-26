@@ -9,10 +9,11 @@ URL="http://127.0.0.1/"
 BROWSER="$(command -v chromium || command -v chromium-browser)"
 LABWC_RC="$HOME/.config/labwc/rc.xml"
 
-# The app is its own service (slsu-kiosk) and may still be starting at login.
-# Wait for it - up to a minute - so the first thing on screen is the app.
-for _ in $(seq 1 60); do
-  curl -s -o /dev/null "$URL" && break
+# The app is its own service (slsu-kiosk) and may still be starting at login -
+# later still with no Wi-Fi, since the service waits for the network to settle
+# first. Wait for it however long that takes, so Chromium never opens onto a
+# "can't reach this site" page it would then sit on.
+until curl -s -o /dev/null "$URL"; do
   sleep 1
 done
 
