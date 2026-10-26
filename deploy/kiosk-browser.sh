@@ -40,6 +40,10 @@ while true; do
   # --disable-pinch           a pinch cannot zoom the whole page; the map still
   #                           pinch-zooms itself
   # --overscroll-history-navigation=0   a sideways swipe cannot go "back"
+  # --enable-gpu-rasterization, --ignore-gpu-blocklist
+  #                           paint on the Pi's graphics chip, not the CPU: the
+  #                           floor drawing is repainted on every pan and zoom
+  # --num-raster-threads=4    any painting left on the CPU uses all four cores
   "$BROWSER" \
     --kiosk \
     --ozone-platform=wayland \
@@ -52,6 +56,9 @@ while true; do
     --disable-pinch \
     --overscroll-history-navigation=0 \
     --check-for-update-interval=31536000 \
+    --enable-gpu-rasterization \
+    --ignore-gpu-blocklist \
+    --num-raster-threads=4 \
     "$URL"
   sleep 2
 done
