@@ -1064,7 +1064,13 @@ function showTutorialView() {
 }
 
 function selectCategory(id) {
-  activeCategory = (id === activeCategory && id !== 'ALL') ? 'ALL' : id;
+  // Tapping the choice already made undoes it - every building's places come
+  // back - but the map stays where it is rather than pulling out to the whole
+  // campus.
+  const stayPut = id === activeCategory && id !== 'ALL';
+  activeCategory = stayPut ? 'ALL' : id;
+  // "All Buildings" (or Back) puts away whichever building was open.
+  if (id === 'ALL' && openBuilding !== null) { openBuilding = null; showOpenBuilding(); }
   paintCategoryButtons();
 
   activeSelectedLocation = null;
@@ -1076,7 +1082,7 @@ function selectCategory(id) {
 
   if (activeCategory === 'ALL') {
     showPanel(tutorialView);
-    autoCenterCampus(true);
+    if (!stayPut) autoCenterCampus(true);
     return;
   }
 
