@@ -196,7 +196,10 @@ const map = L.map('map', {
   wheelPxPerZoomLevel: 120,
   maxBoundsViscosity: 1.0,
   zoomControl: false,
-  attributionControl: false
+  attributionControl: false,
+  // New tiles appear at once rather than fading in: on the Raspberry Pi every
+  // fading tile is one more layer to blend, frame after frame, after a zoom.
+  fadeAnimation: false
 });
 
 // A layer cannot be added before the map has a centre, so seed the view here
@@ -282,6 +285,9 @@ const basemap = L.tileLayer('tiles/{z}/{x}/{y}.png', {
   minNativeZoom: 15,
   maxNativeZoom: 19,
   maxZoom: MAX_ZOOM,
+  // Mid-pinch, scale the tiles already shown rather than fetch every level
+  // passed through (the floor tiles do the same).
+  updateWhenZooming: false,
   attribution: '&copy; OpenStreetMap contributors'
 });
 
@@ -792,7 +798,10 @@ const PlaceMarker = L.CircleMarker.extend({
 // No extra tap tolerance: the canvas hands a tap to the top-most marker in
 // reach, so a margin would only widen the overlap between neighbours. Which of
 // the overlapping ones opens is settled by markerAt() below.
-const markerRenderer = L.canvas({ padding: 0.5, tolerance: 0 });
+// padding 0.2: the canvas reaches a fifth of a screen past each edge - enough
+// for a short drag - rather than half, which made it four times the screen's
+// area to clear and repaint after every zoom.
+const markerRenderer = L.canvas({ padding: 0.2, tolerance: 0 });
 
 const markerFor = new Map();   // location id -> PlaceMarker
 
@@ -931,7 +940,7 @@ const LabelCanvas = L.Canvas.extend({
     L.Canvas.prototype._draw.call(this);
   }
 });
-const labelRenderer = new LabelCanvas({ pane: 'labelPane', padding: 0.3 });
+const labelRenderer = new LabelCanvas({ pane: 'labelPane', padding: 0.2 });
 
 function wrapLabel(ctx, text, maxWidth) {
   const words = text.split(' ');
