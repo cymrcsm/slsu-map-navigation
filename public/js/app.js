@@ -160,6 +160,9 @@ const ZOOM_FLOOR = 0.5 + GEO_ZOOM_SHIFT;
 const ROUTE_MAX_ZOOM = 4 + GEO_ZOOM_SHIFT;
 const FIT_PADDING = 16;
 const PIN_ZOOM = 2.4 + GEO_ZOOM_SHIFT;
+// Below this the markers are hidden (section 8, syncMarkerVisibility). The
+// whole-campus view on the kiosk screen is about 1.2; this is two taps of +.
+const MARKER_ZOOM = 1.9 + GEO_ZOOM_SHIFT;
 const MAX_ZOOM = 6.5 + GEO_ZOOM_SHIFT;
 const READABLE_PX = 15;
 const MIN_ROOM_ZOOM = 3 + GEO_ZOOM_SHIFT;
@@ -806,8 +809,22 @@ function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
     .filter(Boolean)
     .sort((a, b) => b.getLatLng().lat - a.getLatLng().lat)
     .forEach(m => markerLayer.addLayer(m));
+  syncMarkerVisibility(searchQuery);
   return matches;
 }
+
+// Zoomed out to the whole campus the markers are left off: a few hundred dots
+// over the drawing said little but "there is a lot here", and the building
+// names say more. They come on past MARKER_ZOOM - and whenever the map is
+// showing a choice (a building, a category, a search), so a filtered result is
+// never hidden.
+function syncMarkerVisibility(searchQuery) {
+  const q = searchQuery !== undefined ? searchQuery : (searchInput ? searchInput.value : '');
+  const want = map.getZoom() >= MARKER_ZOOM || activeCategory !== 'ALL' || !!q.trim();
+  if (want && !map.hasLayer(markerLayer)) markerLayer.addTo(map);
+  else if (!want && map.hasLayer(markerLayer)) map.removeLayer(markerLayer);
+}
+map.on('zoomend', () => syncMarkerVisibility());
 
 // Crossing pin zoom changes every marker's shape and size; re-measure them all
 // and repaint.
