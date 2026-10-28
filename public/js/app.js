@@ -218,14 +218,53 @@ map.setView(svgToLatLng([MAP_WIDTH / 2, MAP_HEIGHT / 2]), 18, { animate: false }
 // the half-applied scale a cancelled zoom animation left on them. That is the
 // part that shows: the artwork drifting out of register with the route and the
 // street map under it.
-function flyToView(latlng, zoom, options) {
+//
+// The moves themselves read in two steps, so the eye can follow: first the map
+// glides over to the place at the zoom it is already at, then it zooms in
+// gradually. Pulling back - to frame a whole route or a building's rooms - is a
+// single smooth move. Each new move cancels whatever is left of the last.
+const PAN_SECONDS_PER_SCREEN = 0.45;
+const PAN_MAX_SECONDS = 1.1;
+const ZOOM_SECONDS_PER_LEVEL = 0.4;
+const ZOOM_MIN_SECONDS = 0.6;
+const ZOOM_MAX_SECONDS = 1.6;
+let viewMove = 0;
+
+function moveView(latlng, zoom) {
   map.stop();
-  map.flyTo(latlng, zoom, options);
+  const move = ++viewMove;
+  zoom = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), zoom));
+  const size = map.getSize();
+  const off = map.latLngToContainerPoint(latlng).subtract(size.divideBy(2));
+  const screens = Math.hypot(off.x / size.x, off.y / size.y);
+  const zoomBy = zoom - map.getZoom();
+  const zoomSeconds = Math.max(ZOOM_MIN_SECONDS,
+    Math.min(ZOOM_MAX_SECONDS, Math.abs(zoomBy) * ZOOM_SECONDS_PER_LEVEL));
+
+  // Pulling back, or already over the place: one move.
+  if (zoomBy <= 0.05 || screens < 0.12) {
+    map.flyTo(latlng, zoom, { duration: zoomSeconds });
+    return;
+  }
+  map.once('moveend', () => {
+    if (move === viewMove) map.flyTo(latlng, zoom, { duration: zoomSeconds });
+  });
+  map.panTo(latlng, {
+    animate: true, easeLinearity: 0.3,
+    duration: Math.min(PAN_MAX_SECONDS, 0.35 + screens * PAN_SECONDS_PER_SCREEN)
+  });
 }
 
-function fitView(bounds, options) {
-  map.stop();
-  map.fitBounds(bounds, options);
+function flyToView(latlng, zoom) {
+  moveView(latlng, zoom);
+}
+
+// Where fitBounds would end up, reached by the same two steps.
+function fitView(bounds, options = {}) {
+  const pad = L.point(options.padding || [0, 0]);
+  let zoom = map.getBoundsZoom(bounds, false, pad.multiplyBy(2));
+  if (options.maxZoom !== undefined) zoom = Math.min(zoom, options.maxZoom);
+  moveView(bounds.getCenter(), zoom);
 }
 
 // OpenStreetMap requires visible credit wherever its tiles are shown.
