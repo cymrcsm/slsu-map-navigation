@@ -55,6 +55,10 @@ const slug = decodeURIComponent(
   params.get('d') || (location.pathname.split('/go/')[1] || '').split(/[/?#]/)[0] || ''
 );
 const ON_KIOSK = !!document.querySelector('meta[name="kiosk-hosted"]');
+// A place shared by neighbouring buildings names them all, separated by
+// semicolons (as app.js reads it); shown here as a plain list.
+const buildingText = b => (b || '').split(';').map(x => x.trim()).filter(Boolean)
+  .map(x => (x === 'SLSU Main Campus' ? 'Campus Grounds' : x)).join(', ');
 // from=<x>,<y>[,<level>] - where the kiosk stands. The level is the floor it
 // is on (0 = ground); older codes carry only x,y and mean the ground floor.
 const fromParam = (params.get('from') || '').split(',').map(Number);
@@ -287,8 +291,8 @@ function render() {
 
   document.getElementById('dest-name').textContent = dest.name;
   document.getElementById('dest-sub').textContent =
-    dest.acronym ? dest.building + ' · ' + dest.acronym : dest.building;
-  const center = dest.building === dest.name ? 'SLSU Main Campus' : dest.building;
+    dest.acronym ? buildingText(dest.building) + ' · ' + dest.acronym : buildingText(dest.building);
+  const center = dest.building === dest.name ? 'SLSU Main Campus' : buildingText(dest.building);
   document.getElementById('dest-meta').innerHTML =
     '<div><strong>Floor:</strong> ' + esc(dest.floor) + '</div>' +
     '<div><strong>Building / Center:</strong> ' + esc(center) + '</div>' +
@@ -569,7 +573,7 @@ function askFloor() {
   if (!askEl) return;
   document.getElementById('ask-dest').textContent = dest.name;
   document.getElementById('ask-dest-sub').textContent =
-    dest.floor + (dest.building && dest.building !== dest.name ? ' · ' + dest.building : '');
+    dest.floor + (dest.building && dest.building !== dest.name ? ' · ' + buildingText(dest.building) : '');
   const hint = document.getElementById('ask-hint');
   // A code from the kiosk says which floor the kiosk is on - a help to someone
   // who has just scanned it and is not sure what the building calls this floor.

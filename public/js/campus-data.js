@@ -124,7 +124,7 @@ const LOCATIONS = [
   "id": "archives-center",
   "name": "Archives Center",
   "acronym": "AC",
-  "building": "Administration Building",
+  "building": "Archives Center",
   "categories": [
    "stock-archives"
   ],
@@ -213,7 +213,7 @@ const LOCATIONS = [
   "id": "arkyn-s-snack-house",
   "name": "Arkyn's Snack House",
   "acronym": "ASH",
-  "building": "SLSU Main Campus",
+  "building": "Student Center",
   "categories": [
    "food-commercial"
   ],
@@ -230,7 +230,7 @@ const LOCATIONS = [
   "id": "as-101",
   "name": "AS-101",
   "acronym": "AS-101",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "classrooms"
   ],
@@ -247,7 +247,7 @@ const LOCATIONS = [
   "id": "as-102",
   "name": "AS-102",
   "acronym": "AS-102",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "classrooms"
   ],
@@ -264,7 +264,7 @@ const LOCATIONS = [
   "id": "as-103",
   "name": "AS-103",
   "acronym": "AS-103",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "classrooms"
   ],
@@ -281,7 +281,7 @@ const LOCATIONS = [
   "id": "as-104",
   "name": "AS-104",
   "acronym": "AS-104",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "classrooms"
   ],
@@ -298,7 +298,7 @@ const LOCATIONS = [
   "id": "as-105",
   "name": "AS-105",
   "acronym": "AS-105",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "classrooms"
   ],
@@ -315,7 +315,7 @@ const LOCATIONS = [
   "id": "as-106",
   "name": "AS-106",
   "acronym": "AS-106",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "classrooms"
   ],
@@ -332,7 +332,7 @@ const LOCATIONS = [
   "id": "as-107",
   "name": "AS-107",
   "acronym": "AS-107",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "classrooms"
   ],
@@ -349,7 +349,7 @@ const LOCATIONS = [
   "id": "as-108",
   "name": "AS-108",
   "acronym": "AS-108",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "classrooms"
   ],
@@ -366,7 +366,7 @@ const LOCATIONS = [
   "id": "assessment-area",
   "name": "Assessment Area",
   "acronym": "AA",
-  "building": "SLSU Main Campus",
+  "building": "Food Technology Building",
   "categories": [
    "laboratories"
   ],
@@ -383,7 +383,7 @@ const LOCATIONS = [
   "id": "bargo-production",
   "name": "BARGO Production",
   "acronym": "BARGO",
-  "building": "SLSU Main Campus",
+  "building": "Student Center",
   "categories": [
    "auxiliary-services",
    "stock-archives"
@@ -419,7 +419,7 @@ const LOCATIONS = [
   "id": "basketball-court",
   "name": "Basketball Court",
   "acronym": "BC",
-  "building": "Physical Education Building",
+  "building": "SLSU Main Campus",
   "categories": [
    "sports-recreation"
   ],
@@ -605,7 +605,7 @@ const LOCATIONS = [
   "id": "cjso-office",
   "name": "CJSO Office",
   "acronym": "CJSO",
-  "building": "Faculty of Criminal Justice Building",
+  "building": "Criminal Justice Building",
   "categories": [
    "student-orgs",
    "health-services",
@@ -625,7 +625,7 @@ const LOCATIONS = [
   "id": "cm-snack-house",
   "name": "CM Snack House",
   "acronym": "CM",
-  "building": "SLSU Main Campus",
+  "building": "Student Center",
   "categories": [
    "food-commercial"
   ],
@@ -642,7 +642,7 @@ const LOCATIONS = [
   "id": "comfort-room",
   "name": "Comfort Room",
   "acronym": "CR",
-  "building": "SLSU Main Campus",
+  "building": "Hospitality and Tourism Management Building",
   "categories": [
    "comfort-rooms"
   ],
@@ -659,7 +659,7 @@ const LOCATIONS = [
   "id": "comfort-room-10",
   "name": "Comfort Room",
   "acronym": "CR",
-  "building": "SLSU Main Campus",
+  "building": "Industrial Technology Building 1; Industrial Technology Building 2; Industrial Technology Building 3",
   "categories": [
    "comfort-rooms"
   ],
@@ -676,7 +676,7 @@ const LOCATIONS = [
   "id": "comfort-room-11",
   "name": "Comfort Room",
   "acronym": "CR",
-  "building": "SLSU Main Campus",
+  "building": "Multi Purpose Court (MPC)",
   "categories": [
    "comfort-rooms"
   ],
@@ -693,7 +693,7 @@ const LOCATIONS = [
   "id": "comfort-room-2",
   "name": "Comfort Room",
   "acronym": "CR",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "comfort-rooms"
   ],
@@ -744,7 +744,7 @@ const LOCATIONS = [
   "id": "comfort-room-5",
   "name": "Comfort Room",
   "acronym": "CR",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "comfort-rooms"
   ],
@@ -761,7 +761,7 @@ const LOCATIONS = [
   "id": "comfort-room-6",
   "name": "Comfort Room",
   "acronym": "CR",
-  "building": "SLSU Main Campus",
+  "building": "Student Center",
   "categories": [
    "comfort-rooms"
   ],
@@ -778,7 +778,7 @@ const LOCATIONS = [
   "id": "comfort-room-7",
   "name": "Comfort Room",
   "acronym": "CR",
-  "building": "Library",
+  "building": "Research, Innovation, and Extension Services Building",
   "categories": [
    "comfort-rooms"
   ],
@@ -795,7 +795,7 @@ const LOCATIONS = [
   "id": "comfort-room-8",
   "name": "Comfort Room",
   "acronym": "CR",
-  "building": "SLSU Main Campus",
+  "building": "Education Building",
   "categories": [
    "comfort-rooms"
   ],
@@ -812,7 +812,7 @@ const LOCATIONS = [
   "id": "comfort-room-9",
   "name": "Comfort Room",
   "acronym": "CR",
-  "building": "SLSU Main Campus",
+  "building": "Engineering Building",
   "categories": [
    "comfort-rooms"
   ],
@@ -844,7 +844,7 @@ const LOCATIONS = [
   "id": "comfort-rooms",
   "name": "Comfort Rooms",
   "acronym": "CR",
-  "building": "Medical-Dental Clinic",
+  "building": "Multi Purpose Court (MPC)",
   "categories": [
    "comfort-rooms"
   ],
@@ -880,7 +880,7 @@ const LOCATIONS = [
   "id": "commission-on-audit",
   "name": "Commission on Audit",
   "acronym": "CA",
-  "building": "Administration Building",
+  "building": "Archives Center",
   "categories": [
    "admin-offices"
   ],
@@ -1034,7 +1034,7 @@ const LOCATIONS = [
   "id": "ct2-104",
   "name": "CT2-104",
   "acronym": "",
-  "building": "Office of the Faculty of Industrial and Technology Management",
+  "building": "Industrial Technology Building 2",
   "categories": [
    "classrooms"
   ],
@@ -1085,7 +1085,7 @@ const LOCATIONS = [
   "id": "dean-s-office",
   "name": "Dean's Office",
   "acronym": "DO",
-  "building": "Multi-Media Center (MMC)",
+  "building": "Information Technology Building",
   "categories": [
    "academic-departments"
   ],
@@ -1102,7 +1102,7 @@ const LOCATIONS = [
   "id": "dean-s-office-and-faculty-room",
   "name": "Dean's Office and Faculty Room",
   "acronym": "DOFR",
-  "building": "Faculty of Criminal Justice Building",
+  "building": "Criminal Justice Building",
   "categories": [
    "academic-departments",
    "faculty-rooms"
@@ -1120,7 +1120,7 @@ const LOCATIONS = [
   "id": "dean-s-office-and-faculty-room-2",
   "name": "Dean's Office and Faculty Room",
   "acronym": "DOFR",
-  "building": "SLSU Main Campus",
+  "building": "Education Building",
   "categories": [
    "academic-departments",
    "faculty-rooms"
@@ -1138,7 +1138,7 @@ const LOCATIONS = [
   "id": "defense-room",
   "name": "Defense Room",
   "acronym": "DR",
-  "building": "Multi-Media Center (MMC)",
+  "building": "Information Technology Building",
   "categories": [
    "faculty-rooms",
    "classrooms",
@@ -1157,7 +1157,7 @@ const LOCATIONS = [
   "id": "department-of-military-science-and-tactics-off",
   "name": "Department of Military Science and Tactics Office",
   "acronym": "DMSTO",
-  "building": "Barracks",
+  "building": "NSTP CWTS Building",
   "categories": [
    "admin-offices",
    "security-gates"
@@ -1276,7 +1276,7 @@ const LOCATIONS = [
  {
   "id": "engineering-building",
   "name": "Engineering Building",
-  "acronym": "EB",
+  "acronym": "FOE",
   "building": "Engineering Building",
   "categories": [
    "academic-departments",
@@ -1296,9 +1296,9 @@ const LOCATIONS = [
  },
  {
   "id": "faculty-of-criminal-justice-building",
-  "name": "Faculty of Criminal Justice Building",
-  "acronym": "FCJB",
-  "building": "Faculty of Criminal Justice Building",
+  "name": "Criminal Justice Building",
+  "acronym": "FCJ",
+  "building": "Criminal Justice Building",
   "categories": [
    "academic-departments",
    "faculty-rooms",
@@ -1353,7 +1353,7 @@ const LOCATIONS = [
   "id": "faculty-room-2",
   "name": "Faculty Room",
   "acronym": "FR",
-  "building": "SLSU Main Campus",
+  "building": "Information Technology Building",
   "categories": [
    "faculty-rooms"
   ],
@@ -1370,7 +1370,7 @@ const LOCATIONS = [
   "id": "faculty-room-3",
   "name": "Faculty Room",
   "acronym": "FR",
-  "building": "SLSU Main Campus",
+  "building": "Education Building",
   "categories": [
    "faculty-rooms"
   ],
@@ -1387,7 +1387,7 @@ const LOCATIONS = [
   "id": "food-court-fc",
   "name": "Food Court (FC)",
   "acronym": "FC",
-  "building": "Medical-Dental Clinic",
+  "building": "Student Center",
   "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
@@ -1419,7 +1419,7 @@ const LOCATIONS = [
   "id": "fpst-101",
   "name": "FPST 101",
   "acronym": "FPST101",
-  "building": "SLSU Main Campus",
+  "building": "Food Technology Building",
   "categories": [
    "classrooms"
   ],
@@ -1436,7 +1436,7 @@ const LOCATIONS = [
   "id": "fpst-102",
   "name": "FPST 102",
   "acronym": "FPST102",
-  "building": "SLSU Main Campus",
+  "building": "Food Technology Building",
   "categories": [
    "classrooms"
   ],
@@ -1453,7 +1453,7 @@ const LOCATIONS = [
   "id": "fpst-103",
   "name": "FPST 103",
   "acronym": "FPST103",
-  "building": "SLSU Main Campus",
+  "building": "Food Technology Building",
   "categories": [
    "classrooms"
   ],
@@ -1470,7 +1470,7 @@ const LOCATIONS = [
   "id": "fpst-104",
   "name": "FPST 104",
   "acronym": "FPST104",
-  "building": "SLSU Main Campus",
+  "building": "Food Technology Building",
   "categories": [
    "classrooms"
   ],
@@ -1487,7 +1487,7 @@ const LOCATIONS = [
   "id": "fpst-faculty-room",
   "name": "FPST Faculty Room",
   "acronym": "FPST",
-  "building": "SLSU Main Campus",
+  "building": "Food Technology Building",
   "categories": [
    "academic-departments",
    "faculty-rooms"
@@ -1505,7 +1505,7 @@ const LOCATIONS = [
   "id": "free-wifi-zone",
   "name": "Free Wifi Zone",
   "acronym": "FWZ",
-  "building": "Supply and Property Building",
+  "building": "SLSU Main Campus",
   "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
@@ -1520,7 +1520,7 @@ const LOCATIONS = [
   "id": "fruitz-blend-and-food-beverage",
   "name": "Fruitz: Blend and Food Beverage",
   "acronym": "FBFB",
-  "building": "SLSU Main Campus",
+  "building": "Student Center",
   "categories": [
    "food-commercial"
   ],
@@ -1537,7 +1537,7 @@ const LOCATIONS = [
   "id": "garments",
   "name": "Garments",
   "acronym": "",
-  "building": "Office of the Faculty of Industrial and Technology Management",
+  "building": "Industrial Technology Building 2",
   "categories": [
    "laboratories"
   ],
@@ -1554,7 +1554,7 @@ const LOCATIONS = [
   "id": "gender-and-development-center-gad",
   "name": "Gender and Development Center (GAD)",
   "acronym": "GAD",
-  "building": "Administration Building",
+  "building": "Quality Assurance Center",
   "categories": [
    "admin-offices",
    "health-services"
@@ -1572,7 +1572,7 @@ const LOCATIONS = [
   "id": "graduate-duties-gs-11",
   "name": "Graduate Duties GS-11",
   "acronym": "GDG",
-  "building": "SLSU Main Campus",
+  "building": "Graduate Studies Building",
   "categories": [
    "classrooms"
   ],
@@ -1589,7 +1589,7 @@ const LOCATIONS = [
   "id": "graduate-duties-gs-12",
   "name": "Graduate Duties GS-12",
   "acronym": "GDG",
-  "building": "SLSU Main Campus",
+  "building": "Graduate Studies Building",
   "categories": [
    "classrooms"
   ],
@@ -1606,7 +1606,7 @@ const LOCATIONS = [
   "id": "graduate-programs-operations-office",
   "name": "Graduate Programs Operations Office",
   "acronym": "GPOO",
-  "building": "SLSU Main Campus",
+  "building": "Graduate Studies Building",
   "categories": [
    "admin-offices",
    "academic-departments"
@@ -1732,7 +1732,7 @@ const LOCATIONS = [
   "id": "htm-101",
   "name": "HTM-101",
   "acronym": "HTM-101",
-  "building": "SLSU Main Campus",
+  "building": "Hospitality and Tourism Management Building",
   "categories": [
    "classrooms"
   ],
@@ -1749,7 +1749,7 @@ const LOCATIONS = [
   "id": "htm-102",
   "name": "HTM-102",
   "acronym": "HTM-102",
-  "building": "SLSU Main Campus",
+  "building": "Hospitality and Tourism Management Building",
   "categories": [
    "classrooms"
   ],
@@ -1766,7 +1766,7 @@ const LOCATIONS = [
   "id": "htm-103",
   "name": "HTM-103",
   "acronym": "HTM-103",
-  "building": "SLSU Main Campus",
+  "building": "Hospitality and Tourism Management Building",
   "categories": [
    "classrooms"
   ],
@@ -1785,7 +1785,7 @@ const LOCATIONS = [
   "name": "HTM-202",
   "acronym": "",
   "floor": "2nd Floor",
-  "building": "SLSU Main Campus",
+  "building": "Hospitality and Tourism Management Building",
   "categories": [
    "classrooms"
   ],
@@ -1798,7 +1798,7 @@ const LOCATIONS = [
   "id": "html-office",
   "name": "HTML Office",
   "acronym": "HTML",
-  "building": "SLSU Main Campus",
+  "building": "Hospitality and Tourism Management Building",
   "categories": [
    "student-orgs",
    "health-services",
@@ -1851,7 +1851,7 @@ const LOCATIONS = [
   "id": "ias-conference-room",
   "name": "IAS Conference Room",
   "acronym": "IAS",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "classrooms",
    "libraries"
@@ -1869,7 +1869,7 @@ const LOCATIONS = [
   "id": "ias-faculty-room",
   "name": "IAS Faculty Room",
   "acronym": "IAS",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "academic-departments",
    "faculty-rooms"
@@ -1887,7 +1887,7 @@ const LOCATIONS = [
   "id": "ict-1",
   "name": "ICT-1",
   "acronym": "ICT-1",
-  "building": "Faculty of Computing and Information Sciences (FCIS) Building",
+  "building": "Information Technology Building",
   "categories": [
    "classrooms"
   ],
@@ -1904,7 +1904,7 @@ const LOCATIONS = [
   "id": "ict-2",
   "name": "ICT-2",
   "acronym": "ICT-2",
-  "building": "Faculty of Computing and Information Sciences (FCIS) Building",
+  "building": "Information Technology Building",
   "categories": [
    "classrooms"
   ],
@@ -1923,7 +1923,7 @@ const LOCATIONS = [
   "name": "ICT-201",
   "acronym": "ICT-201",
   "floor": "2nd Floor",
-  "building": "Faculty of Computing and Information Sciences (FCIS) Building",
+  "building": "Information Technology Building",
   "categories": [
    "classrooms"
   ],
@@ -1938,7 +1938,7 @@ const LOCATIONS = [
   "name": "ICT-203",
   "acronym": "",
   "floor": "2nd Floor",
-  "building": "SLSU Main Campus",
+  "building": "Information Technology Building",
   "categories": [
    "classrooms"
   ],
@@ -1951,7 +1951,7 @@ const LOCATIONS = [
   "id": "ict-3",
   "name": "ICT-3",
   "acronym": "ICT-3",
-  "building": "SLSU Main Campus",
+  "building": "Information Technology Building",
   "categories": [
    "classrooms"
   ],
@@ -1968,7 +1968,7 @@ const LOCATIONS = [
   "id": "ie-103",
   "name": "IE-103",
   "acronym": "IE-103",
-  "building": "SLSU Main Campus",
+  "building": "Education Building",
   "categories": [
    "classrooms"
   ],
@@ -1985,7 +1985,7 @@ const LOCATIONS = [
   "id": "ilab-1",
   "name": "iLAB-1",
   "acronym": "",
-  "building": "SLSU Main Campus",
+  "building": "Information Technology Building",
   "categories": [
    "laboratories"
   ],
@@ -2002,7 +2002,7 @@ const LOCATIONS = [
   "id": "ilab-2",
   "name": "iLAB-2",
   "acronym": "",
-  "building": "SLSU Main Campus",
+  "building": "Information Technology Building",
   "categories": [
    "laboratories"
   ],
@@ -2019,7 +2019,7 @@ const LOCATIONS = [
   "id": "ilab-3",
   "name": "iLAB-3",
   "acronym": "",
-  "building": "SLSU Main Campus",
+  "building": "Information Technology Building",
   "categories": [
    "laboratories"
   ],
@@ -2129,7 +2129,7 @@ const LOCATIONS = [
   "id": "innovation-assets-management-and-transfer-unit",
   "name": "Innovation Assets Management and Transfer Unit",
   "acronym": "IAMTU",
-  "building": "Research, Innovation and Extension Services (RIES) Building",
+  "building": "Research, Innovation, and Extension Services Building",
   "categories": [
    "admin-offices",
    "auxiliary-services"
@@ -2168,7 +2168,7 @@ const LOCATIONS = [
   "id": "interrogation-room",
   "name": "Interrogation Room",
   "acronym": "IR",
-  "building": "Faculty of Criminal Justice Building",
+  "building": "Criminal Justice Building",
   "categories": [
    "laboratories"
   ],
@@ -2202,7 +2202,7 @@ const LOCATIONS = [
   "id": "it-101-2",
   "name": "IT-101",
   "acronym": "IT-101",
-  "building": "Industrial Technology Building 2",
+  "building": "Industrial Technology Building 1",
   "categories": [
    "classrooms"
   ],
@@ -2304,7 +2304,7 @@ const LOCATIONS = [
   "id": "it-303",
   "name": "IT-303",
   "acronym": "IT-303",
-  "building": "Industrial Technology Building 2",
+  "building": "Industrial Technology Building 3",
   "categories": [
    "classrooms"
   ],
@@ -2321,7 +2321,7 @@ const LOCATIONS = [
   "id": "it-304",
   "name": "IT-304",
   "acronym": "IT-304",
-  "building": "Industrial Technology Building 2",
+  "building": "Industrial Technology Building 3",
   "categories": [
    "classrooms"
   ],
@@ -2489,7 +2489,7 @@ const LOCATIONS = [
   "id": "jam-d-lite",
   "name": "Jam D' Lite",
   "acronym": "JDL",
-  "building": "SLSU Main Campus",
+  "building": "Student Center",
   "categories": [
    "food-commercial"
   ],
@@ -2523,7 +2523,7 @@ const LOCATIONS = [
   "id": "julies-bakeshop",
   "name": "Julies Bakeshop",
   "acronym": "JB",
-  "building": "SLSU Main Campus",
+  "building": "Student Center",
   "categories": [
    "food-commercial"
   ],
@@ -2540,7 +2540,7 @@ const LOCATIONS = [
   "id": "khera-s-snack-house",
   "name": "Khera's Snack House",
   "acronym": "KSH",
-  "building": "SLSU Main Campus",
+  "building": "Student Center",
   "categories": [
    "food-commercial"
   ],
@@ -2557,7 +2557,7 @@ const LOCATIONS = [
   "id": "kitchen",
   "name": "Kitchen",
   "acronym": "",
-  "building": "SLSU Main Campus",
+  "building": "Research, Innovation, and Extension Services Building",
   "categories": [
    "food-commercial"
   ],
@@ -2574,7 +2574,7 @@ const LOCATIONS = [
   "id": "lab-area",
   "name": "Lab Area",
   "acronym": "LA",
-  "building": "Office of the Faculty of Industrial and Technology Management",
+  "building": "Industrial Technology Building 2",
   "categories": [
    "laboratories"
   ],
@@ -2661,7 +2661,7 @@ const LOCATIONS = [
   "id": "marie-s-snack-house",
   "name": "Marie's Snack House",
   "acronym": "MSH",
-  "building": "Medical-Dental Clinic",
+  "building": "Student Center",
   "categories": [
    "food-commercial"
   ],
@@ -2678,7 +2678,7 @@ const LOCATIONS = [
   "id": "mecha-1",
   "name": "Mecha 1",
   "acronym": "MECHA1",
-  "building": "Engineering Building",
+  "building": "Faculty of Engineering Department Building",
   "categories": [
    "laboratories"
   ],
@@ -2695,7 +2695,7 @@ const LOCATIONS = [
   "id": "mecha-2",
   "name": "Mecha 2",
   "acronym": "MECHA2",
-  "building": "Engineering Building",
+  "building": "Faculty of Engineering Department Building",
   "categories": [
    "laboratories"
   ],
@@ -2712,7 +2712,7 @@ const LOCATIONS = [
   "id": "medical-dental-clinic",
   "name": "Medical-Dental Clinic",
   "acronym": "MC",
-  "building": "Medical-Dental Clinic",
+  "building": "Student Center",
   "categories": [
    "admin-offices",
    "health-services",
@@ -2816,7 +2816,7 @@ const LOCATIONS = [
   "id": "multi-faith-room-old-ias-conference-room",
   "name": "Multi-Faith Room/old IAS Conference Room",
   "acronym": "MROICR",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "health-services",
    "auxiliary-services"
@@ -2892,7 +2892,7 @@ const LOCATIONS = [
   "id": "observation-room",
   "name": "Observation Room",
   "acronym": "OR",
-  "building": "Faculty of Criminal Justice Building",
+  "building": "Criminal Justice Building",
   "categories": [
    "laboratories"
   ],
@@ -2909,7 +2909,7 @@ const LOCATIONS = [
   "id": "office-of-techvoc",
   "name": "Office of Techvoc",
   "acronym": "OT",
-  "building": "Faculty of Industrial and Technology Management",
+  "building": "SLSU ICT Center",
   "categories": [
    "admin-offices",
    "academic-departments",
@@ -2945,7 +2945,7 @@ const LOCATIONS = [
   "id": "office-of-the-director-for-quality-assurance",
   "name": "Office of the Director for Quality Assurance",
   "acronym": "ODQA",
-  "building": "Administration Building",
+  "building": "Quality Assurance Center",
   "categories": [
    "admin-offices"
   ],
@@ -2962,7 +2962,7 @@ const LOCATIONS = [
   "id": "office-of-the-director-of-curriculum-innovatio",
   "name": "Office of the Director of Curriculum Innovation, Credentialing, and Life Long Learning",
   "acronym": "ODCICLLL",
-  "building": "SLSU Main Campus",
+  "building": "Graduate Studies Building",
   "categories": [
    "admin-offices",
    "academic-departments",
@@ -3088,7 +3088,7 @@ const LOCATIONS = [
   "id": "office-of-the-vice-president",
   "name": "Office of the Vice President",
   "acronym": "OVP",
-  "building": "Research, Innovation and Extension Services (RIES) Building",
+  "building": "Research, Innovation, and Extension Services Building",
   "categories": [
    "admin-offices",
    "academic-departments",
@@ -3124,7 +3124,7 @@ const LOCATIONS = [
   "id": "open-air-bench",
   "name": "Open Air Bench",
   "acronym": "OAB",
-  "building": "Criminology Building",
+  "building": "SLSU Main Campus",
   "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
@@ -3184,7 +3184,7 @@ const LOCATIONS = [
   "id": "open-air-benches-3",
   "name": "Open-Air Benches",
   "acronym": "OB",
-  "building": "Industrial Technology Building 5",
+  "building": "SLSU Main Campus",
   "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
@@ -3214,7 +3214,7 @@ const LOCATIONS = [
   "id": "open-air-benches-5",
   "name": "Open-Air Benches",
   "acronym": "OB",
-  "building": "Multi-Media Center (MMC)",
+  "building": "SLSU Main Campus",
   "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
@@ -3229,7 +3229,7 @@ const LOCATIONS = [
   "id": "open-air-benches-6",
   "name": "Open-Air Benches",
   "acronym": "OB",
-  "building": "Food Mart",
+  "building": "SLSU Main Campus",
   "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
@@ -3276,7 +3276,7 @@ const LOCATIONS = [
   "name": "Open Space",
   "acronym": "",
   "floor": "3rd Floor",
-  "building": "SLSU Main Campus",
+  "building": "Graduate Studies Building",
   "categories": [
    "sports-recreation"
   ],
@@ -3357,7 +3357,7 @@ const LOCATIONS = [
   "id": "parking-area-3",
   "name": "Parking Area",
   "acronym": "PA",
-  "building": "Multi-Media Center (MMC)",
+  "building": "SLSU Main Campus",
   "categories": [
    "parking-waiting"
   ],
@@ -3527,7 +3527,7 @@ const LOCATIONS = [
   "id": "parking-area-motorcycles-4",
   "name": "Parking Area (Motorcycles)",
   "acronym": "PA",
-  "building": "Office of the Faculty of Industrial and Technology Management",
+  "building": "SLSU Main Campus",
   "categories": [
    "parking-waiting"
   ],
@@ -3544,7 +3544,7 @@ const LOCATIONS = [
   "id": "parking-area-motorcycles-5",
   "name": "Parking Area (Motorcycles)",
   "acronym": "PA",
-  "building": "Multi-Media Center (MMC)",
+  "building": "SLSU Main Campus",
   "categories": [
    "parking-waiting"
   ],
@@ -3644,7 +3644,7 @@ const LOCATIONS = [
   "id": "pe-room",
   "name": "PE Room",
   "acronym": "PE",
-  "building": "Faculty of Criminal Justice Building",
+  "building": "Criminal Justice Building",
   "categories": [
    "laboratories",
    "security-gates"
@@ -3720,7 +3720,7 @@ const LOCATIONS = [
   "id": "plenary-hall",
   "name": "Plenary Hall",
   "acronym": "PH",
-  "building": "Medical-Dental Clinic",
+  "building": "Student Center",
   "categories": [
    "admin-offices",
    "classrooms",
@@ -3806,7 +3806,7 @@ const LOCATIONS = [
   "id": "radyo-pilipinas",
   "name": "Radyo Pilipinas",
   "acronym": "RP",
-  "building": "SLSU Main Campus",
+  "building": "Radyo Pilipinas",
   "categories": [
    "auxiliary-services"
   ],
@@ -3823,7 +3823,7 @@ const LOCATIONS = [
   "id": "receiving-area",
   "name": "Receiving Area",
   "acronym": "RA",
-  "building": "SLSU Main Campus",
+  "building": "Food Technology Building",
   "categories": [
    "laboratories"
   ],
@@ -3840,7 +3840,7 @@ const LOCATIONS = [
   "id": "records-management-office",
   "name": "Records Management Office",
   "acronym": "RMO",
-  "building": "Administration Building",
+  "building": "Archives Center",
   "categories": [
    "admin-offices"
   ],
@@ -3904,9 +3904,9 @@ const LOCATIONS = [
  },
  {
   "id": "research-innovation-and-extension-services-building",
-  "name": "Research, Innovation and Extension Services (RIES) Building",
-  "acronym": "RIESB",
-  "building": "Research, Innovation and Extension Services (RIES) Building",
+  "name": "Research, Innovation, and Extension Services Building",
+  "acronym": "RIES",
+  "building": "Research, Innovation, and Extension Services Building",
   "categories": [
    "admin-offices",
    "auxiliary-services"
@@ -3924,7 +3924,7 @@ const LOCATIONS = [
   "id": "ries-ethics-and-review-services-ries-managemen",
   "name": "RIES Ethics and Review Services RIES Management Information Office RIES Communication Office RIES Knowledge Management Office",
   "acronym": "RIES",
-  "building": "Research, Innovation and Extension Services (RIES) Building",
+  "building": "Research, Innovation, and Extension Services Building",
   "categories": [
    "admin-offices",
    "auxiliary-services"
@@ -4125,7 +4125,7 @@ const LOCATIONS = [
   "id": "san-roque-gate",
   "name": "San Roque Gate",
   "acronym": "SRG",
-  "building": "SLSU ICT Center",
+  "building": "SLSU Main Campus",
   "categories": [
    "security-gates"
   ],
@@ -4174,7 +4174,7 @@ const LOCATIONS = [
   "id": "smart-lab",
   "name": "Smart Lab",
   "acronym": "SL",
-  "building": "SLSU Main Campus",
+  "building": "Information Technology Building",
   "categories": [
    "laboratories"
   ],
@@ -4191,7 +4191,7 @@ const LOCATIONS = [
   "id": "stock-room",
   "name": "Stock Room",
   "acronym": "SR",
-  "building": "Faculty of Criminal Justice Building",
+  "building": "Criminal Justice Building",
   "categories": [
    "stock-archives"
   ],
@@ -4208,7 +4208,7 @@ const LOCATIONS = [
   "id": "stock-room-2",
   "name": "Stock Room",
   "acronym": "SR",
-  "building": "SLSU Main Campus",
+  "building": "Institute of Arts and Sciences Building",
   "categories": [
    "stock-archives"
   ],
@@ -4225,7 +4225,7 @@ const LOCATIONS = [
   "id": "stock-room-3",
   "name": "Stock Room",
   "acronym": "SR",
-  "building": "SLSU Main Campus",
+  "building": "Education Building",
   "categories": [
    "stock-archives"
   ],
@@ -4259,7 +4259,7 @@ const LOCATIONS = [
   "id": "storage-area",
   "name": "Storage Area",
   "acronym": "SA",
-  "building": "SLSU Main Campus",
+  "building": "Food Technology Building",
   "categories": [
    "stock-archives"
   ],
@@ -4276,7 +4276,7 @@ const LOCATIONS = [
   "id": "storage-room",
   "name": "Storage Room",
   "acronym": "SR",
-  "building": "SLSU Main Campus",
+  "building": "Research, Innovation, and Extension Services Building",
   "categories": [
    "stock-archives"
   ],
@@ -4293,7 +4293,7 @@ const LOCATIONS = [
   "id": "storage-room-2",
   "name": "Storage Room",
   "acronym": "SR",
-  "building": "SLSU Main Campus",
+  "building": "Research, Innovation, and Extension Services Building",
   "categories": [
    "stock-archives"
   ],
@@ -4400,7 +4400,7 @@ const LOCATIONS = [
   "id": "toilet-area",
   "name": "Toilet Area",
   "acronym": "TA",
-  "building": "SLSU Main Campus",
+  "building": "Food Technology Building",
   "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
@@ -4415,7 +4415,7 @@ const LOCATIONS = [
   "id": "toilet-area-2",
   "name": "Toilet Area",
   "acronym": "TA",
-  "building": "SLSU Main Campus",
+  "building": "Food Technology Building",
   "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
@@ -4430,7 +4430,7 @@ const LOCATIONS = [
   "id": "toilet-area-3",
   "name": "Toilet Area",
   "acronym": "TA",
-  "building": "SLSU Main Campus",
+  "building": "Graduate Studies Building",
   "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
@@ -4445,7 +4445,7 @@ const LOCATIONS = [
   "id": "toilet-area-4",
   "name": "Toilet Area",
   "acronym": "TA",
-  "building": "SLSU Main Campus",
+  "building": "Multi Purpose Court (MPC)",
   "categories": [],
   "floor": "Ground Floor",
   "hours": "Open during campus hours",
@@ -4477,7 +4477,7 @@ const LOCATIONS = [
   "name": "Training Hall",
   "acronym": "",
   "floor": "3rd Floor",
-  "building": "Research, Innovation and Extension Services (RIES) Building",
+  "building": "Research, Innovation, and Extension Services Building",
   "categories": [
    "admin-offices",
    "laboratories",
@@ -4492,7 +4492,7 @@ const LOCATIONS = [
   "id": "twin-s-snack-house",
   "name": "Twin's Snack House",
   "acronym": "TSH",
-  "building": "Medical-Dental Clinic",
+  "building": "Student Center",
   "categories": [
    "food-commercial"
   ],
@@ -4509,7 +4509,7 @@ const LOCATIONS = [
   "id": "volleyball-court",
   "name": "Volleyball Court",
   "acronym": "VC",
-  "building": "Physical Education Building",
+  "building": "SLSU Main Campus",
   "categories": [
    "sports-recreation"
   ],
@@ -4662,7 +4662,7 @@ const LOCATIONS = [
   "id": "what-if-silogan",
   "name": "What If Silogan",
   "acronym": "WIS",
-  "building": "SLSU Main Campus",
+  "building": "Student Center",
   "categories": [
    "food-commercial"
   ],
