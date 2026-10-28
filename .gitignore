@@ -13,14 +13,13 @@ certs/
 .DS_Store
 Thumbs.db
 
-# thesis proposal PDF — kept locally, not committed (decide later)
-docs/*.pdf
+# docs/: only the .md files are shared (context for the team and for Claude);
+# the proposal PDF, manuals, transcripts etc. stay local
+docs/*
+!docs/*.md
 
 # public static build output (tools/build-web.mjs)
 web/
 
 # local override for the public phone-page URL (see docs/WEB-DEPLOY.md)
 web-url
-
-# pasted transcript of an old Claude session - contains the DuckDNS token
-docs/old-claude-session.txt
