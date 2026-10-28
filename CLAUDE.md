@@ -14,7 +14,7 @@ npm run dev               # nodemon
 npm run smoke             # 15 HTTP checks against a RUNNING server (routes, tiles, assets, admin auth)
 npm run build:paths       # tools/build-walkpaths.js: floor SVGs → public/js/walkpaths.js
 npm run build:data        # tools/build-data.js: both DBs → public/js/campus-data.js  (--check = report drift, exit 1)
-npm run clean:svg         # tools/clean-floor-svg.js: hide routing strokes / transparent frame in a fresh Figma export (--check)
+npm run clean:svg         # tools/clean-floor-svg.js: hide routing strokes / transparent frame / shrink embedded textures to WebP in a fresh Figma export (--check)
 npm run db:init           # rebuilds db/slsu_directory.db FROM campus-data.js (destructive; rarely needed)
 npm run phone-test        # LAN https server for testing live GPS on a real phone
 node --check public/js/app.js   # the only syntax gate for front-end edits
@@ -47,6 +47,7 @@ Express: static `public/`, captive-portal probes, `/api/*` (locations, search, c
 - `public/js/georef.js` — the single drawing-units ↔ lat/lng transform. Drawing space is the 320×570 `FRAME`, 1 unit ≈ 1 m, y down. `geo-overlay.js` is the custom Leaflet `GeoImageOverlay` for the floor SVGs.
 - `public/js/handoff.js` — builds the QR URLs (`vendor/qrcode`, offline).
 - Function-wrap pattern is used to extend behaviour without editing originals: `const xBase = x; x = function () { ...; xBase(); }` (see `syncWithServer`, `chooseSuggestion`, `openAdminPanel`, `closeAdminPanel`, `lockAdmin`).
+- Raspberry Pi performance (the kiosk target, 4 GB): the floor SVGs are `<img>` overlays, and resizing one makes the browser re-lay-out the whole drawing. So `GeoImageOverlay` only *scales* a drawing mid-zoom and resizes it once on `zoomend`; the floors not on view are `setLowRes(true)` (painted once at 640px, then only stretched). Place markers are not DOM elements: section 8's `PlaceMarker` draws dots, or pin stamps at `PIN_ZOOM`, on one shared canvas, and a tap opens the place nearest the finger (`markerAt`). The route's dash animation runs a few cycles, not forever, and dialogs use a plain tint, not `backdrop-filter`. Keep new map features in that spirit: no per-frame DOM work, no infinite animations, no blur.
 - CSS palette lives in tokens at the top of `style.css` (`--slsu-navy-deep: #12294D`, `--route-line`, `--danger-color`). The kiosk has no mouse: use `:active`, not `:hover`. `--surface-hover` is a colour token, not a hover state.
 
 ### Floor artwork and the walk network

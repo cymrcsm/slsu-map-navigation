@@ -11,7 +11,7 @@
 const GeoImageOverlay = L.ImageOverlay.extend({
   initialize: function (url, options) {
     this._url = url;
-    L.setOptions(this, options);
+    L.setOptions(this, L.extend({ lowResWidth: 640 }, options));
 
     const w = this.options.canvasWidth;
     const h = this.options.canvasHeight;
@@ -27,9 +27,9 @@ const GeoImageOverlay = L.ImageOverlay.extend({
     this._spanY = [L.latLng(svgToLatLng([w / 2, 0])), L.latLng(svgToLatLng([w / 2, h]))];
   },
 
-  _pixelSize: function () {
+  _pixelSize: function (zoom) {
     const map = this._map;
-    const z = map.getZoom();
+    const z = zoom === undefined ? map.getZoom() : zoom;
     const a = map.project(this._spanX[0], z);
     const b = map.project(this._spanX[1], z);
     const c = map.project(this._spanY[0], z);
@@ -51,20 +51,56 @@ const GeoImageOverlay = L.ImageOverlay.extend({
       (this._bearing ? ' rotate(' + this._bearing + 'deg)' : '');
   },
 
+  // Place the image so it covers `target` (its true on-screen size) while laid
+  // out at this._size: the difference is made up by scale, which only moves an
+  // already painted picture and never makes the browser redraw the SVG.
+  _place: function (p, target) {
+    this._pose(p.x - this._size.x / 2, p.y - this._size.y / 2, target.x / this._size.x);
+  },
+
+  // A flyTo moves the zoom a little every frame. Resizing the image each time
+  // makes the browser redraw the whole SVG each time, which a Raspberry Pi
+  // cannot do at frame rate. So mid-flight the drawing keeps the size it was
+  // last painted at and is only scaled; it is resized - painted sharp again -
+  // once, when the zoom settles.
+  getEvents: function () {
+    const events = { zoom: this._onZoom, viewreset: this._reset, zoomend: this._reset };
+    if (this._zoomAnimated) events.zoomanim = this._animateZoom;
+    return events;
+  },
+
+  _onZoom: function () {
+    if (!this._size) { this._reset(); return; }
+    this._place(this._map.latLngToLayerPoint(this._centre), this._pixelSize());
+  },
+
+  // A faint floor under the one being viewed does not need to be sharp. Low
+  // resolution paints it once, small, and from then on only scales it - the
+  // two floors not on view cost next to nothing however the map zooms.
+  setLowRes: function (on) {
+    if (this._lowRes === !!on) return this;
+    this._lowRes = !!on;
+    if (this._map) this._reset();
+    return this;
+  },
+
   _reset: function () {
     const size = this._pixelSize();
-    const p = this._map.latLngToLayerPoint(this._centre);
-    this._image.style.width = size.x + 'px';
-    this._image.style.height = size.y + 'px';
-    this._size = size;
-    this._pose(p.x - size.x / 2, p.y - size.y / 2, 1);
+    const laidOut = this._lowRes
+      ? { x: this.options.lowResWidth, y: this.options.lowResWidth * size.y / size.x }
+      : size;
+    if (!this._size || this._size.x !== laidOut.x || this._size.y !== laidOut.y) {
+      this._image.style.width = laidOut.x + 'px';
+      this._image.style.height = laidOut.y + 'px';
+      this._size = laidOut;
+    }
+    this._place(this._map.latLngToLayerPoint(this._centre), size);
   },
 
   _animateZoom: function (e) {
     const map = this._map;
-    const scale = map.getZoomScale(e.zoom);
+    if (!this._size) this._reset();
     const p = map._latLngToNewLayerPoint(this._centre, e.zoom, e.center);
-    const size = this._size || this._pixelSize();
-    this._pose(p.x - size.x / 2, p.y - size.y / 2, scale);
+    this._place(p, this._pixelSize(e.zoom));
   }
 });

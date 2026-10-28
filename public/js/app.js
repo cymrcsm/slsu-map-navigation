@@ -243,6 +243,9 @@ function applyFloorOpacity() {
     const isActive = i === activeLevel;
     ov.setOpacity(isActive ? front : INACTIVE_FLOOR_OPACITY);
     if (ov.setZIndex) ov.setZIndex(isActive ? 2 : 1);
+    // Faint floors are drawn small and stretched; only the floor on view is
+    // painted at full detail (geo-overlay.js, setLowRes).
+    ov.setLowRes(!isActive);
   });
 }
 
@@ -453,43 +456,111 @@ function paintCategoryButtons() {
 // 8. MARKERS
 // ==========================================
 
-function pinSvg(color) {
-  return '<svg viewBox="0 0 24 32" width="24" height="32" aria-hidden="true">' +
-    '<path d="M12 0.9C5.9 0.9 1 5.8 1 11.9c0 7.8 9.4 18.1 10.1 18.9a1.2 1.2 0 0 0 1.8 0C13.6 30 23 19.7 23 11.9 23 5.8 18.1 0.9 12 0.9Z"' +
-    ' fill="' + color + '" stroke="#FEFDF9" stroke-width="1.6" stroke-linejoin="round"/>' +
-    '<circle cx="12" cy="11.9" r="4.1" fill="#FEFDF9"/></svg>';
+// Every place is painted on one canvas: a dot when zoomed out, a pin when
+// zoomed in. As page elements - one per place - the browser had to move and
+// restyle all of them on every zoom, and build a hundred pins from scratch each
+// time the view crossed into pin zoom. On a Raspberry Pi that was most of the
+// time a zoom took. On the canvas a redraw is a few hundred small stamps.
+
+const PIN_PATH = 'M12 0.9C5.9 0.9 1 5.8 1 11.9c0 7.8 9.4 18.1 10.1 18.9a1.2 1.2 0 0 0 1.8 0C13.6 30 23 19.7 23 11.9 23 5.8 18.1 0.9 12 0.9Z';
+const PIN_W = 24, PIN_H = 32, PIN_TIP = 30;   // the tip sits 30px down, on the place
+const PIN_PAD = 10;                           // room for the shadow around a stamp
+const PIN_HEAD_Y = 11.9;                      // centre of the pin's round head
+const MARK_EDGE = '#FEFDF9';                  // --map-paper, the pins' outline
+const DOT_R = 6;
+
+// One stamp per colour, drawn once: the pin with its outline, white eye and the
+// soft shadow the CSS drop-shadow used to give it.
+const PIN_STAMPS = {};
+function pinStamp(color) {
+  if (PIN_STAMPS[color]) return PIN_STAMPS[color];
+  const dpr = window.devicePixelRatio || 1;
+  const c = document.createElement('canvas');
+  c.width = (PIN_W + PIN_PAD * 2) * dpr;
+  c.height = (PIN_H + PIN_PAD * 2) * dpr;
+  const ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.translate(PIN_PAD, PIN_PAD);
+  const shape = new Path2D(PIN_PATH);
+  ctx.shadowColor = 'rgba(51, 51, 51, 0.35)';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetY = 2;
+  ctx.fillStyle = color;
+  ctx.fill(shape);
+  ctx.shadowColor = 'transparent';
+  ctx.lineWidth = 1.6;
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = MARK_EDGE;
+  ctx.stroke(shape);
+  ctx.beginPath();
+  ctx.arc(12, PIN_HEAD_Y, 4.1, 0, Math.PI * 2);
+  ctx.fillStyle = MARK_EDGE;
+  ctx.fill();
+  return (PIN_STAMPS[color] = c);
 }
 
-const ICON_CACHE = {};
-function iconFor(category, big) {
-  const key = category + (big ? ':pin' : ':dot');
-  if (ICON_CACHE[key]) return ICON_CACHE[key];
-  const color = getCategoryColor(category);
-  const icon = big
-    ? L.divIcon({ className: 'location-pin-icon', html: pinSvg(color),
-                  iconSize: [24, 32], iconAnchor: [12, 30], popupAnchor: [0, -30] })
-    : L.divIcon({ className: 'location-dot-icon',
-                  html: '<span class="dot" style="background:' + color + '"></span>',
-                  iconSize: [12, 12], iconAnchor: [6, 6], popupAnchor: [0, -6] });
-  ICON_CACHE[key] = icon;
-  return icon;
-}
+function pinZoom() { return map.getZoom() >= PIN_ZOOM; }
 
-let bigPins = map.getZoom() >= PIN_ZOOM;
-const markerFor = new Map();   // location id -> L.Marker
+// A circle marker that draws itself as a pin at pin zoom. Leaflet's canvas
+// renderer still does the projecting, culling and hit testing; only the shape
+// it paints and the box it occupies change.
+const PlaceMarker = L.CircleMarker.extend({
+  _updateBounds: function () {
+    if (!pinZoom()) return L.CircleMarker.prototype._updateBounds.call(this);
+    const p = this._point;
+    this._pxBounds = L.bounds(
+      [p.x - PIN_W / 2 - PIN_PAD, p.y - PIN_TIP - PIN_PAD],
+      [p.x + PIN_W / 2 + PIN_PAD, p.y - PIN_TIP + PIN_H + PIN_PAD]);
+  },
+
+  _updatePath: function () {
+    if (!pinZoom()) return L.CircleMarker.prototype._updatePath.call(this);
+    const r = this._renderer;
+    if (!r._drawing || this._empty()) return;
+    const p = this._point;
+    r._ctx.drawImage(pinStamp(this.options.fillColor),
+      p.x - PIN_W / 2 - PIN_PAD, p.y - PIN_TIP - PIN_PAD,
+      PIN_W + PIN_PAD * 2, PIN_H + PIN_PAD * 2);
+  },
+
+  _containsPoint: function (pt) {
+    if (!pinZoom()) return L.CircleMarker.prototype._containsPoint.call(this, pt);
+    const p = this._point;
+    return pt.x >= p.x - PIN_W / 2 && pt.x <= p.x + PIN_W / 2 &&
+           pt.y >= p.y - PIN_TIP && pt.y <= p.y - PIN_TIP + PIN_H;
+  },
+
+  // where a finger aims: the dot itself, or the pin's round head
+  _aim: function () {
+    return pinZoom() ? this._point.subtract([0, PIN_TIP - PIN_HEAD_Y]) : this._point;
+  }
+});
+
+// No extra tap tolerance: the canvas hands a tap to the top-most marker in
+// reach, so a margin would only widen the overlap between neighbours. Which of
+// the overlapping ones opens is settled by markerAt() below.
+const markerRenderer = L.canvas({ padding: 0.5, tolerance: 0 });
+
+const markerFor = new Map();   // location id -> PlaceMarker
 
 function createMarker(loc) {
-  const marker = L.marker(toLeafletCoords(loc.coords), {
-    icon: iconFor(primaryCategory(loc), bigPins),
-    title: loc.acronym ? `${loc.name} (${loc.acronym})` : loc.name,
-    riseOnHover: true
+  const color = getCategoryColor(primaryCategory(loc));
+  const marker = new PlaceMarker(toLeafletCoords(loc.coords), {
+    renderer: markerRenderer, radius: DOT_R, weight: 1.5, color: MARK_EDGE,
+    fillColor: color, fillOpacity: 1,
+    // a tap on a marker is the marker's, not also the map's (the map's own
+    // click handlers would otherwise run under it)
+    bubblingMouseEvents: false
   });
-  marker.on('click', () => {
+  marker.on('click', e => {
     // While a location is being added, the pins are scenery: opening one would
     // swap the form out from under the user, and a tap meant for the spot
     // picker next to a pin must not land on the pin instead.
     if (!addView.classList.contains('hidden')) return;
-    showLocationDetails(PLACES.find(p => p.id === loc.id) || loc);
+    // The tap is read from the raw event: for a circle this small Leaflet
+    // reports the circle's own centre as e.containerPoint.
+    const id = markerAt(map.mouseEventToLayerPoint(e.originalEvent)) || loc.id;
+    showLocationDetails(PLACES.find(p => p.id === id) || loc);
   });
   markerFor.set(loc.id, marker);
   return marker;
@@ -514,21 +585,43 @@ function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
   // returned list stays complete so search and category counts still span the
   // whole campus.
   const onThisFloor = matches.filter(loc => levelOfFloor(loc.floor) === activeLevel);
-  markerLayer.clearLayers();
   visibleIds = new Set(onThisFloor.map(l => l.id));
-  onThisFloor.forEach(loc => markerLayer.addLayer(markerFor.get(loc.id)));
+
+  // Northernmost first, so where pins overlap the one lower on screen is
+  // painted over the one above it - the order the page elements used to stack.
+  markerLayer.clearLayers();
+  onThisFloor
+    .map(loc => markerFor.get(loc.id))
+    .filter(Boolean)
+    .sort((a, b) => b.getLatLng().lat - a.getLatLng().lat)
+    .forEach(m => markerLayer.addLayer(m));
   return matches;
 }
 
-// Swap dot icons for pin icons when crossing the zoom threshold.
+// Crossing pin zoom changes every marker's shape and size; re-measure them all
+// and repaint.
+let pinsShowing = pinZoom();
 map.on('zoomend', () => {
-  const want = map.getZoom() >= PIN_ZOOM;
-  if (want === bigPins) return;
-  bigPins = want;
-  PLACES.forEach(loc => {
-    if (visibleIds.has(loc.id)) markerFor.get(loc.id).setIcon(iconFor(primaryCategory(loc), bigPins));
-  });
+  if (pinZoom() === pinsShowing) return;
+  pinsShowing = pinZoom();
+  markerLayer.eachLayer(m => m.redraw());
 });
+
+// Where markers overlap the canvas reports whichever was painted last; open
+// the one the finger is closest to instead - the nearest dot, or the nearest
+// pin head among the pins under the tap.
+function markerAt(layerPoint) {
+  let best = null, bestD = Infinity;
+  visibleIds.forEach(id => {
+    const m = markerFor.get(id);
+    if (!m || !markerLayer.hasLayer(m) || !m._point) return;
+    if (pinZoom() && !m._containsPoint(layerPoint)) return;
+    const d = m._aim().distanceTo(layerPoint);
+    if (d < bestD) { bestD = d; best = id; }
+  });
+  return best;
+}
+
 
 // ==========================================
 // 9. DETAIL PANEL
@@ -655,8 +748,7 @@ function selectCategory(id) {
 
   // Frame the pins that are left, so the category is visible at a glance.
   if (shown.length) {
-    const group = L.featureGroup(shown.map(l => markerFor.get(l.id)));
-    fitView(group.getBounds(), {
+    fitView(L.latLngBounds(shown.map(l => toLeafletCoords(l.coords))), {
       padding: [80, 80], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 0.8
     });
   }

@@ -1051,25 +1051,6 @@ body, html {
   to { transform: scale(1.06); }
 }
 
-.location-pin-icon {
-  background: transparent;
-  border: none;
-  filter: drop-shadow(0 2px 3px rgba(51, 51, 51, 0.35));
-}
-.location-dot-icon {
-  background: transparent;
-  border: none;
-}
-
-.location-dot-icon .dot {
-  display: block;
-  width: 10px;
-  height: 10px;
-  margin: 1px;
-  border-radius: 50%;
-  border: 1.5px solid var(--map-paper);
-  box-shadow: 0 1px 2px rgba(51, 51, 51, 0.4);
-}
 .kiosk-pulsing-marker {
   position: relative;
   width: 20px;
@@ -1097,11 +1078,20 @@ body, html {
   100% { transform: scale(1.8); opacity: 0; }
 }
 
+/* The floor drawings are moved and scaled by transform (geo-overlay.js). Telling
+   the browser so keeps each one on its own layer, painted once and then only
+   moved, rather than redrawn from the SVG while a zoom is in flight. */
+.campus-overlay { will-change: transform; }
+
 .leaflet-interactive.route-line {
   stroke: var(--route-line);
   stroke-dasharray: 10, 10;
   paint-order: stroke;
-  animation: dash 1s linear infinite;
+  /* A few marching cycles to catch the eye, then still. stroke-dashoffset is
+     repainted on the main thread every frame, and left running forever it kept
+     a Raspberry Pi busy for as long as a route stayed on screen. Each run ends
+     a whole dash period on, so it stops on the same pattern it started with. */
+  animation: dash 1s linear 4;
 }
 
 @keyframes dash {
@@ -1114,7 +1104,7 @@ body, html {
   stroke: var(--route-line);
   stroke-dasharray: 3, 7;
   opacity: 0.85;
-  animation: dash 1.4s linear infinite;
+  animation: dash 1.4s linear 3;
 }
 
 .leaflet-tooltip {
@@ -1192,9 +1182,10 @@ body, html {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(18, 41, 77, 0.45);
-  backdrop-filter: blur(8px) saturate(0.9);
-  -webkit-backdrop-filter: blur(8px) saturate(0.9);
+  /* A plain tint, not backdrop-filter: blur. Blurring the live map behind a
+     dialog is redone whenever anything under it moves, which a Raspberry Pi
+     feels; the darker tint does the same job of setting the dialog apart. */
+  background: rgba(18, 41, 77, 0.62);
 }
 
 .admin-overlay.hidden { display: none; }
@@ -1325,8 +1316,7 @@ body, html {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(30, 42, 51, 0.55);
-  backdrop-filter: blur(2px);
+  background: rgba(30, 42, 51, 0.62);   /* no blur - see .admin-overlay */
 }
 .qr-overlay.hidden { display: none; }
 
