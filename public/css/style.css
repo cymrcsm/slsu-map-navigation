@@ -290,6 +290,35 @@ body, html {
   background: var(--map-paper);
 }
 
+/* Building list: each building opens into the categories inside it. */
+.bldg-group { display: flex; flex-direction: column; gap: 4px; }
+
+.bldg-chevron {
+  width: 10px;
+  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+}
+.bldg-group.open .bldg-chevron { transform: rotate(90deg); }
+.bldg-group.open > .bldg-btn { border-color: var(--primary-strong); }
+
+.bldg-subs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: 14px;
+  padding-left: 8px;
+  border-left: 2px solid var(--on-brand-edge);
+}
+.bldg-subs[hidden] { display: none; }
+
+.cat-btn.sub-btn { padding: 7px 10px; }
+.cat-btn.sub-btn.active { padding: 6px 9px; }
+.sub-btn .cat-label { font-size: 11.5px; font-weight: 500; }
+
 .category-view-header h3 {
   font-size: 15px;
   font-weight: 700;

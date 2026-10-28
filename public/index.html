@@ -48,7 +48,7 @@
               <div class="step-content">
                 <strong>Search or Browse</strong>
                 <p>Start typing an office, room code, building or acronym — matching places
-                   appear as you type. Or pick a category on the right to list everything in it.</p>
+                   appear as you type. Or tap a building on the right and choose what you are looking for inside it.</p>
               </div>
             </div>
 
@@ -81,7 +81,7 @@
         <!-- 2. CATEGORY VIEW: EVERY ROOM IN THE CHOSEN CATEGORY -->
         <div id="category-view" class="info-view hidden">
           <button id="back-from-category-btn" class="back-btn">← Back to Kiosk Guide</button>
-          <div class="panel-section-label">Category</div>
+          <div id="category-view-kind" class="panel-section-label">Category</div>
           <div class="category-view-header">
             <h3 id="category-view-title">Category name</h3>
             <p id="category-view-count">0 places</p>
@@ -242,7 +242,7 @@
     </main>
 
     <aside class="panel panel-right">
-      <div class="panel-section-label panel-right-label">Categories</div>
+      <div class="panel-section-label panel-right-label">Buildings</div>
       <div id="category-list" class="category-list">
       </div>
     </aside>

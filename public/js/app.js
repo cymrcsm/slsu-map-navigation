@@ -23,8 +23,38 @@ function getCategoryName(categoryId) {
 
 const primaryCategory = loc => (loc.categories && loc.categories[0]) || null;
 const locationColor = loc => getCategoryColor(primaryCategory(loc));
-const inCategory = (loc, id) =>
-  id === 'ALL' || (loc.categories && loc.categories.indexOf(id) !== -1);
+// The data files every place outside a real building under "SLSU Main
+// Campus"; the kiosk calls that group Campus Grounds (section 7).
+const CAMPUS_GROUNDS = 'SLSU Main Campus';
+// A place shared by neighbouring buildings - a comfort room between them -
+// names them all, separated by semicolons, and is listed under each.
+const buildingsOf = loc => (loc.building || CAMPUS_GROUNDS).split(';').map(b => b.trim()).filter(Boolean);
+const buildingText = loc => buildingsOf(loc).map(buildingLabel).join(', ');
+const buildingLabel = b => (b === CAMPUS_GROUNDS ? 'Campus Grounds' : b);
+
+// A building filter id: 'B|<building>|<category id or *>' (section 7).
+const filterId = (building, category) => 'B|' + building + '|' + category;
+function parseFilter(id) {
+  if (typeof id !== 'string' || id.indexOf('B|') !== 0) return null;
+  const cut = id.lastIndexOf('|');
+  return { building: id.slice(2, cut), category: id.slice(cut + 1) };
+}
+
+// What a filter is called on screen: "Laboratories · Engineering Building".
+function filterName(id) {
+  const f = parseFilter(id);
+  if (!f) return getCategoryName(id);
+  return f.category === '*' ? buildingLabel(f.building)
+    : getCategoryName(f.category) + ' · ' + buildingLabel(f.building);
+}
+
+function inCategory(loc, id) {
+  if (id === 'ALL') return true;
+  const f = parseFilter(id);
+  if (!f) return !!(loc.categories && loc.categories.indexOf(id) !== -1);
+  return buildingsOf(loc).indexOf(f.building) !== -1 &&
+    (f.category === '*' || !!(loc.categories && loc.categories.indexOf(f.category) !== -1));
+}
 
 // campus-data.js is generated and never written to at runtime, so locations
 // added or removed from the kiosk are kept as a layer on top of it, in this
@@ -382,6 +412,7 @@ const tutorialView = document.getElementById('tutorial-view');
 const categoryView = document.getElementById('category-view');
 const detailView = document.getElementById('detail-view');
 const categoryViewTitle = document.getElementById('category-view-title');
+const categoryViewKind = document.getElementById('category-view-kind');
 const categoryViewCount = document.getElementById('category-view-count');
 const categoryResults = document.getElementById('category-results');
 const backFromCategoryBtn = document.getElementById('back-from-category-btn');
@@ -468,60 +499,169 @@ function renderKioskMarker() {
 renderKioskMarker();
 
 // ==========================================
-// 7. CATEGORY BUTTONS
+// 7. BUILDING LIST
 // ==========================================
+// The right panel lists buildings, not categories. Each building opens into
+// the categories found inside it - its classrooms, labs, comfort rooms - with
+// a count for each, and choosing one of those lists and shows those places.
+// Places filed under no real building (the data's "SLSU Main Campus") are the
+// outdoor ones and come last, as Campus Grounds.
+//
+// The choice is still kept in activeCategory, as a filter id that inCategory()
+// understands, so search, the markers and the results list need no changes:
+//   'ALL'                          everything
+//   'B|<building>|*'               every place in one building
+//   'B|<building>|<category id>'   one category inside one building
 
 let categoryCounts = {};
+let buildingCounts = {};   // building -> { '*': n, <category id>: n }
 
 function recountCategories() {
   categoryCounts = {};
-  PLACES.forEach(l => (l.categories || []).forEach(id => {
-    categoryCounts[id] = (categoryCounts[id] || 0) + 1;
-  }));
+  buildingCounts = {};
+  PLACES.forEach(l => {
+    (l.categories || []).forEach(id => { categoryCounts[id] = (categoryCounts[id] || 0) + 1; });
+    buildingsOf(l).forEach(b => {
+      const counts = buildingCounts[b] || (buildingCounts[b] = { '*': 0 });
+      counts['*']++;
+      (l.categories || []).forEach(id => { counts[id] = (counts[id] || 0) + 1; });
+    });
+  });
 }
 recountCategories();
 
-const countFor = id => (id === 'ALL' ? PLACES.length : (categoryCounts[id] || 0));
+const countFor = id => {
+  if (id === 'ALL') return PLACES.length;
+  const f = parseFilter(id);
+  if (f) return (buildingCounts[f.building] || {})[f.category] || 0;
+  return categoryCounts[id] || 0;
+};
 
-const categoryButtons = new Map();  
+const categoryButtons = new Map();   // filter id -> button
+let openBuilding = null;             // the building whose dropdown is open
 
-CATEGORIES.forEach(cat => {
+// Buildings A-Z, Campus Grounds last.
+function buildingsInOrder() {
+  return Object.keys(buildingCounts).sort((a, b) =>
+    (a === CAMPUS_GROUNDS) - (b === CAMPUS_GROUNDS) || buildingLabel(a).localeCompare(buildingLabel(b)));
+}
+
+function filterButton(id, labelText, swatchColor, extraClass) {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = 'cat-btn';
-  btn.dataset.category = cat.id;
+  btn.className = 'cat-btn' + (extraClass ? ' ' + extraClass : '');
+  btn.dataset.category = id;
   btn.setAttribute('aria-pressed', 'false');
-
-  const swatch = document.createElement('span');
-  swatch.className = 'cat-swatch';
-  swatch.style.background = cat.id === 'ALL' ? 'var(--text-muted)' : getCategoryColor(cat.id);
-
+  if (swatchColor) {
+    const swatch = document.createElement('span');
+    swatch.className = 'cat-swatch';
+    swatch.style.background = swatchColor;
+    btn.appendChild(swatch);
+  }
   const label = document.createElement('span');
   label.className = 'cat-label';
-  label.textContent = cat.name;
-
+  label.textContent = labelText;
   const count = document.createElement('span');
   count.className = 'cat-count';
-  count.textContent = countFor(cat.id);
+  count.textContent = countFor(id);
+  btn.append(label, count);
+  btn.addEventListener('click', () => selectCategory(id));
+  categoryButtons.set(id, btn);
+  return btn;
+}
 
-  btn.append(swatch, label, count);
-  btn.addEventListener('click', () => selectCategory(cat.id));
-  categoryListEl.appendChild(btn);
-  categoryButtons.set(cat.id, btn);
-});
+function buildBuildingList() {
+  categoryListEl.innerHTML = '';
+  categoryButtons.clear();
+  categoryListEl.appendChild(filterButton('ALL', 'All Buildings', 'var(--text-muted)'));
+
+  buildingsInOrder().forEach(building => {
+    const group = document.createElement('div');
+    group.className = 'bldg-group';
+    group.dataset.building = building;
+
+    // The building row only opens and closes its dropdown; what to show is
+    // chosen inside it.
+    const head = document.createElement('button');
+    head.type = 'button';
+    head.className = 'cat-btn bldg-btn';
+    head.setAttribute('aria-expanded', 'false');
+    const chevron = document.createElement('span');
+    chevron.className = 'bldg-chevron';
+    chevron.setAttribute('aria-hidden', 'true');
+    chevron.textContent = '›';
+    const label = document.createElement('span');
+    label.className = 'cat-label';
+    label.textContent = buildingLabel(building);
+    const count = document.createElement('span');
+    count.className = 'cat-count';
+    count.textContent = buildingCounts[building]['*'];
+    head.append(chevron, label, count);
+    head.addEventListener('click', () => toggleBuilding(building));
+
+    const subs = document.createElement('div');
+    subs.className = 'bldg-subs';
+    subs.hidden = true;
+    subs.appendChild(filterButton(filterId(building, '*'), 'All places here', null, 'sub-btn'));
+    Object.keys(buildingCounts[building])
+      .filter(id => id !== '*')
+      .sort((a, b) => getCategoryName(a).localeCompare(getCategoryName(b)))
+      .forEach(id => subs.appendChild(
+        filterButton(filterId(building, id), getCategoryName(id), getCategoryColor(id), 'sub-btn')));
+
+    group.append(head, subs);
+    categoryListEl.appendChild(group);
+  });
+  showOpenBuilding();
+  paintCategoryButtons();
+}
+
+// Opening a building chooses all of its places straight away; tapping it again
+// closes it and lets that choice go - the map stays where it is.
+function toggleBuilding(building) {
+  if (openBuilding === building) {
+    openBuilding = null;
+    showOpenBuilding();
+    if (parseFilter(activeCategory)) selectCategory(activeCategory);   // a re-tap deselects
+    return;
+  }
+  openBuilding = building;
+  showOpenBuilding();
+  const everything = filterId(building, '*');
+  if (activeCategory !== everything) selectCategory(everything);
+  // A building low in the list opens below the bottom edge; bring the whole
+  // dropdown into view (no smooth scrolling - it is a frame-by-frame repaint).
+  const group = [...categoryListEl.querySelectorAll('.bldg-group')]
+    .find(g => g.dataset.building === openBuilding);
+  if (group) group.scrollIntoView({ block: 'nearest' });
+}
+
+// One dropdown open at a time, so the list stays short enough to read.
+function showOpenBuilding() {
+  categoryListEl.querySelectorAll('.bldg-group').forEach(group => {
+    const open = group.dataset.building === openBuilding;
+    group.classList.toggle('open', open);
+    group.querySelector('.bldg-subs').hidden = !open;
+    group.querySelector('.bldg-btn').setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+}
 
 function paintCategoryButtons() {
   categoryButtons.forEach((btn, id) => {
     const on = id === activeCategory;
     btn.classList.toggle('active', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    const color = id === 'ALL' ? 'var(--primary-strong)' : getCategoryColor(id);
+    const f = parseFilter(id);
+    const cat = f ? f.category : id;
+    const color = (cat === 'ALL' || cat === '*') ? 'var(--primary-strong)' : getCategoryColor(cat);
     btn.style.borderColor = on ? color : '';
     // One selected ground for every category, so the pressed state reads the
     // same everywhere; the border keeps the category colour as the identity.
     btn.style.background = on ? 'var(--map-stone)' : '';
   });
 }
+
+buildBuildingList();
 
 // ==========================================
 // 8. MARKERS
@@ -727,7 +867,7 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   detailTitle.textContent = loc.name;
   detailBuilding.textContent = loc.acronym || '';
   detailFloor.textContent = loc.floor;
-  detailCenter.textContent = loc.building === loc.name ? 'SLSU Main Campus' : loc.building;
+  detailCenter.textContent = loc.building === loc.name ? 'SLSU Main Campus' : buildingText(loc);
   const ll = svgToLatLng(loc.coords);
   detailCoords.textContent = ll[0].toFixed(6) + ', ' + ll[1].toFixed(6);
   resetRemovePrompt();
@@ -738,7 +878,7 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   // Coming from a category listing, "back" should return to that listing.
   backToTutorialBtn.textContent = activeCategory === 'ALL'
     ? '← Back to Kiosk Guide'
-    : '← Back to ' + getCategoryName(activeCategory);
+    : '← Back to ' + filterName(activeCategory);
 
   // Show the floor this room is on, otherwise its pin is filtered out and the
   // map flies to an empty spot on the wrong drawing.
@@ -777,7 +917,11 @@ function selectCategory(id) {
     return;
   }
 
-  categoryViewTitle.textContent = getCategoryName(activeCategory);
+  // Within one building the building is a given, so each row names the floor
+  // instead - the thing that differs between its rooms.
+  const inBuilding = !!parseFilter(activeCategory);
+  categoryViewTitle.textContent = filterName(activeCategory);
+  categoryViewKind.textContent = inBuilding ? 'Building' : 'Category';
   categoryViewCount.textContent = shown.length === 1 ? '1 place' : shown.length + ' places';
 
   categoryResults.innerHTML = '';
@@ -801,9 +945,10 @@ function selectCategory(id) {
       const name = document.createElement('strong');
       name.textContent = loc.name;
       const sub = document.createElement('small');
+      const where = inBuilding ? loc.floor : buildingText(loc);
       sub.textContent = loc.acronym && !loc.name.includes(loc.acronym)
-        ? loc.acronym + ' · ' + loc.building
-        : loc.building;
+        ? loc.acronym + ' · ' + where
+        : where;
       text.append(name, sub);
 
       li.append(swatch, text);
@@ -899,8 +1044,8 @@ function renderSuggestions(query) {
   suggestionList.innerHTML = suggestions.map((loc, i) => {
     const color = locationColor(loc);
     const sub = loc.acronym && !loc.name.includes(loc.acronym)
-      ? highlight(loc.acronym, q) + ' · ' + escapeHtml(loc.building)
-      : escapeHtml(loc.building);
+      ? highlight(loc.acronym, q) + ' · ' + escapeHtml(buildingText(loc))
+      : escapeHtml(buildingText(loc));
     return '<li class="suggestion" role="option" id="sug-' + i + '" data-index="' + i + '">' +
              '<span class="suggestion-swatch" style="background:' + color + '"></span>' +
              '<span class="suggestion-text">' +
@@ -1468,12 +1613,11 @@ function say(el, text, kind) {
   el.className = 'form-msg' + (kind ? ' ' + kind : '');
 }
 
+// A place added, moved to another building or removed can add or empty a
+// building or a category, so the list is rebuilt rather than recounted.
 function refreshCategoryCounts() {
   recountCategories();
-  categoryButtons.forEach((btn, id) => {
-    const c = btn.querySelector('.cat-count');
-    if (c) c.textContent = countFor(id);
-  });
+  buildBuildingList();
 }
 
 // Offered in the building list even when no location uses them yet, so the
@@ -1485,7 +1629,7 @@ const EXTRA_BUILDINGS = [
 
 function refreshBuildingOptions() {
   const names = [...new Set(
-    PLACES.map(l => l.building).filter(Boolean).concat(EXTRA_BUILDINGS)
+    PLACES.reduce((all, l) => all.concat(l.building ? buildingsOf(l) : []), []).concat(EXTRA_BUILDINGS)
   )].sort();
   buildingOptions.innerHTML = '';
   names.forEach(n => {
