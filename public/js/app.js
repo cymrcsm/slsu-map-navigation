@@ -835,6 +835,113 @@ function markerAt(layerPoint) {
 
 
 // ==========================================
+// 8b. BUILDING NAMES
+// ==========================================
+// Building and gate names over the map (positions in building-labels.js), drawn
+// on top of the floor drawing - whose own names are small text along the
+// walls - and under the routes and pins. They size with the zoom the way a
+// street map's do: small over the whole campus, larger closer in, and where
+// two would collide the one earlier in the list is drawn and the other waits.
+//
+// They are painted on a canvas of their own, like the markers: during a zoom
+// the canvas is scaled as a picture and repainted once when the zoom settles,
+// so the names cost nothing per frame.
+
+const LABEL_FONT = '700 {px}px ' + getComputedStyle(document.body).fontFamily;
+const LABEL_INK = '#12294D';                      // --slsu-navy-deep
+const LABEL_HALO = 'rgba(254, 253, 249, 0.92)';   // --map-paper
+const LABEL_MAX_WIDTH = 9;                        // wrap after about this many ems
+
+// 10px over the whole campus (zoom ~1.2 above GEO_ZOOM_SHIFT), 18px from ~3.5 in.
+function labelPx() {
+  const z = map.getZoom() - GEO_ZOOM_SHIFT;
+  return Math.round(Math.max(10, Math.min(18, 10 + (z - 1.2) * 3.5)));
+}
+
+// Names sit above the floor drawing (floorPane, 350) and above the routes and
+// place pins too (overlayPane, 400): with a pin on nearly every room, names
+// drawn underneath were half hidden. They stay under the kiosk's own marker and
+// its "You Are Here" tag (markerPane 600, tooltipPane 650). Taps go straight
+// through to whatever is underneath, so a name never blocks a pin.
+map.createPane('labelPane');
+map.getPane('labelPane').style.zIndex = 450;
+map.getPane('labelPane').style.pointerEvents = 'none';
+
+// Each full repaint starts with nothing placed, so the collision check below
+// only ever compares names drawn in the same pass.
+const LabelCanvas = L.Canvas.extend({
+  _draw: function () {
+    this._placed = [];
+    L.Canvas.prototype._draw.call(this);
+  }
+});
+const labelRenderer = new LabelCanvas({ pane: 'labelPane', padding: 0.3 });
+
+function wrapLabel(ctx, text, maxWidth) {
+  const words = text.split(' ');
+  const lines = [];
+  let line = '';
+  words.forEach(w => {
+    const next = line ? line + ' ' + w : w;
+    if (line && ctx.measureText(next).width > maxWidth) { lines.push(line); line = w; }
+    else line = next;
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+// A label is a circle marker that paints text instead of a circle - the same
+// trick as PlaceMarker - so Leaflet's canvas renderer projects and culls it.
+const BuildingLabel = L.CircleMarker.extend({
+  options: { interactive: false, radius: 1, stroke: false, fill: false },
+
+  // Generous, so a name is never culled while any of it is on screen.
+  _updateBounds: function () {
+    const p = this._point;
+    this._pxBounds = L.bounds(p.subtract([140, 50]), p.add([140, 50]));
+  },
+
+  _updatePath: function () {
+    const r = this._renderer;
+    if (!r._drawing || this._empty()) return;
+    const ctx = r._ctx;
+    const px = labelPx() - (this.options.gate ? 1 : 0);
+    ctx.font = LABEL_FONT.replace('{px}', px);
+    const lines = wrapLabel(ctx, this.options.text, px * LABEL_MAX_WIDTH);
+    const lineH = px * 1.15;
+    const w = Math.max(...lines.map(l => ctx.measureText(l).width));
+    const h = lineH * lines.length;
+    const p = this._point;
+    const box = [p.x - w / 2 - 4, p.y - h / 2 - 3, p.x + w / 2 + 4, p.y + h / 2 + 3];
+    if (r._placed.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) return;
+    r._placed.push(box);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(3, px / 4);
+    ctx.strokeStyle = LABEL_HALO;
+    ctx.fillStyle = LABEL_INK;
+    lines.forEach((line, i) => {
+      const y = p.y - h / 2 + lineH * (i + 0.5);
+      ctx.strokeText(line, p.x, y);
+      ctx.fillText(line, p.x, y);
+    });
+  },
+
+  _containsPoint: function () { return false; }
+});
+
+const buildingLabelLayer = L.layerGroup(
+  (typeof BUILDING_LABELS !== 'undefined' ? BUILDING_LABELS : []).map(l =>
+    new BuildingLabel(toLeafletCoords(l.at), { renderer: labelRenderer, text: l.text, gate: !!l.gate }))
+).addTo(map);
+
+// The size changes with the zoom, so every name is re-measured once the zoom
+// settles (the renderer repaints on the moveend that follows).
+map.on('zoomend', () => buildingLabelLayer.eachLayer(l => l._project && l._project()));
+
+// ==========================================
 // 9. DETAIL PANEL
 // ==========================================
 
