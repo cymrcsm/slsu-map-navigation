@@ -4,6 +4,7 @@
 #   sudo systemctl enable --now slsu-kiosk
 #
 # Adjust User, WorkingDirectory and the Environment lines to match the Pi.
+# Newer Raspberry Pi OS has no default `pi` user - use your own (`whoami`).
 # AmbientCapabilities lets Node bind 80/443 without running as root.
 
 [Unit]

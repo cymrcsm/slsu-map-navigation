@@ -1,166 +1,240 @@
-# Kiosk deployment — trusted HTTPS for the phone hand-off
+# Kiosk deployment — Raspberry Pi as its own Wi-Fi network
 
-Goal: any visitor scans the QR, joins the kiosk's Wi-Fi, and the live-GPS map
-opens **with no security warning and no setup on their phone** — while the kiosk
-still runs fully offline.
+Goal: a visitor scans the **"No mobile data?"** QR, joins the kiosk's Wi-Fi, and
+the live-GPS map opens **with no security warning and no setup on their phone**
+— with no internet anywhere. (The main QR is the GitHub Pages copy, which needs
+the phone's own mobile data; see `docs/WEB-DEPLOY.md`.)
 
-How it works: the kiosk is its own Wi-Fi access point. A free DuckDNS name gets a
-real Let's Encrypt certificate (issued once, over the internet, via a DNS record
-— the kiosk is never exposed). The kiosk's own DNS then answers that name with
-its own address, so the trusted `https://…` connection is entirely local.
+How it works: the Pi is its own Wi-Fi access point (`SLSU-Kiosk-Map`). The free
+DuckDNS name `slsu-kiosk.duckdns.org` has a real Let's Encrypt certificate. The
+Pi's own DNS answers that name with its own address, `10.42.0.1`, so phones on
+the kiosk Wi-Fi reach the Pi over trusted `https://` without ever asking the
+internet. The IP stored at DuckDNS is never used by visitors.
 
-**Steps marked 👤 are yours to do** (they need the internet, a browser login, or
-`sudo` on the Pi). Everything else is already in this repo.
-
----
-
-## What you need
-
-- Raspberry Pi 4 (the target device) with Raspberry Pi OS, plus keyboard/screen
-  or SSH for setup.
-- Internet on the Pi **once** for setup, and briefly every ~60 days to renew the
-  cert. None during normal use.
-- ~30 minutes.
-
-Throughout, the example name is `slsu-kiosk.duckdns.org` and the kiosk's Wi-Fi
-address is `10.42.0.1`. Substitute your own name everywhere.
+**Steps marked 👤 are yours to do** (they need the Pi, a browser login, or the
+laptop that holds the certificate).
 
 ---
 
-## Part A — free domain (DuckDNS)  👤
+## Before you start
 
-1. Go to <https://www.duckdns.org> and sign in (GitHub / Google / Reddit).
-2. Under **domains**, type a name — e.g. `slsu-kiosk` — and click **add domain**.
-   You now own `slsu-kiosk.duckdns.org`.
-3. Copy the **token** shown at the top of the page. Keep it — the cert step needs
-   it, and it is a password.
+- Raspberry Pi 4 with Raspberry Pi OS (64-bit, Desktop). Check the version on
+  the Pi with `cat /etc/os-release`:
+  - **`VERSION_CODENAME=bookworm` or newer** → follow **F1** in Part F.
+  - **`bullseye` or older** → follow **F2**.
+- **Internet on the Pi by Ethernet cable** while setting up. Part F turns the
+  Pi's Wi-Fi into the kiosk network, so after that the Wi-Fi no longer reaches
+  the internet. If you set up over SSH, connect SSH over Ethernet too, or use a
+  keyboard and screen.
+- The laptop that holds the certificate (`certs/` in the project folder).
+- Your Pi username. Newer Raspberry Pi OS has no default `pi` user; replace
+  `pi` below with yours (run `whoami` on the Pi).
 
-> The IP box on DuckDNS does not matter; leave it or set it to `10.42.0.1`. The
-> kiosk's own DNS is what actually answers this name for visitors.
-
----
-
-## Part B — the TLS certificate  👤
-
-On any computer with internet (your laptop is fine — the files copy to the Pi
-afterward). Uses `acme.sh`, a single shell script, with DuckDNS's DNS API so no
-inbound connection is ever needed.
-
-```bash
-curl https://get.acme.sh | sh -s email=you@example.com
-export DuckDNS_Token="paste-your-duckdns-token"
-
-~/.acme.sh/acme.sh --issue --dns dns_duckdns \
-  -d slsu-kiosk.duckdns.org \
-  --server letsencrypt
-```
-
-It writes the cert into `~/.acme.sh/slsu-kiosk.duckdns.org_ecc/`. That is it —
-you now have a browser-trusted certificate for a name you control.
+Throughout, the name is `slsu-kiosk.duckdns.org` and the kiosk's address is
+`10.42.0.1`.
 
 ---
 
-## Part C — the Pi as a Wi-Fi access point  👤
+## Part A — DuckDNS  👤
 
-On the Pi:
+On <https://www.duckdns.org>, set the **current ip** of `slsu-kiosk` to
+`10.42.0.1` and click **update ip**. It no longer needs to point at the laptop;
+the Pi answers the name itself.
+
+---
+
+## Part B — the certificate  👤
+
+Nothing to issue — the Let's Encrypt certificate already on the laptop is for
+the *name*, not the machine, so it moves to the Pi as-is (Part D). It expires
+**2026-12-07**; renewal is Part H.
+
+---
+
+## Part C — install the kiosk app  👤
+
+On the Pi, while it still has internet:
 
 ```bash
 sudo apt update
-sudo apt install -y hostapd dnsmasq
+sudo apt install -y git nodejs npm build-essential python3
+node --version            # 18 or newer
+
+git clone https://github.com/cymrcsm/slsu-map-navigation.git ~/thesis-map-navigation
+cd ~/thesis-map-navigation
+npm ci --omit=dev
+```
+
+Do **not** run `npm run db:init` — the directory database ships with the repo,
+and `db:init` rebuilds it.
+
+---
+
+## Part D — copy the certificate from the laptop  👤
+
+Find the Pi's address on your network first (on the Pi: `hostname -I`, the first
+number). Then on the **laptop**, in PowerShell, from the project folder:
+
+```powershell
+scp -r certs <user>@<pi-address>:~/thesis-map-navigation/
+```
+
+On the Pi, check it arrived:
+
+```bash
+ls ~/thesis-map-navigation/certs        # cert.pem  hostname  key.pem
+cat ~/thesis-map-navigation/certs/hostname   # slsu-kiosk.duckdns.org
+```
+
+`certs/` is never committed (it holds the private key), which is why it is
+copied by hand.
+
+---
+
+## Part E — run the kiosk as a service  👤
+
+```bash
+cd ~/thesis-map-navigation
+sudo cp deploy/slsu-kiosk.service /etc/systemd/system/
+sudoedit /etc/systemd/system/slsu-kiosk.service
+```
+
+In the editor:
+
+- `User=` → your Pi username.
+- `WorkingDirectory=` → `/home/<user>/thesis-map-navigation`.
+- `KIOSK_ADMIN_CODE=` → the real admin code (not `change-me`).
+
+Then:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now slsu-kiosk
+journalctl -u slsu-kiosk -n 20
+```
+
+The log should show HTTP on 80, `🔒 HTTPS on port 443`, and a phone QR of
+`https://slsu-kiosk.duckdns.org` (no `:3443` — the Pi uses the standard ports).
+
+---
+
+## Part F — turn the Pi's Wi-Fi into the kiosk network  👤
+
+Do this last: after it, the Pi's Wi-Fi stops reaching the internet.
+
+Both paths use the same DNS/DHCP server:
+
+```bash
+sudo apt install -y dnsmasq
+sudo cp ~/thesis-map-navigation/deploy/dnsmasq.conf /etc/dnsmasq.conf
+```
+
+### F1 — Bookworm or newer (NetworkManager)
+
+```bash
+sudo raspi-config nonint do_wifi_country PH
+
+# stop the Pi joining your normal Wi-Fi on wlan0 (list names with: nmcli con show)
+sudo nmcli con modify "<your-wifi-connection>" connection.autoconnect no
+
+sudo nmcli con add type wifi ifname wlan0 con-name kiosk-ap autoconnect yes \
+  ssid SLSU-Kiosk-Map \
+  802-11-wireless.mode ap 802-11-wireless.band bg 802-11-wireless.channel 6 \
+  802-11-wireless.ap-isolation 1 \
+  wifi-sec.key-mgmt wpa-psk wifi-sec.proto rsn \
+  wifi-sec.pairwise ccmp wifi-sec.group ccmp wifi-sec.psk "slsu-campus" \
+  ipv4.method manual ipv4.addresses 10.42.0.1/24 ipv6.method disabled
+
+sudo nmcli con up kiosk-ap
+sudo systemctl enable dnsmasq
+sudo systemctl restart dnsmasq
+```
+
+`ipv4.method manual` matters: NetworkManager's `shared` mode starts its own
+dnsmasq, which would fight the one configured above.
+
+### F2 — Bullseye or older (dhcpcd + hostapd)
+
+```bash
+sudo apt install -y hostapd
 sudo systemctl unmask hostapd
 
-# static address for the Wi-Fi interface
 echo -e "\ninterface wlan0\nstatic ip_address=10.42.0.1/24\nnohook wpa_supplicant" | sudo tee -a /etc/dhcpcd.conf
 
-# configs from this repo (edit the SSID / password / hostname inside first)
-sudo cp deploy/hostapd.conf /etc/hostapd/hostapd.conf
-sudo cp deploy/dnsmasq.conf /etc/dnsmasq.conf
-sudo sed -i 's#DAEMON_CONF=.*#DAEMON_CONF="/etc/hostapd/hostapd.conf"#' /etc/default/hostapd
+sudo cp ~/thesis-map-navigation/deploy/hostapd.conf /etc/hostapd/hostapd.conf
+sudo sed -i 's#^\#\?DAEMON_CONF=.*#DAEMON_CONF="/etc/hostapd/hostapd.conf"#' /etc/default/hostapd
 
-sudo systemctl enable --now hostapd dnsmasq
+sudo systemctl enable hostapd dnsmasq
 sudo reboot
 ```
 
-After the reboot, `SLSU-Kiosk-Map` should be visible from a phone. Joining it
-gives you an address like `10.42.0.57`, gateway `10.42.0.1`.
+### Check
 
-Edit `deploy/dnsmasq.conf` first if your name is not `slsu-kiosk.duckdns.org` —
-change the `address=/slsu-kiosk.duckdns.org/10.42.0.1` line.
-
----
-
-## Part D — the kiosk app  👤
-
-On the Pi:
+From a phone, `SLSU-Kiosk-Map` should appear; the password is `slsu-campus`
+(change it in the command above / `deploy/hostapd.conf`). Joining gives the
+phone an address like `10.42.0.57`. On the Pi:
 
 ```bash
-git clone https://github.com/cymrcsm/slsu-map-navigation.git ~/thesis-map-navigation
-cd ~/thesis-map-navigation
-npm ci
-npm run db:init          # builds db/slsu_directory.db from campus-data.js
-
-# install the certificate from Part B (copy the ~/.acme.sh/... folder over first,
-# or run acme.sh on the Pi itself)
-npm run install-cert -- ~/.acme.sh/slsu-kiosk.duckdns.org_ecc
-
-# run it as a service on ports 80 / 443
-sudo cp deploy/slsu-kiosk.service /etc/systemd/system/
-sudoedit /etc/systemd/system/slsu-kiosk.service   # set User, WorkingDirectory,
-                                                  # KIOSK_ADMIN_CODE
-sudo systemctl enable --now slsu-kiosk
-sudo systemctl status slsu-kiosk
+ip addr show wlan0          # inet 10.42.0.1/24
+systemctl status dnsmasq    # active (running)
 ```
 
-(`install-cert` wrote `certs/hostname`, so the QR already uses
-`slsu-kiosk.duckdns.org` — the `KIOSK_HOSTNAME` line in the service file is just a
-belt-and-braces override.)
-
-`journalctl -u slsu-kiosk -f` should show it listening on 80 and 443, and
-`Phone hand-off QR points at: https://slsu-kiosk.duckdns.org`.
-
 ---
 
-## Part E — the kiosk browser
+## Part G — the kiosk screen
 
-Point Chromium in kiosk mode at `http://localhost` (the touchscreen uses plain
-HTTP on the box itself, which is fine). The "📱 Take this on my phone" QR it
-draws will already carry `https://slsu-kiosk.duckdns.org/go/…` — `install-cert`
-recorded the hostname from the certificate.
+Chromium on the Pi should open `http://localhost` full-screen at login. The
+touchscreen uses plain HTTP on the box itself, which is fine. The phone QR it
+draws already carries `https://slsu-kiosk.duckdns.org/go/…`.
 
----
-
-## Part F — renewing the certificate  👤
-
-Let's Encrypt certs last 90 days. On any machine with internet, every ~60 days:
+On Bookworm (labwc desktop), add to `~/.config/labwc/autostart`:
 
 ```bash
-export DuckDNS_Token="…"
-~/.acme.sh/acme.sh --renew -d slsu-kiosk.duckdns.org --force
-npm run install-cert -- ~/.acme.sh/slsu-kiosk.duckdns.org_ecc
-sudo systemctl restart slsu-kiosk
+chromium --kiosk --noerrdialogs --disable-infobars http://localhost &
 ```
 
-If the Pi has internet, add that as a weekly cron / systemd timer and it is
-hands-off. For a thesis window of a few weeks, one issuance is enough.
+(The browser may be called `chromium-browser` on older images.)
+
+---
+
+## Part H — renewing the certificate  👤
+
+Let's Encrypt certificates last 90 days; this one expires **2026-12-07**. On the
+laptop, in Git Bash, any time in the last month:
+
+```bash
+export DuckDNS_Token="…"                         # from duckdns.org
+/c/Users/JEDPAD~1/acmesh/acme.sh --renew -d slsu-kiosk.duckdns.org --force
+npm run install-cert -- C:/Users/JEDPAD~1/acmesh/data/slsu-kiosk.duckdns.org_ecc
+```
+
+Then repeat Part D (copy `certs/` to the Pi) and on the Pi run
+`sudo systemctl restart slsu-kiosk`. The renewal temporarily sets a DuckDNS TXT
+record; it does not touch the `10.42.0.1` IP from Part A.
 
 ---
 
 ## Test checklist
 
-On a phone (ideally one iOS + one Android), joined to `SLSU-Kiosk-Map`:
+On a phone (ideally one iPhone + one Android), mobile data **off**, joined to
+`SLSU-Kiosk-Map`:
 
 - [ ] Joining the Wi-Fi does **not** show a persistent "no internet" nag.
-- [ ] Kiosk → pick a place → "Take this on my phone" → scan → the map opens with
-      **no certificate warning**.
-- [ ] The blue dot appears and follows you as you walk; "… m to go" counts down.
-- [ ] Walk out of Wi-Fi range with the tab open — the dot keeps following (GPS
+- [ ] Kiosk → pick a place → Ask for Directions → "Take this on my phone" →
+      **No mobile data?** → scan → the map opens with **no certificate warning**.
+- [ ] Allow location → the pin appears and follows you; "… m to go" counts down.
+- [ ] Walk out of Wi-Fi range with the tab open — the pin keeps following (GPS
       needs no network).
+
+If the page will not load: on the Pi, `journalctl -u slsu-kiosk -n 50` (server
+errors), `systemctl status dnsmasq` (DNS), and `cat certs/hostname` (must be the
+DuckDNS name).
 
 ---
 
 ## If you truly cannot get a domain
 
-`node tools/make-cert.mjs <ip>` makes a self-signed cert. It works, but every
-phone shows a one-time "not private" warning and iOS Safari may still refuse
-geolocation. Acceptable for the team's own testing; not for walk-up evaluators.
-See `docs/ACCEPTANCE.md` and `docs/PHONE-HANDOFF.md`.
+`node tools/make-cert.mjs 10.42.0.1` makes a self-signed cert. It works, but
+every phone shows a one-time "not private" warning and iOS Safari may still
+refuse geolocation. Acceptable for the team's own testing; not for walk-up
+evaluators. See `docs/ACCEPTANCE.md` and `docs/PHONE-HANDOFF.md`.

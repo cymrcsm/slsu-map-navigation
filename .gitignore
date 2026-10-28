@@ -21,3 +21,6 @@ web/
 
 # local override for the public phone-page URL (see docs/WEB-DEPLOY.md)
 web-url
+
+# pasted transcript of an old Claude session - contains the DuckDNS token
+docs/old-claude-session.txt
