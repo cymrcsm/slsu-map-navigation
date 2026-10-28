@@ -49,6 +49,12 @@ P('campus artwork is present', svg.status === 200 && svgLen > 100000, Math.round
 const tile = await head('/tiles/19/444156/246920.png');
 P('cached tiles serve as PNG', tile.status === 200 && tile.type.includes('image/png'), tile.type);
 
+const floorTile = await head('/floor-tiles/ground/18/222078/123461.webp');
+P('floor tiles serve as WebP', floorTile.status === 200 && floorTile.type.includes('image/webp'), floorTile.type);
+
+const blankTile = await head('/floor-tiles/ground/18/0/0.webp');
+P('missing floor tile -> 404, not the app page', blankTile.status === 404, String(blankTile.status));
+
 const captive = await head('/generate_204');
 P('captive-portal probe answered', captive.status === 204);
 

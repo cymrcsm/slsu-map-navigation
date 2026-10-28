@@ -183,17 +183,35 @@ systemctl status dnsmasq    # active (running)
 
 ## Part G — the kiosk screen
 
-Chromium on the Pi should open `http://localhost` full-screen at login. The
-touchscreen uses plain HTTP on the box itself, which is fine. The phone QR it
-draws already carries `https://slsu-kiosk.duckdns.org/go/…`.
-
-On Bookworm (labwc desktop), add to `~/.config/labwc/autostart`:
+On the Pi, after Part E:
 
 ```bash
-chromium --kiosk --noerrdialogs --disable-infobars http://localhost &
+cd ~/thesis-map-navigation
+bash deploy/install-kiosk.sh
+sudo reboot
 ```
 
-(The browser may be called `chromium-browser` on older images.)
+From then on the Pi boots straight to the desktop and opens the app fullscreen
+in Chromium (`deploy/kiosk-browser.sh`), reopening it two seconds after it is
+ever closed. Chromium is locked down by `deploy/chromium-kiosk-policy.json`: no
+developer tools, downloads or printing, and no site but the kiosk's own. The
+script also turns the touch screen's mouse emulation off, which pinch-to-zoom
+needs. Keep the display on the same micro-HDMI port: the touch input is mapped
+to that output.
+
+For maintenance over SSH, `pkill -f kiosk-browser.sh; pkill -x chromium` stops
+the kiosk until the next reboot; the undo steps are at the top of
+`install-kiosk.sh`.
+
+This Pi boots from a USB flash drive, which is very slow at the small writes a
+browser makes all the time (about 1.3 MB/s measured), so `kiosk-browser.sh`
+keeps Chromium's cache in RAM (`/dev/shm`) rather than on the drive. A USB SSD
+instead of the flash drive is the larger fix.
+
+The kiosk browser uses plain HTTP on the box itself (`http://127.0.0.1`), which
+is fine. The "📱 Take this on my phone" QR it
+draws will already carry `https://slsu-kiosk.duckdns.org/go/…` — `install-cert`
+recorded the hostname from the certificate.
 
 ---
 

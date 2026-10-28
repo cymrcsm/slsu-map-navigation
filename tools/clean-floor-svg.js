@@ -75,10 +75,10 @@ const EXPECTED = {
   'thirdFloor_layer.svg': ['1E1E1E', 'B9B30C', '960609', 'BB7CBD', '047319', '171AC5']
 };
 
-// Pixels per drawing unit kept in an embedded texture. Room-reading zoom is
-// around 15-30 px per unit; the very deepest zoom is about 90, where textures
-// soften slightly.
-const TEXTURE_PX_PER_UNIT = 40;
+// Pixels per drawing unit kept in an embedded texture: about what the deepest
+// floor tiles show (z23, ~55 px per unit - build-floor-tiles.mjs), so cutting
+// tiles from a cleaned drawing loses nothing. Room-reading zoom is 15-30.
+const TEXTURE_PX_PER_UNIT = 56;
 
 const PNG_IMAGE = /(<image id="([^"]+)"[^>]*?(?:xlink:)?href=")data:image\/png;base64,([A-Za-z0-9+/=]+)"/g;
 

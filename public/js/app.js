@@ -204,12 +204,13 @@ const basemapBtn = document.getElementById('basemap-btn');
 // boundary padded to match setMaxBounds() below, at z15-19. Nothing here
 // reaches the network, so the street map works with the kiosk offline.
 // The OpenStreetMap credit stays: it is an ODbL licence condition and does not
-// lapse because the tiles are served locally.
+// lapse because the tiles are served locally. It is text, not a link: on the
+// kiosk a tap on a link would leave the app, and kiosk mode has no back button.
 const basemap = L.tileLayer('tiles/{z}/{x}/{y}.png', {
   minNativeZoom: 15,
   maxNativeZoom: 19,
   maxZoom: MAX_ZOOM,
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  attribution: '&copy; OpenStreetMap contributors'
 });
 
 // One drawing per level, in the same order as WALK_PATHS.levels. They share the
@@ -217,35 +218,103 @@ const basemap = L.tileLayer('tiles/{z}/{x}/{y}.png', {
 const FLOOR_ASSETS = ['assets/groundFloor_layer.svg',
                       'assets/secondFloor_layer.svg',
                       'assets/thirdFloor_layer.svg'];
+
+// The same drawings cut into map tiles by tools/build-floor-tiles.mjs - what
+// the kiosk normally draws. As one SVG image, a floor zoomed in to read a room
+// is ~17,000 x 31,000 px, and the Raspberry Pi repainted the 14 MB drawing on
+// every pan and zoom: the map lagged. As tiles, like the street map, only the
+// squares on screen are loaded, at the zoom on screen. The tiles are cut for
+// georef.js's default placement, so a calibration saved in this browser
+// (calibrate.html) brings the SVGs back - they follow it, the tiles cannot.
+// Re-run the tool after re-exporting a floor, or the kiosk shows the old one.
+const FLOOR_TILES = ['floor-tiles/ground', 'floor-tiles/second', 'floor-tiles/third'];
+const FLOOR_TILE_MIN_ZOOM = 18;   // build-floor-tiles.mjs --zmin
+const FLOOR_TILE_MAX_ZOOM = 23;   // build-floor-tiles.mjs --zmax
+const USE_FLOOR_TILES = !GEOREF_IS_CALIBRATED;
 let activeLevel = 0;
 
-// Every floor is drawn at once rather than swapped. The floor being viewed sits
-// on top at full strength; the rest stay faint underneath so the building keeps
-// its shape while you move between them. The floor a route happens to end on
-// does not decide this - the floor the user is looking at does.
+// Only the floor being viewed is drawn. The other floors used to stay faint
+// underneath it so the building kept its shape between switches, but on the
+// Raspberry Pi 4 drawing three stacked plans on every zoom and pan made the map
+// lag. Set SHOW_INACTIVE_FLOORS to true for the old look. The floor a route
+// happens to end on does not decide which floor shows - the floor the user is
+// looking at does.
+const SHOW_INACTIVE_FLOORS = false;
 const INACTIVE_FLOOR_OPACITY = 0.18;
 
-const floorOverlays = FLOOR_ASSETS.map(url => new GeoImageOverlay(url, {
-  canvasWidth: MAP_WIDTH,
-  canvasHeight: MAP_HEIGHT,
-  bearingDeg: GEOREF.bearingDeg,
-  className: 'campus-overlay'
-}));
+// Floors sit over the street map and under routes and pins: a pane of their
+// own, between the tile pane (200) and the overlay pane (400) routes draw in.
+map.createPane('floorPane').style.zIndex = 350;
 
-// Bounds are identical across floors, so any one of them speaks for all.
-const campusOverlay = floorOverlays[0];
-const bounds = campusOverlay.getBounds();
+// Fully transparent tiles are never written, and the server answers for them
+// with a 404 (server.js); Leaflet then puts this in place of a broken image.
+const BLANK_TILE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+// The frame's corners - the same for every floor, tiles or SVG.
+const bounds = L.latLngBounds(canvasCornersLatLng(MAP_WIDTH, MAP_HEIGHT));
 map.setMaxBounds(bounds.pad(0.25));
+
+// Between whole zoom levels Leaflet scales tiles by a fraction and the browser
+// softens the edges of each one; with zoomSnap: 0 nearly every zoom is in
+// between. Where two softened edges meet, a hairline shows - a faint grid over
+// the drawing. So floor tiles are 257 px images laid 256 px apart: the extra
+// row and column is the neighbour's real first row and column
+// (build-floor-tiles.mjs), so every seam pixel has drawing under it. Leaflet
+// blends tiles with plus-lighter, which would add that overlap up into a
+// bright line instead, so floor tiles blend normally.
+const FloorTileLayer = L.TileLayer.extend({
+  _initTile: function (tile) {
+    L.TileLayer.prototype._initTile.call(this, tile);
+    const size = this.getTileSize();
+    tile.style.width = (size.x + 1) + 'px';
+    tile.style.height = (size.y + 1) + 'px';
+    tile.style.mixBlendMode = 'normal';
+  }
+});
+
+const floorOverlays = USE_FLOOR_TILES
+  ? FLOOR_TILES.map(dir => new FloorTileLayer(dir + '/{z}/{x}/{y}.webp', {
+      pane: 'floorPane',
+      minNativeZoom: FLOOR_TILE_MIN_ZOOM,
+      maxNativeZoom: FLOOR_TILE_MAX_ZOOM,
+      // Leaflet rounds the zoom before comparing it with maxZoom, so a limit of
+      // MAX_ZOOM itself (23.73) would hide the floor above zoom 23.5.
+      maxZoom: Math.ceil(MAX_ZOOM),
+      bounds: bounds,
+      errorTileUrl: BLANK_TILE,
+      // Mid-pinch, scale the tiles already loaded rather than fetch every level
+      // passed through; the right ones load when the fingers lift.
+      updateWhenZooming: false,
+      className: 'campus-overlay'
+    }))
+  : FLOOR_ASSETS.map(url => new GeoImageOverlay(url, {
+      pane: 'floorPane',
+      canvasWidth: MAP_WIDTH,
+      canvasHeight: MAP_HEIGHT,
+      bearingDeg: GEOREF.bearingDeg,
+      className: 'campus-overlay'
+    }));
 
 function applyFloorOpacity() {
   const front = basemapVisible ? OVERLAY_OPACITY_OVER_BASEMAP : 1;
   floorOverlays.forEach((ov, i) => {
     const isActive = i === activeLevel;
+    const show = isActive || SHOW_INACTIVE_FLOORS;
     ov.setOpacity(isActive ? front : INACTIVE_FLOOR_OPACITY);
     if (ov.setZIndex) ov.setZIndex(isActive ? 2 : 1);
-    // Faint floors are drawn small and stretched; only the floor on view is
-    // painted at full detail (geo-overlay.js, setLowRes).
-    ov.setLowRes(!isActive);
+    if (USE_FLOOR_TILES) {
+      // A tile layer keeps fetching tiles on every pan and zoom while it is on
+      // the map, seen or not, so a hidden floor leaves the map.
+      if (show && !map.hasLayer(ov)) ov.addTo(map);
+      else if (!show && map.hasLayer(ov)) map.removeLayer(ov);
+    } else {
+      // A hidden SVG stays on the map - display: none - so switching back to it
+      // does not decode the drawing again. A faint floor shown underneath is
+      // painted small and stretched (geo-overlay.js, setLowRes).
+      const el = ov.getElement();
+      if (el) el.style.display = show ? '' : 'none';
+      ov.setLowRes(!isActive);
+    }
   });
 }
 
@@ -262,7 +331,9 @@ function applyBasemap(on) {
   }
 }
 
-floorOverlays.forEach(ov => ov.addTo(map));
+// Tile floors go on in applyFloorOpacity(), the active one only; the SVG
+// floors all go on now and are hidden there.
+if (!USE_FLOOR_TILES) floorOverlays.forEach(ov => ov.addTo(map));
 applyBasemap(true);
 
 const CAMPUS_CENTER = toLeafletCoords([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
@@ -1066,8 +1137,8 @@ function splitByLevel(points) {
 // even when it is a floor below the room.
 //
 // The legs off the selected floor are context, not the answer, and they are
-// drawn over a plan already faded to INACTIVE_FLOOR_OPACITY - so they sit well
-// below the selected leg rather than competing with it for attention.
+// drawn faint - over no plan at all unless SHOW_INACTIVE_FLOORS is on - so they
+// sit well below the selected leg rather than competing with it for attention.
 const ROUTE_RUN_OPACITY = [1, 0.3, 0.12];
 const ROUTE_RUN_OPACITY_FLOOR = 0.12;
 
@@ -2165,308 +2236,13 @@ syncWithServer = async function () {
 // screen happens by accident more often than on purpose - mid-form, with the
 // authorization code thrown away. Leaving is now always a deliberate act.
 // Escape is gone for the same reason: a kiosk has no keyboard to press it on,
-// but the phone hand-off and the on-screen one both do.
+// but the phone hand-off does.
 
-// ==========================================
-// ON-SCREEN KEYBOARD
-// ==========================================
-// The kiosk is a touch screen with no physical keys. This keyboard appears when
-// any text field is tapped - the search bar, or a field in the admin panel and
-// its add and edit forms - and types into whichever one was tapped last. It
-// goes on a tap anywhere outside it, and on its own when the typing is done.
-//
-// Laid out like a phone's: a letters layer with shift, and a symbols layer
-// behind a ?123 key, each with comma, full stop, space and enter along the
-// bottom. Shift is one-shot - the next letter is capitalised and it drops -
-// and a second tap while it is up locks it, as on a phone.
-//
-// It types by dispatching the same input and keydown events a real keyboard
-// would, so the suggestion list, the Enter-to-confirm handlers on the code
-// fields, and everything else already listening on those inputs is reused
-// rather than repeated.
-
-const kioskKeyboard = document.getElementById('kiosk-keyboard');
-const keyboardRows = document.getElementById('keyboard-rows');
-
-// Which field the keys go to. Set on every tap of an eligible input.
-let keyboardTarget = null;
-let keyboardLayer = 'letters';       // 'letters' | 'symbols'
-let keyboardShift = 'off';           // 'off' | 'once' | 'lock'
-
-const KEYBOARD_TYPES = new Set(['text', 'password', 'number', 'search']);
-function keyboardEligible(el) {
-  return !!el && el.tagName === 'INPUT' && KEYBOARD_TYPES.has(el.type) && !el.disabled && !el.readOnly;
-}
-
-// A key is a character, or one of the named keys. w is its width in key
-// units; every row totals ten, so the columns line up between rows.
-const K = (k, w, label) => ({ k: k, w: w || 1, label: label });
-const KEYBOARD_LAYERS = {
-  letters: [
-    '1234567890'.split('').map(c => K(c)),
-    'qwertyuiop'.split('').map(c => K(c)),
-    'asdfghjkl'.split('').map(c => K(c)),
-    [K('shift', 1.5, '\u21E7')].concat('zxcvbnm'.split('').map(c => K(c)), [K('backspace', 1.5, '\u232B')]),
-    [K('symbols', 2, '?123'), K(','), K('space', 4, 'space'), K('.'), K('enter', 2, 'enter')]
-  ],
-  symbols: [
-    '1234567890'.split('').map(c => K(c)),
-    '@#$_&-+()/'.split('').map(c => K(c)),
-    '~^|\\[]{}<>'.split('').map(c => K(c)),
-    [K('=')].concat('*"\':;!?'.split('').map(c => K(c)), [K('backspace', 2, '\u232B')]),
-    [K('letters', 2, 'ABC'), K(','), K('space', 4, 'space'), K('.'), K('enter', 2, 'enter')]
-  ]
-};
-// The nine-key letter row is inset half a key each side so it stays aligned.
-// Both layers have five rows, so switching between them does not change the
-// height of the keys.
-const KEYBOARD_INSET = { letters: { 2: 'inset-half' }, symbols: {} };
-
-// A number field has no caret to speak of - selectionStart is null on it - so
-// text goes on the end. Everything else is edited at the caret, as typing would.
-function keyboardType(text) {
-  const t = keyboardTarget;
-  if (!t) return;
-  if (t.selectionStart === null || t.selectionStart === undefined) {
-    t.value = t.value + text;
-  } else {
-    const start = t.selectionStart, end = t.selectionEnd;
-    const v = t.value;
-    t.value = v.slice(0, start) + text + v.slice(end);
-    const caret = start + text.length;
-    t.setSelectionRange(caret, caret);
-  }
-  t.dispatchEvent(new Event('input', { bubbles: true }));
-}
-
-function keyboardBackspace() {
-  const t = keyboardTarget;
-  if (!t) return;
-  if (t.selectionStart === null || t.selectionStart === undefined) {
-    t.value = t.value.slice(0, -1);
-  } else {
-    const start = t.selectionStart, end = t.selectionEnd;
-    const v = t.value;
-    if (start === end && start === 0) return;
-    const from = start === end ? start - 1 : start;
-    t.value = v.slice(0, from) + v.slice(end);
-    t.setSelectionRange(from, from);
-  }
-  t.dispatchEvent(new Event('input', { bubbles: true }));
-}
-
-function renderKeyboard() {
-  keyboardRows.innerHTML = '';
-  const insets = KEYBOARD_INSET[keyboardLayer] || {};
-  KEYBOARD_LAYERS[keyboardLayer].forEach((row, r) => {
-    const rowEl = document.createElement('div');
-    rowEl.className = 'keyboard-row' + (insets[r] ? ' ' + insets[r] : '');
-    row.forEach(key => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'keyboard-key';
-      btn.dataset.key = key.k;
-      btn.style.flex = key.w + ' 1 0';
-      const named = key.label !== undefined;
-      if (named) {
-        btn.textContent = key.label;
-        btn.classList.add('key-named', 'key-' + key.k);
-        if (key.k === 'shift' && keyboardShift !== 'off') btn.classList.add('on');
-        if (key.k === 'shift' && keyboardShift === 'lock') btn.classList.add('locked');
-        if (key.k === 'backspace') btn.setAttribute('aria-label', 'Backspace');
-      } else {
-        const upper = keyboardShift !== 'off' && /^[a-z]$/.test(key.k);
-        btn.textContent = upper ? key.k.toUpperCase() : key.k;
-      }
-      rowEl.appendChild(btn);
-    });
-    keyboardRows.appendChild(rowEl);
-  });
-}
-
-// At the bottom of the map card, whichever field it serves. When the field is
-// in the admin dialog the dialog moves to the top, out of the keyboard's way.
-// A field with a dropdown behind it (a <datalist>) and the keyboard take
-// turns on top, decided by what was tapped last. The browser draws the
-// dropdown above everything, so "keyboard on top" means the dropdown shut:
-// tapping a key sets the field's list attribute aside, which closes the
-// dropdown and keeps it closed while the keys are in use. Tapping the field
-// gives the list back, and the same tap opens the dropdown over the keyboard
-// as it always did. Putting the keyboard away gives the list back too.
-function holdBackList(input) {
-  if (input && input.hasAttribute('list')) {
-    input.dataset.keyboardList = input.getAttribute('list');
-    input.removeAttribute('list');
-  }
-}
-function giveBackList(input) {
-  if (input && input.dataset.keyboardList) {
-    input.setAttribute('list', input.dataset.keyboardList);
-    delete input.dataset.keyboardList;
-  }
-}
-
-function showKeyboardFor(input) {
-  if (keyboardTarget && keyboardTarget !== input) giveBackList(keyboardTarget);
-  keyboardTarget = input;
-  const inDialog = !!input.closest('#admin-overlay');
-  // For a field in the admin dialog the keyboard is shorter, the dialog moves
-  // to the top and is told how much room the keyboard takes, so the dialog
-  // fits above it and scrolls inside itself rather than running underneath -
-  // and the field just tapped is scrolled into that visible part. Without
-  // this the code field and the building field, low in the edit form, sat
-  // behind the keys while being typed into.
-  kioskKeyboard.classList.toggle('for-dialog', inDialog);
-  adminOverlay.classList.toggle('keyboard-open', inDialog);
-  kioskKeyboard.hidden = false;
-  renderKeyboard();
-  if (inDialog) {
-    adminOverlay.style.setProperty('--keyboard-height', kioskKeyboard.offsetHeight + 'px');
-    input.scrollIntoView({ block: 'nearest' });
-  }
-}
-
-function hideKeyboard() {
-  giveBackList(keyboardTarget);
-  kioskKeyboard.hidden = true;
-  kioskKeyboard.classList.remove('for-dialog');
-  adminOverlay.classList.remove('keyboard-open');
-  adminOverlay.style.removeProperty('--keyboard-height');
-  keyboardTarget = null;
-  // Next time it opens it starts fresh, as a phone's does.
-  keyboardLayer = 'letters';
-  keyboardShift = 'off';
-  renderKeyboard();
-}
-
-renderKeyboard();
-
-// Keys must not take focus from the field, or the suggestion list closes under
-// the finger - the same guard the suggestion list itself uses above. Done on
-// pointerdown, which covers a finger and a mouse alike and stops the focus
-// change without stopping the click that follows. (Cancelling touchstart, as
-// this once did, cancels that click as well - on the touch screen itself the
-// keys would never have registered.)
-kioskKeyboard.addEventListener('pointerdown', e => {
-  e.preventDefault();
-  // The keyboard was tapped, so it goes on top: the field's dropdown, if it
-  // has one and it is open, is shut by setting the list aside, and a blur and
-  // refocus closes a popup that was already showing. Refocusing by script
-  // does not reopen it - only a tap on the field does.
-  const t = keyboardTarget;
-  if (t && t.hasAttribute('list')) {
-    holdBackList(t);
-    t.blur();
-    t.focus();
-  }
-});
-
-// A tap on the keyboard is not a tap outside the search box.
-kioskKeyboard.addEventListener('click', e => e.stopPropagation());
-
-keyboardRows.addEventListener('click', e => {
-  const btn = e.target.closest('.keyboard-key');
-  if (!btn) return;
-  // The field may have gone - a form reset, a panel closed - since it was tapped.
-  if (!keyboardTarget || !keyboardTarget.isConnected || keyboardTarget.offsetParent === null) {
-    hideKeyboard();
-    return;
-  }
-  const key = btn.dataset.key;
-  keyboardTarget.focus();
-
-  if (key === 'shift') {
-    // off -> once -> lock -> off
-    keyboardShift = keyboardShift === 'off' ? 'once' : keyboardShift === 'once' ? 'lock' : 'off';
-    renderKeyboard();
-    return;
-  }
-  if (key === 'symbols' || key === 'letters') {
-    keyboardLayer = key;
-    keyboardShift = 'off';
-    renderKeyboard();
-    return;
-  }
-  if (key === 'backspace') { keyboardBackspace(); return; }
-  if (key === 'enter') {
-    // Enter is what a real keyboard would send - the search box picks its
-    // result on it, the code fields confirm on it - and it is also the end of
-    // using the keyboard for that field, so the keyboard goes.
-    keyboardTarget.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
-    hideKeyboard();
-    return;
-  }
-
-  let text = key === 'space' ? ' ' : key;
-  if (keyboardShift !== 'off' && /^[a-z]$/.test(text)) text = text.toUpperCase();
-  keyboardType(text);
-  if (keyboardShift === 'once') { keyboardShift = 'off'; renderKeyboard(); }
-});
-
-// Shown on a tap of any eligible field - a tap, not any focus, so a button that
-// refocuses a field (the search bar's clear button, say) does not summon it.
-// A tap anywhere else puts it away. Taps on the keyboard itself never reach
-// here - it stops them above - so pressing a key is not a tap elsewhere, and a
-// tap on the field being typed into keeps it, since that tap shows it again.
-// The field was tapped, so its dropdown goes on top: the list is given back
-// at pointerdown, ahead of the tap opening it, and it opens over the keyboard
-// as it always did. A tap on a key hands the top back to the keyboard.
-document.addEventListener('pointerdown', e => {
-  const input = e.target.closest('input');
-  if (keyboardEligible(input)) giveBackList(input);
-  // A dropdown - a floor picker, the location picker - opens its own list on
-  // the tap, and that list is drawn over everything, keyboard included. The
-  // keyboard goes first, so the choices are what is on screen. Done at
-  // pointerdown, ahead of the popup, the same as the datalist above.
-  if (e.target.closest('select')) hideKeyboard();
-}, true);
-
-document.addEventListener('click', e => {
-  const input = e.target.closest('input');
-  if (keyboardEligible(input)) showKeyboardFor(input);
-  else if (!kioskKeyboard.hidden) hideKeyboard();
-});
-
-// So is any button that submits what was typed, or abandons it: unlock, the
-// confirm and cancel on each authorization step, the two cancel-changes
-// buttons. Tapping one of those is being done with the keyboard. The buttons
-// that lead on to the code field - Save changes, Add New Location - are not
-// here: the next thing after them is more typing.
-[
-  'admin-unlock-btn',
-  'add-confirm-btn', 'add-cancel-btn',
-  'edit-confirm-btn', 'edit-cancel-btn',
-  'move-confirm-btn', 'move-cancel-btn',
-  'remove-confirm-btn', 'remove-cancel-btn',
-  'edit-cancel-changes-btn', 'admin-cancel-float'
-].forEach(id => {
-  const btn = document.getElementById(id);
-  if (btn) btn.addEventListener('click', hideKeyboard);
-});
-
-// Picking from a field's dropdown is the end of using the keyboard for it, so
-// the keyboard goes. The pick reaches us as a change event on the field; the
-// keyboard's own typing does not fire one, so this does not trip mid-word.
-document.addEventListener('change', e => {
-  const t = keyboardTarget;
-  if (!t || e.target !== t) return;
-  if (t.hasAttribute('list') || t.dataset.keyboardList) hideKeyboard();
-});
-
-// Choosing a result is the end of the search, so the keyboard goes with it.
-const chooseSuggestionBase = chooseSuggestion;
-chooseSuggestion = function () {
-  chooseSuggestionBase.apply(this, arguments);
-  hideKeyboard();
-};
-
-// Closing the admin panel takes its fields with it, and the keyboard too.
-// If it closed while still unlocked, it stepped aside for a task, so the
+// If the admin panel closed while still unlocked, it stepped aside for a task, so the
 // floating "Cancel changes" comes up to offer a way back.
 const closeAdminPanelBase = closeAdminPanel;
 closeAdminPanel = function () {
   closeAdminPanelBase.apply(this, arguments);
-  hideKeyboard();
   adminCancelFloat.hidden = !sessionAdminCode;
 };
 
@@ -2481,3 +2257,11 @@ lockAdmin = function () {
   adminCancelFloat.hidden = true;
   lockAdminBase.apply(this, arguments);
 };
+
+// ==========================================
+// KIOSK LOCK-DOWN
+// ==========================================
+// A long press on the touch screen opens the browser's own menu - Back, Save
+// as, Print, Inspect - and every one of those leads out of the kiosk. Nothing
+// in the app uses that menu, so it never opens.
+document.addEventListener('contextmenu', e => e.preventDefault());
