@@ -74,8 +74,8 @@ fs.writeFileSync(path.join(OUT, 'manifest.webmanifest'), JSON.stringify({
   name: 'SLSU Campus Walking Directions',
   short_name: 'SLSU Campus',
   display: 'standalone',
-  background_color: '#aab7ad',
-  theme_color: '#0F7A87',
+  background_color: '#FEFDF9',   // --map-paper
+  theme_color: '#1B3A6B',        // --slsu-navy
   start_url: './'
 }, null, 2));
 
