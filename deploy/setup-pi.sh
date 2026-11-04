@@ -26,7 +26,9 @@ step() { echo; echo "== $*"; }
 
 step "1/8  Packages: git, Node.js, build tools"
 sudo apt-get update
-sudo apt-get install -y git build-essential python3 curl
+# dnsmasq-base: the DNS/DHCP program for the kiosk's own Wi-Fi
+# (deploy/kiosk-ap.sh), without the package that would run it at every boot.
+sudo apt-get install -y git build-essential python3 curl dnsmasq-base
 # Node is left alone if present: the NodeSource build carries its own npm and
 # conflicts with Debian's npm package, so asking for both fails.
 if ! command -v node >/dev/null; then
@@ -42,6 +44,11 @@ cd "$REPO"
 npm ci --omit=dev
 # Never npm run db:init here: the directory databases ship with the repo, and
 # db:init rebuilds them, losing the admin edits.
+# Updates can also be pushed here from the laptop (git push kiosk main), for
+# when the Pi runs its own Wi-Fi and cannot reach GitHub. updateInstead updates
+# the files too, and refuses if anything here is changed and uncommitted - such
+# as admin edits in db/ - rather than overwrite it.
+git config receive.denyCurrentBranch updateInstead
 
 step "3/8  App service: slsu-kiosk (ports 80 and 443)"
 sed -e "s|^User=.*|User=$APP_USER|" \
@@ -109,6 +116,11 @@ sudo systemctl restart systemd-journald
 for t in apt-daily.timer apt-daily-upgrade.timer man-db.timer; do
   sudo systemctl disable --now "$t" 2>/dev/null || true
 done
+# Wi-Fi power saving off: with it on, the Pi's Wi-Fi dozes and stops
+# answering SSH and pings from the laptop until the Pi itself sends something.
+# Applies from the next time a Wi-Fi connection starts (or a reboot).
+printf '[connection]\nwifi.powersave = 2\n' \
+  | sudo tee /etc/NetworkManager/conf.d/slsu-kiosk-wifi-powersave.conf >/dev/null
 
 step "6/8  Kiosk mode (fullscreen browser, auto-login, no screen blanking)"
 bash "$REPO/deploy/install-kiosk.sh"

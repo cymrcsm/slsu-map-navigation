@@ -23,7 +23,8 @@ the Pi, and see "Working on the Pi" at the end.
 | Hostname | `kiosk` (also reachable as `kiosk.local` on the same network) |
 | User | `pi`, which may use `sudo` after typing its password. Ask Jed for the password |
 | Time zone, keyboard | Asia/Manila, US |
-| Wi-Fi it joins | `Casem` (phone hotspot, open) and `Plenary Hall`. Passwords are on the card only, not in git |
+| Wi-Fi it joins | `Casem` (phone hotspot, open) and `Plenary Hall`. Passwords are on the card only, not in git. Wi-Fi power saving off |
+| Its own Wi-Fi | `SLSU-Kiosk-Map`, kiosk at 10.42.0.1, when switched on with `deploy/kiosk-ap.sh` (see "The kiosk's own Wi-Fi") |
 | SSH | On. Password sign-in, plus a key for the laptop that does the set-up |
 | Node.js | 20 or newer. The current card has NodeSource's `nodejs` 20.x, which includes npm; a card without Node gets Debian's `nodejs` + `npm` |
 | App | This repo, cloned to `/home/pi/thesis-map-navigation`, branch `main` |
@@ -97,8 +98,63 @@ Then check it against `docs/ACCEPTANCE.md`.
   from `campus-data.js`.
 - **The certificate expires 2026-12-07.** Renew it as in `docs/KIOSK-DEPLOY.md`,
   Part H, and copy `certs/` to the Pi again.
-- Turning the Pi into its own Wi-Fi network ("SLSU-Kiosk-Map", `docs/KIOSK-DEPLOY.md`
-  Part F) is **not** part of the agreed set-up yet. It is on hold.
+- **Updating while the kiosk runs its own Wi-Fi:** the Pi can't reach GitHub,
+  so use one of the ways in "Reaching the Pi" below.
+
+---
+
+## The kiosk's own Wi-Fi ("Option A")
+
+The Pi can run its own Wi-Fi network, **SLSU-Kiosk-Map** (password
+`slsu-campus`). Visitors join it with mobile data off, scan the kiosk's "No
+mobile data?" QR, and get the phone page from the kiosk itself. `deploy/kiosk-ap.sh`
+switches it on and off. The DNS and DHCP settings are in `deploy/dnsmasq.conf`.
+
+What it changes:
+- The Pi 4 has **one Wi-Fi radio**. While it runs SLSU-Kiosk-Map, it does not join
+  Plenary Hall or Casem, so it has **no internet over Wi-Fi**. The kiosk doesn't
+  need any; updating it does (see below).
+- The kiosk is at **10.42.0.1** on that network.
+- An **Ethernet cable** to a router still gives the Pi internet at the same time.
+
+Switching on, the first time:
+1. **Trial first.** On the Pi (over SSH, as usual):
+   `sudo bash ~/thesis-map-navigation/deploy/kiosk-ap.sh on --trial 15`.
+   Your SSH session freezes, because the Wi-Fi it used is gone. That is expected.
+2. Within 15 minutes, connect the laptop's Wi-Fi to SLSU-Kiosk-Map, with the
+   phone USB-tethered to the laptop for internet. Then run `ssh pi@10.42.0.1` and
+   test from a phone.
+3. All good: `sudo bash ~/thesis-map-navigation/deploy/kiosk-ap.sh keep`. It then
+   starts at every boot.
+   Anything wrong, or no way back in: do nothing. After 15 minutes, or at a
+   reboot, the Pi goes back to Plenary Hall or Casem by itself.
+
+Other commands: `... kiosk-ap.sh off` (back to joining Plenary Hall or Casem),
+`... kiosk-ap.sh status`. They log to `journalctl -t slsu-kiosk-ap`.
+
+### Reaching the Pi while it runs its own Wi-Fi
+
+1. **Join its Wi-Fi (everyday fixes).** Plug the phone into the laptop and turn
+   on USB tethering, for the laptop's internet. Then connect the laptop's Wi-Fi to
+   SLSU-Kiosk-Map. Now `ssh pi@10.42.0.1` works. To update the app, push from the
+   laptop straight to the Pi:
+   ```
+   git remote add kiosk pi@10.42.0.1:thesis-map-navigation    # once
+   git push kiosk main
+   ```
+   The Pi's files update as if it had pulled; then `sudo systemctl restart slsu-kiosk`.
+   The push is refused if the Pi has uncommitted changes, such as admin edits in
+   `db/`. Copy `db/kiosk_overrides.db` back to the laptop, commit it, and push again.
+2. **Ethernet (bigger jobs).** Cable the Pi to a router or a wall port. It gets
+   internet through the cable while its Wi-Fi keeps serving visitors, so
+   `git pull`, `apt` and certificate copies all work. Any laptop on that network
+   can reach it.
+3. **Switch it off for a while.** Run `sudo bash deploy/kiosk-ap.sh off`. The Pi
+   rejoins Plenary Hall or Casem as before. Afterwards, run `on --trial 15` and
+   then `keep` again.
+
+The certificate (`certs/`, expires 2026-12-07) is renewed on the laptop
+(`docs/KIOSK-DEPLOY.md`, Part H) and copied to the Pi in any of these ways.
 
 ---
 

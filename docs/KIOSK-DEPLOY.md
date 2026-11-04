@@ -120,6 +120,12 @@ The log should show HTTP on 80, `🔒 HTTPS on port 443`, and a phone QR of
 
 ## Part F — turn the Pi's Wi-Fi into the kiosk network  👤
 
+> **Now done by `deploy/kiosk-ap.sh`**, with a trial mode that switches back by
+> itself. Use that, as described in `docs/PI-SETUP.md`, "The kiosk's own
+> Wi-Fi". The manual steps below are kept for reference; F1 is what the script
+> does, except that it runs dnsmasq with the repo's config through its own
+> service instead of the dnsmasq package.
+
 Do this last: after it, the Pi's Wi-Fi stops reaching the internet.
 
 Both paths use the same DNS/DHCP server:
