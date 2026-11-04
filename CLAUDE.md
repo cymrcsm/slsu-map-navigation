@@ -77,3 +77,5 @@ Route rendering: colour `#12294D` on both kiosk and phone; opacity keyed to the 
 ### Deploy
 
 `.github/workflows/deploy-web.yml` runs `build-web.mjs` and publishes `web/` to GitHub Pages on pushes to `main` that touch phone-page files. Work is pushed directly to `main`. `deploy/` and `docs/KIOSK-DEPLOY.md` cover the Raspberry Pi access-point + trusted-cert setup.
+
+**The kiosk Pi's agreed environment is `docs/PI-SETUP.md`, applied by `deploy/setup-pi.sh`. Read it before doing anything on the Pi, and change both together.** Ask before changing anything on the Pi; `sudo` needs the owner to type the password.
