@@ -23,6 +23,14 @@ function connect() {
       updated_at TEXT NOT NULL
     );`);
     db.run('CREATE INDEX IF NOT EXISTS idx_overrides_kind ON overrides(kind);');
+    // Kiosk-wide settings that are not about one location - for now where the
+    // kiosk itself stands. Kept here rather than in the browser's storage so a
+    // new card, a reset browser or a second screen all get the same answer.
+    db.run(`CREATE TABLE IF NOT EXISTS settings (
+      key        TEXT PRIMARY KEY,
+      value      TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );`);
   });
   return db;
 }
@@ -47,7 +55,7 @@ function parse(row) {
 // the front end already works with.
 async function snapshot() {
   const rows = await all('SELECT id, kind, payload FROM overrides');
-  const out = { custom: [], edited: {}, removed: [] };
+  const out = { custom: [], edited: {}, removed: [], kiosk: await getKioskPosition() };
   rows.forEach(r => {
     const data = parse(r);
     if (data === null) return;
@@ -104,6 +112,26 @@ async function editLocation(id, fields, isCustom) {
   return merged;
 }
 
+// Where the kiosk stands: { coords: [x, y] in drawing units, level: floor
+// index }, or null while it has never been set (the page then uses its
+// built-in default).
+async function getKioskPosition() {
+  const row = await get("SELECT value FROM settings WHERE key = 'kiosk_position'");
+  if (!row) return null;
+  try { return JSON.parse(row.value); } catch (err) { return null; }
+}
+
+function setKioskPosition(position) {
+  return run(
+    `INSERT INTO settings (key, value, updated_at) VALUES ('kiosk_position', ?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value,
+                                    updated_at = excluded.updated_at`,
+    [JSON.stringify(position), new Date().toISOString()]
+  );
+}
+
+// Clears the location edits only. The kiosk's position is not an edit to the
+// directory, and "start the directory over" should not move "You are here".
 async function reset() {
   const res = await run('DELETE FROM overrides');
   return res.changes || 0;
@@ -116,5 +144,6 @@ function close() {
 
 module.exports = {
   DB_PATH, connect, close, snapshot, kindOf,
-  addCustom, removeLocation, editLocation, reset
+  addCustom, removeLocation, editLocation, reset,
+  getKioskPosition, setKioskPosition
 };

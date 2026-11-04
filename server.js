@@ -211,6 +211,24 @@ app.delete('/api/locations/:id', requireAdmin, route(async (req, res) => {
   res.json(Object.assign({ id }, result));
 }));
 
+// Where the kiosk stands, set from the admin panel ("Set current kiosk
+// position"). Read back through GET /api/overrides as `kiosk`. Drawing units:
+// the 320 x 570 frame of public/js/georef.js; level is the floor index.
+app.put('/api/kiosk-position', requireAdmin, route(async (req, res) => {
+  const body = req.body || {};
+  const [x, y] = Array.isArray(body.coords) ? body.coords.map(Number) : [];
+  const level = Number(body.level);
+  if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > 320 || y < 0 || y > 570) {
+    return res.status(400).json({ error: 'Invalid kiosk coordinates.' });
+  }
+  if (!Number.isInteger(level) || level < 0 || level > 2) {
+    return res.status(400).json({ error: 'Invalid floor.' });
+  }
+  const position = { coords: [Math.round(x * 10) / 10, Math.round(y * 10) / 10], level };
+  await overrides.setKioskPosition(position);
+  res.json(position);
+}));
+
 app.post('/api/overrides/reset', requireAdmin, route(async (req, res) => {
   res.json({ cleared: await overrides.reset() });
 }));

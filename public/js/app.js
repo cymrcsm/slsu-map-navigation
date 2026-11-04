@@ -65,7 +65,8 @@ function inCategory(loc, id) {
 // can do is lie to itself until the next reload.
 const API = {
   overrides: 'api/overrides',
-  locations: 'api/locations'
+  locations: 'api/locations',
+  kioskPosition: 'api/kiosk-position'
 };
 
 async function adminFetch(method, url, code, body) {
@@ -132,7 +133,25 @@ async function loadOverrides() {
   customPlaces = Array.isArray(data.custom) ? data.custom : [];
   removedIds = Array.isArray(data.removed) ? data.removed : [];
   editedFields = (data.edited && typeof data.edited === 'object') ? data.edited : {};
+  applyServerKioskPosition(data.kiosk);
   return true;
+}
+
+// Where the kiosk stands is kept by the server too (section 6), so it survives
+// a new card or a reset browser. The browser's own copy is only what is drawn
+// before the server answers.
+function applyServerKioskPosition(saved) {
+  if (!saved || !Array.isArray(saved.coords) || saved.coords.length !== 2) return;
+  const [x, y] = saved.coords.map(Number);
+  const level = Number(saved.level);
+  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isInteger(level)) return;
+  if (level < 0 || level >= FLOOR_ASSETS.length) return;
+  kioskCoords = [x, y];
+  kioskLevel = level;
+  try {
+    localStorage.setItem('kiosk_coords', JSON.stringify(kioskCoords));
+    localStorage.setItem('kiosk_level', String(kioskLevel));
+  } catch (err) { /* the server copy is the one that counts */ }
 }
 
 function rebuildAllMarkers() {
@@ -143,6 +162,7 @@ function rebuildAllMarkers() {
 
 async function syncWithServer() {
   const ok = await loadOverrides();
+  renderKioskMarker();
   PLACES = buildPlaces();
   rebuildAllMarkers();
   recountCategories();
@@ -1626,7 +1646,13 @@ map.on('click', (e) => {
     renderKioskMarker();
     isSettingKioskLocation = false;
     setKioskBtn.classList.remove('active-placement');
-    inspector.innerText = `Kiosk position updated to: [${x}, ${y}] on ${LEVELS[kioskLevel] || 'this floor'}`;
+    const where = `[${x}, ${y}] on ${LEVELS[kioskLevel] || 'this floor'}`;
+    inspector.innerText = `Kiosk position updated to: ${where} - saving...`;
+    // Saved on the server with the code the panel was unlocked with, so the
+    // position outlives this browser (loadOverrides reads it back).
+    adminFetch('PUT', API.kioskPosition, sessionAdminCode, { coords: kioskCoords, level: kioskLevel })
+      .then(() => { inspector.innerText = `Kiosk position saved: ${where}`; })
+      .catch(err => { inspector.innerText = `Kiosk position NOT saved (${err.message}) - set it again`; });
     if (activeRouteLayers.length && activeSelectedLocation) drawRoute(activeSelectedLocation);
     return;
   }
