@@ -25,7 +25,7 @@ the Pi, and see "Working on the Pi" at the end.
 | Time zone, keyboard | Asia/Manila, US |
 | Wi-Fi it joins | `Casem` (phone hotspot, open) and `Plenary Hall`. Passwords are on the card only, not in git |
 | SSH | On. Password sign-in, plus a key for the laptop that does the set-up |
-| Node.js | Debian's `nodejs` package (20 or newer) |
+| Node.js | 20 or newer. The current card has NodeSource's `nodejs` 20.x, which includes npm; a card without Node gets Debian's `nodejs` + `npm` |
 | App | This repo, cloned to `/home/pi/thesis-map-navigation`, branch `main` |
 | App service | systemd `slsu-kiosk`: `node server.js` on ports 80 (http) and 443 (https) |
 | Admin-panel code | Set when `setup-pi.sh` first runs and kept on the Pi only (`/etc/systemd/system/slsu-kiosk.service.d/admin-code.conf`). Never commit it |

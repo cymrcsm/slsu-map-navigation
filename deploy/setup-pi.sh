@@ -26,7 +26,15 @@ step() { echo; echo "== $*"; }
 
 step "1/8  Packages: git, Node.js, build tools"
 sudo apt-get update
-sudo apt-get install -y git nodejs npm build-essential python3 curl
+sudo apt-get install -y git build-essential python3 curl
+# Node is left alone if present: the NodeSource build carries its own npm and
+# conflicts with Debian's npm package, so asking for both fails.
+if ! command -v node >/dev/null; then
+  sudo apt-get install -y nodejs
+fi
+if ! command -v npm >/dev/null; then
+  sudo apt-get install -y npm
+fi
 echo "node $(node --version), npm $(npm --version)"
 
 step "2/8  App dependencies (npm ci)"
