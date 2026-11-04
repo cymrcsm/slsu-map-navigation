@@ -55,8 +55,10 @@ the Pi from starting, and the gain on a microSD card is small.
    - These settings land on the card's boot partition as `user-data`,
      `network-config` and `meta-data` (cloud-init). The Pi reads them **once**, on
      its first start. To change them after that first start, edit the files on
-     the card from a laptop, **and** change `instance-id:` in `meta-data` to
-     something new, or the Pi ignores the edit.
+     the card from a laptop, **and** give the settings a new ID in **both**
+     places it is written: `instance-id:` in `meta-data` and `i=` in
+     `cmdline.txt` (keep that file one line). The `cmdline.txt` one wins, so
+     changing only `meta-data` makes the Pi ignore the edit.
    - In `user-data`, under `user:`, make sure of two things. `sudo:` must say
      `"ALL=(ALL:ALL) ALL"`; Imager has written `sudo: null`, which can leave `pi`
      without admin rights. `ssh_authorized_keys:` should list the public key of
