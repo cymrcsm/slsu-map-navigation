@@ -2703,18 +2703,23 @@ function showKeyboardFor(input) {
   if (keyboardTarget && keyboardTarget !== input) giveBackList(keyboardTarget);
   keyboardTarget = input;
   const inDialog = !!input.closest('#admin-overlay');
-  // For a field in the admin dialog the keyboard is shorter, the dialog moves
-  // to the top and is told how much room the keyboard takes, so the dialog
-  // fits above it and scrolls inside itself rather than running underneath -
-  // and the field just tapped is scrolled into that visible part. Without
-  // this the code field and the building field, low in the edit form, sat
-  // behind the keys while being typed into.
+  // For a field in the admin dialog the keyboard is shorter, and the dialog
+  // stays where it is unless the keys would cover it. Only then does it rise,
+  // just far enough to sit above them, scrolling inside itself if it is too
+  // tall for that room - and the field just tapped is scrolled into view.
+  // (It used to jump to the top of the screen every time, even when the keys
+  // were nowhere near it.)
   kioskKeyboard.classList.toggle('for-dialog', inDialog);
-  adminOverlay.classList.toggle('keyboard-open', inDialog);
   kioskKeyboard.hidden = false;
   renderKeyboard();
+  adminOverlay.classList.remove('keyboard-open');
   if (inDialog) {
-    adminOverlay.style.setProperty('--keyboard-height', kioskKeyboard.offsetHeight + 'px');
+    const keysTop = kioskKeyboard.getBoundingClientRect().top;
+    adminOverlay.style.setProperty('--keyboard-room', (window.innerHeight - keysTop + 16) + 'px');
+    const card = adminOverlay.querySelector('.admin-card');
+    if (card.getBoundingClientRect().bottom > keysTop - 16) {
+      adminOverlay.classList.add('keyboard-open');
+    }
     input.scrollIntoView({ block: 'nearest' });
   }
 }
@@ -2724,7 +2729,7 @@ function hideKeyboard() {
   kioskKeyboard.hidden = true;
   kioskKeyboard.classList.remove('for-dialog');
   adminOverlay.classList.remove('keyboard-open');
-  adminOverlay.style.removeProperty('--keyboard-height');
+  adminOverlay.style.removeProperty('--keyboard-room');
   keyboardTarget = null;
   // Next time it opens it starts fresh, as a phone's does.
   keyboardLayer = 'letters';
