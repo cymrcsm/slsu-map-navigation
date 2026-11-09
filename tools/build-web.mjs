@@ -29,7 +29,8 @@ let html = fs.readFileSync(path.join(PUB, 'mobile.html'), 'utf8')
 fs.writeFileSync(path.join(OUT, 'index.html'), html);
 
 // --- copy the assets the page loads ---------------------------------------
-const JS = ['georef.js', 'geo-overlay.js', 'campus-data.js', 'walkpaths.js', 'routing.js', 'mobile.js'];
+const JS = ['georef.js', 'geo-overlay.js', 'campus-data.js', 'walkpaths.js', 'routing.js',
+            'building-labels.js', 'map-marks.js', 'mobile.js'];
 fs.mkdirSync(path.join(OUT, 'js'), { recursive: true });
 for (const f of JS) fs.copyFileSync(path.join(PUB, 'js', f), path.join(OUT, 'js', f));
 

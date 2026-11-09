@@ -12,6 +12,8 @@ on:
       - 'public/mobile.html'
       - 'public/js/mobile.js'
       - 'public/js/routing.js'
+      - 'public/js/map-marks.js'
+      - 'public/js/building-labels.js'
       - 'public/js/walkpaths.js'
       - 'public/js/campus-data.js'
       - 'public/js/georef.js'

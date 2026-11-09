@@ -103,27 +103,33 @@
     }
     .leaflet-tooltip-top:before { border-top-color:var(--map-paper); }
 
-    /* All three markers are inline SVG that inherits colour from these rules.
-       The destination wears its category's colour, set inline by mobile.js -
-       the colour its pin has on the kiosk map; the walker is the seal's sky
-       blue; the kiosk is the deep navy of the kiosk's own marker. */
-    .dest-pin, .me-pin, .kiosk-pin { display:block; }
-    .dest-pin svg, .me-pin svg, .kiosk-pin svg { width:100%; height:100%; display:block; }
-    .dest-pin {
-      width:30px; height:30px; color:#7C736A;
-      filter:drop-shadow(0 2px 3px rgba(51,51,51,.35));
+    /* The markers as the kiosk draws them. Places and building names are
+       canvas (js/map-marks.js); these three are page elements. The
+       destination is the kiosk's pin in its category colour, a size up; the
+       kiosk is the kiosk's own navy "you are here" dot (.kiosk-pulsing-marker
+       in style.css); the walker is the same dot in the seal's sky blue. */
+    .dest-pin { display:block; width:36px; height:48px; filter:drop-shadow(0 2px 3px rgba(51,51,51,.35)); }
+    .dest-pin svg { width:100%; height:100%; display:block; }
+    .kiosk-dot, .me-dot {
+      position:relative; width:20px; height:20px; border-radius:50%;
+      border:3px solid var(--map-paper); box-shadow:0 0 10px rgba(18,41,77,.35);
     }
-    .me-pin {
-      width:22px; height:22px; color:var(--slsu-sky);
-      filter:drop-shadow(0 1px 2px rgba(0,0,0,.45));
+    .kiosk-dot { background:var(--slsu-navy-deep); }
+    .me-dot { background:var(--slsu-sky); }
+    .kiosk-dot::after, .me-dot::after {
+      content:''; position:absolute; top:-8px; left:-8px; width:30px; height:30px; border-radius:50%;
+      background:rgba(27,58,107,.25); animation:pulse-ring 1.8s cubic-bezier(.215,.61,.355,1) infinite;
     }
-    /* Where the walk started. Same tack as the walker, in the kiosk marker's
-       deep navy and a size down, so the two read as related without
-       competing - the sky-blue one is you, this one is the kiosk you left. */
-    .kiosk-pin {
-      width:20px; height:20px; color:var(--slsu-navy-deep); opacity:.9;
-      filter:drop-shadow(0 1px 2px rgba(0,0,0,.3));
-    }
+    .me-dot::after { background:rgba(62,124,177,.3); }
+    @keyframes pulse-ring { 0% { transform:scale(.6); opacity:1; } 100% { transform:scale(1.8); opacity:0; } }
+    .kiosk-tip { display:inline-flex; align-items:center; gap:6px; }
+    .kiosk-tip svg { width:15px; height:15px; color:var(--slsu-navy); }
+
+    /* A tapped place's name, in the tooltip's paper style. */
+    .leaflet-popup-content-wrapper { background:var(--map-paper); border-radius:10px; box-shadow:var(--card-shadow-hover); }
+    .leaflet-popup-content { margin:8px 12px; font-size:13px; line-height:1.35; color:var(--slsu-ink); }
+    .leaflet-popup-tip { background:var(--map-paper); }
+    .pop-sub { color:var(--text-muted); font-size:12px; }
 
     /* "Which floor are you on?" - the public copy asks this before it draws
        the route, because the route starts on that floor and the phone cannot
@@ -204,6 +210,8 @@
   <script src="js/campus-data.js"></script>
   <script src="js/walkpaths.js"></script>
   <script src="js/routing.js"></script>
+  <script src="js/building-labels.js"></script>
+  <script src="js/map-marks.js"></script>
   <script src="js/mobile.js"></script>
 </body>
 </html>

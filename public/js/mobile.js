@@ -148,6 +148,7 @@ function showFloor(level) {
   if (overlay) map.removeLayer(overlay);
   overlay = next;
   overlay.addTo(map);
+  paintPlaces();
   paintFloorButtons();
   applyFloorVisibility();
   applyRouteEmphasis();
@@ -256,12 +257,78 @@ if (!dest) {
   throw new Error('unknown slug: ' + slug);
 }
 
+// --- the kiosk's map marks: every place, and the building names ---------
+// Drawn by MapMarks (map-marks.js), the same code the kiosk draws them with:
+// a dot in the place's category colour, a pin from PIN_ZOOM in, hidden
+// below MARKER_ZOOM where the building names say more. Only the places on
+// the floor on screen are drawn. A tap names the place.
+const PIN_ZOOM = 2.4 + GEO_ZOOM_SHIFT;      // = PIN_ZOOM in app.js
+const MARKER_ZOOM = 1.9 + GEO_ZOOM_SHIFT;   // = MARKER_ZOOM in app.js
+
+MapMarks.addBuildingLabels(map, typeof BUILDING_LABELS !== 'undefined' ? BUILDING_LABELS : [], svgToLatLng);
+
+// var, not const: showFloor() may ask for a repaint before this line has run.
+var placeLayer = L.layerGroup();
+var placeRenderer = L.canvas({ padding: 0.2, tolerance: 0 });
+
+function placeColour(loc) {
+  const id = loc.categories && loc.categories[0];
+  const cat = id && CATEGORIES.find(c => c.id === id);
+  return cat && cat.color ? cat.color : UNCATEGORISED_COLOUR;
+}
+
+function paintPlaces() {
+  if (!placeLayer) return;
+  placeLayer.clearLayers();
+  LOCATIONS
+    .filter(l => l.id !== dest.id && Array.isArray(l.coords) &&
+                 WalkRouting.levelOfFloor(l.floor) === shownFloor)
+    // northernmost first, so a pin lower on screen is painted over the one above
+    .sort((a, b) => a.coords[1] - b.coords[1])
+    .forEach(l => {
+      const m = MapMarks.placeMarker(svgToLatLng(l.coords), placeColour(l), placeRenderer, PIN_ZOOM);
+      m.place = l;
+      m.on('click', e => nameNearestPlace(e));
+      placeLayer.addLayer(m);
+    });
+  syncPlaces();
+}
+
+function syncPlaces() {
+  const want = map.getZoom() >= MARKER_ZOOM;
+  if (want && !map.hasLayer(placeLayer)) placeLayer.addTo(map);
+  else if (!want && map.hasLayer(placeLayer)) map.removeLayer(placeLayer);
+}
+map.on('zoomend', syncPlaces);
+map.on('click', () => map.closePopup());
+MapMarks.redrawOnPinZoom(map, placeLayer, PIN_ZOOM);
+
+// Where marks overlap, the one nearest the finger is named (as the kiosk's
+// markerAt() does).
+function nameNearestPlace(e) {
+  const at = map.mouseEventToLayerPoint(e.originalEvent);
+  let best = null, bestD = Infinity;
+  placeLayer.eachLayer(m => {
+    if (!m._point) return;
+    const d = m._aim().distanceTo(at);
+    if (d < bestD) { bestD = d; best = m; }
+  });
+  if (!best) return;
+  const l = best.place;
+  // closeOnClick off: the map sees the same tap as a click of its own and
+  // would close the name as soon as it opened. A tap on the map closes it.
+  L.popup({ closeButton: false, autoPan: false, closeOnClick: false, offset: [0, best._map.getZoom() >= PIN_ZOOM ? -24 : -4] })
+    .setLatLng(best.getLatLng())
+    .setContent('<strong>' + esc(l.name) + '</strong><br><span class="pop-sub">' +
+                esc(buildingText(l.building)) + ' · ' + esc(l.floor) + '</span>')
+    .openOn(map);
+}
+
 let destLevel = 0;
 // Marker artwork, inlined rather than fetched: this page is opened on a phone
 // that may already be off the kiosk network, and an <img> that fails to load
 // would leave the destination unmarked. Each takes its colour from the class
 // wrapped around it.
-const DEST_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.25 10.1433C3.25 5.24427 7.15501 1.25 12 1.25C16.845 1.25 20.75 5.24427 20.75 10.1433C20.75 12.5084 20.076 15.0479 18.8844 17.2419C17.6944 19.4331 15.9556 21.3372 13.7805 22.3539C12.6506 22.882 11.3494 22.882 10.2195 22.3539C8.04437 21.3372 6.30562 19.4331 5.11556 17.2419C3.92403 15.0479 3.25 12.5084 3.25 10.1433ZM12 2.75C8.00843 2.75 4.75 6.04748 4.75 10.1433C4.75 12.2404 5.35263 14.5354 6.4337 16.526C7.51624 18.5192 9.04602 20.1496 10.8546 20.995C11.5821 21.335 12.4179 21.335 13.1454 20.995C14.954 20.1496 16.4838 18.5192 17.5663 16.526C18.6474 14.5354 19.25 12.2404 19.25 10.1433C19.25 6.04748 15.9916 2.75 12 2.75ZM12 7.75C10.7574 7.75 9.75 8.75736 9.75 10C9.75 11.2426 10.7574 12.25 12 12.25C13.2426 12.25 14.25 11.2426 14.25 10C14.25 8.75736 13.2426 7.75 12 7.75ZM8.25 10C8.25 7.92893 9.92893 6.25 12 6.25C14.0711 6.25 15.75 7.92893 15.75 10C15.75 12.0711 14.0711 13.75 12 13.75C9.92893 13.75 8.25 12.0711 8.25 10Z" fill="currentColor"></path></svg>';
 const PIN_TACK_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><line x1="12" y1="21.6666" x2="12" y2="16.3333" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></line><path d="M 19 16.3333 c -0.1187 -0.932 -0.424 -2.3467 -1.292 -3.8333 -0.4467 -0.7653 -0.9373 -1.3707 -1.3747 -1.8333 V 5 c 0 -1.4733 -1.1933 -2.6667 -2.6667 -2.6667 h -3.3333 c -1.4733 0 -2.6667 1.1933 -2.6667 2.6667 v 5.6667 c -0.4387 0.4627 -0.9293 1.068 -1.3747 1.8333 -0.8667 1.4867 -1.1733 2.9013 -1.292 3.8333 H 19 Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>';
 
 let destMarker = null, originMarker = null, routeGroup = L.featureGroup().addTo(map);
@@ -311,16 +378,21 @@ function render() {
     (dest.description ? '<div>' + esc(dest.description) + '</div>' : '');
 
   if (destMarker) map.removeLayer(destMarker);
+  // The kiosk's pin in the room's category colour, a size up from the rest
+  // so the destination stands out among them. Its tip (30/32 down) is on the room.
   destMarker = L.marker(svgToLatLng(dest.coords), {
-    icon: L.divIcon({ className: '', html: '<div class="dest-pin" style="color:' + destColour() + '">' + DEST_ICON + '</div>', iconSize: [30, 30], iconAnchor: [15, 28] })
-  }).addTo(map).bindTooltip(dest.name, { direction: 'top', offset: [0, -22] });
+    icon: L.divIcon({ className: '', html: '<div class="dest-pin">' + MapMarks.pinSvg(destColour()) + '</div>', iconSize: [36, 48], iconAnchor: [18, 45] }),
+    zIndexOffset: 1000
+  }).addTo(map).bindTooltip(dest.name, { direction: 'top', offset: [0, -42] });
 
   if (originXY) {
     if (originMarker) map.removeLayer(originMarker);
+    // The kiosk's own marker as the kiosk draws it, with its label.
     originMarker = L.marker(svgToLatLng(originXY), {
-      icon: L.divIcon({ className: '', html: '<div class="kiosk-pin">' + PIN_TACK_ICON + '</div>', iconSize: [20, 20], iconAnchor: [10, 19] }),
-      interactive: false
-    }).addTo(map).bindTooltip('Kiosk', { direction: 'top' });
+      icon: L.divIcon({ className: '', html: '<div class="kiosk-dot"></div>', iconSize: [22, 22], iconAnchor: [11, 11] }),
+      interactive: false, zIndexOffset: 900
+    }).addTo(map).bindTooltip('<span class="kiosk-tip">' + PIN_TACK_ICON + '<span>Kiosk</span></span>',
+                              { permanent: true, direction: 'top', offset: [0, -12] });
     drawRoute(originXY, startTail(), myLevel);
     fitRoute();
   } else {
@@ -505,11 +577,11 @@ function onPosition(rawXY, accuracyM, headingDeg) {
 // headingDeg is still taken so the caller does not change, but the pin does not
 // rotate: a tack drawn on its side reads as a broken icon rather than a bearing.
 function drawMe(ll, radiusUnits, headingDeg) {  // eslint-disable-line no-unused-vars
-  const html = '<div class="me-pin">' + PIN_TACK_ICON + '</div>';
-  // The tack's needle is its point, so the marker hangs by its bottom edge and
-  // the tip lands on the true position - the centre of the accuracy circle.
+  // The kiosk's "you are here" dot, in the walker's sky blue, centred on the
+  // position - the centre of the accuracy circle.
+  const html = '<div class="me-dot"></div>';
   const size = [22, 22];
-  const anchor = [11, 21];
+  const anchor = [11, 11];
   if (!meMarker) {
     meMarker = L.marker(ll, { icon: L.divIcon({ className: '', html: html, iconSize: size, iconAnchor: anchor }), zIndexOffset: 2000 }).addTo(map);
     meCircle = L.circle(ll, { radius: radiusUnits, color: ME_COLOUR, weight: 1, opacity: .5, fillOpacity: .12 }).addTo(map);
