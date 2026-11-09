@@ -73,7 +73,7 @@ One palette per floor (`FLOORS` in `build-walkpaths.js`); a stroke outside the p
 
 **Walkpath rule (from the owner, non-negotiable):** routes must strictly follow drawn lines. The only allowed off-line hops are kiosk → nearest walkway, walkway → stair START, and stair FINISH → walkway on the floor arrived at. The kiosk can stand on any floor (`kioskLevel`, set from the floor showing when its position is placed; carried to the phone as `from=x,y,level`), so routes also run downward: 2F walkway → FINISH → stairs → START → ground walkway. Never add synthetic bridging edges to the network; a pin that can't route within `OFFPATH_LIMIT = 2` units is fixed by the owner drawing lines, not by code. When the owner re-exports a floor, the shared layers (`#1E1E1E` ground walkway; 2F walkway + chains if the export is the third floor) replace the copies in the other SVGs — remove the old paths, never merge — and the green oval rect ("Rectangle 2612") stays; then `clean:svg`, `build:paths` and `build:tiles`. Check the export's routing lines against the artwork first: one export arrived with every routing line nudged +1 in x while the artwork stayed put, and had to be shifted back.
 
-Route rendering: colour `#12294D` on both kiosk and phone; opacity keyed to the selected floor (`ROUTE_RUN_OPACITY = [1, 0.3, 0.12]` in app.js).
+Route rendering: blue `#1A73E8` on a white edge (`--route-line`/`--route-casing`; `ROUTE_COLOUR`/`ROUTE_CASING` in mobile.js) on both kiosk and phone; walking time is 80 m/min plus 0.25 min per storey (`WALK_M_PER_MIN`, `STAIR_MIN_PER_STOREY`, in app.js and mobile.js), shown in the card (`#route-summary`) and as a "3 min" chip on the route; opacity keyed to the selected floor (`ROUTE_RUN_OPACITY = [1, 0.3, 0.12]` in app.js).
 
 ### Deploy
 

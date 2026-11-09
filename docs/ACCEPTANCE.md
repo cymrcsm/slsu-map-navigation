@@ -27,7 +27,7 @@ mocked real-GPS re-route, follow-cam toggle) was run headless during development
 - [ ] Type in search → suggestions appear → pick one → it flies to the pin.
 - [ ] Pick a category on the right → only that category's pins remain.
 - [ ] Tap a pin → detail panel shows name / floor / building / coordinates.
-- [ ] **Ask for Directions** → a route line from "You Are Here" + "about N m on foot".
+- [ ] **Ask for Directions** → a blue route line from "You Are Here", a "N min" chip on it, and "N min (N m)" in the card.
 - [ ] **GF / 2F** buttons swap the floor drawing.
 - [ ] "Edit details" / "Add location" → enter the admin code → change persists after reload.
 

@@ -24,8 +24,15 @@ const Z_FOLLOW = GEO_ZOOM_SHIFT + 3.4;
 
 const OFFPATH_LIMIT = 2;   // map units ≈ metres — matches app.js
 // Both the legs and the off-path hops are drawn in this; --route in
-// mobile.html carries the same value for anything styled in CSS.
-const ROUTE_COLOUR = '#12294D';
+// mobile.html carries the same value for anything styled in CSS. The bright
+// blue map apps use, on a white edge (ROUTE_CASING) under the floor shown -
+// the same as --route-line / --route-casing on the kiosk.
+const ROUTE_COLOUR = '#1A73E8';
+const ROUTE_CASING = '#FFFFFF';
+// Walking time: 80 m a minute (about 4.8 km/h) plus a quarter of a minute a
+// storey of stairs - WALK_M_PER_MIN and STAIR_MIN_PER_STOREY in app.js.
+const WALK_M_PER_MIN = 80;
+const STAIR_MIN_PER_STOREY = 0.25;
 // The kiosk's palette for what is drawn on the map from here (the CSS
 // tokens in mobile.html carry the rest): the seal's sky blue for the
 // walker's own position, the warm clay amber for a line that only points,
@@ -191,6 +198,11 @@ function applyRouteEmphasis() {
     // the dashing alone tells the floors apart.
     const solid = !HAS_FLOOR_PICKER;
     const faded = here ? 1 : 0.3;
+    // The white edge goes only under the leg on the floor shown.
+    if (part.casing) {
+      part.layer.setStyle({ weight: 10, opacity: here ? 1 : 0 });
+      return;
+    }
     part.layer.setStyle(part.connector
       ? { weight: 4, opacity: solid ? 1 : .8 * faded }
       : { weight: here ? 6 : 4, opacity: solid ? 1 : .9 * faded, dashArray: here ? null : '4 8' });
@@ -360,7 +372,12 @@ function drawRoute(fromXY, tail, fromLevel = 0) {
 
   WalkRouting.splitByLevel(path).forEach(run => {
     if (run.pts.length < 2) return;
-    const layer = L.polyline(run.pts.map(svgToLatLng), {
+    const pts = run.pts.map(svgToLatLng);
+    const casing = L.polyline(pts, {
+      color: ROUTE_CASING, lineCap: 'round', lineJoin: 'round', interactive: false
+    }).addTo(routeGroup);
+    routeParts.push({ layer: casing, level: run.level, casing: true });
+    const layer = L.polyline(pts, {
       color: ROUTE_COLOUR, lineCap: 'round', lineJoin: 'round'
     }).addTo(routeGroup);
     routeParts.push({ layer: layer, level: run.level });
@@ -384,8 +401,11 @@ function drawRoute(fromXY, tail, fromLevel = 0) {
   if (endGap <= OFFPATH_LIMIT) walked.push([dest.coords[0], dest.coords[1], destLevel]);
   const metres = Math.round(WalkRouting.walkMetres(walked, GEOREF.metresPerUnit));
 
-  let note = 'About ' + metres + ' m ' + (tail || 'to go');
   const runs = WalkRouting.splitByLevel(path);
+  let storeys = 0;
+  for (let i = 1; i < runs.length; i++) storeys += Math.abs(runs[i].level - runs[i - 1].level);
+  const minutes = Math.max(1, Math.round(metres / WALK_M_PER_MIN + storeys * STAIR_MIN_PER_STOREY));
+  let note = 'About ' + minutes + ' min (' + metres + ' m) ' + (tail || 'to go');
   if (runs.length > 1) note += ', then ' + stairsPhrase(runs, fromLevel, destLevel);
   if (endGap > OFFPATH_LIMIT) {
     note += ' — ends ' + Math.round(endGap * GEOREF.metresPerUnit) + ' m from the nearest walkway';

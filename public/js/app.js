@@ -1290,6 +1290,8 @@ function clearActiveRoute() {
   activeRouteLayers.forEach(l => map.removeLayer(l));
   activeRouteLayers = [];
   if (sendToPhoneBtn) sendToPhoneBtn.hidden = true;
+  const summary = document.getElementById('route-summary');
+  if (summary) summary.hidden = true;
 }
 
 function routeLengthUnits(points) {
@@ -1520,15 +1522,26 @@ function drawRoute(destination, followDestination = false, refit = true) {
   // always the one being explained. Weight and dash stay tied to the room's own
   // floor instead, so the leg that actually arrives stays recognisable as the
   // answer while the user looks over the floors below it.
+  // The arriving leg is drawn the way a map app draws a route: a solid blue
+  // line on a white edge, so it stands out over the dark roads and the pale
+  // floors alike. The other floors' legs stay thin and dashed.
   const runs = splitByLevel(path);
   runs.forEach(run => {
     if (run.pts.length < 2) return;
     const arrival = run.level === destLevel;
-    activeRouteLayers.push(L.polyline(run.pts.map(toLeafletCoords), {
-      weight: arrival ? 5 : 3,
-      opacity: routeRunOpacity(run.level, activeLevel),
-      dashArray: arrival ? null : '4 8',
-      className: 'route-line', lineCap: 'round', lineJoin: 'round'
+    const opacity = routeRunOpacity(run.level, activeLevel);
+    const pts = run.pts.map(toLeafletCoords);
+    if (arrival) {
+      activeRouteLayers.push(L.polyline(pts, {
+        weight: 10, opacity: opacity, interactive: false,
+        className: 'route-casing', lineCap: 'round', lineJoin: 'round'
+      }).addTo(map));
+    }
+    activeRouteLayers.push(L.polyline(pts, {
+      weight: arrival ? 6 : 3,
+      opacity: opacity, interactive: false,
+      className: arrival ? 'route-line route-main' : 'route-line route-other',
+      lineCap: 'round', lineJoin: 'round'
     }).addTo(map));
   });
 
@@ -1561,6 +1574,11 @@ function drawRoute(destination, followDestination = false, refit = true) {
   });
   metres = Math.round(metres * GEOREF.metresPerUnit);
 
+  const storeys = routeStoreys(runs);
+  const minutes = walkMinutes(metres, storeys);
+  showRouteSummary(destination, runs, metres, minutes, endGap);
+  addEtaBubble(runs, destLevel, minutes);
+
   const changes = runs.length - 1;
   let note = destination.name + ' — about ' + metres + ' m on foot';
   if (changes > 0) {
@@ -1591,6 +1609,74 @@ function drawRoute(destination, followDestination = false, refit = true) {
 
   // A route is now on screen — offer to take it to a phone.
   if (sendToPhoneBtn) sendToPhoneBtn.hidden = false;
+}
+
+// ---- Walking time, as a map app shows it ----
+// 80 m a minute is about 4.8 km/h, the usual walking pace map apps assume,
+// and each storey of stairs adds a quarter of a minute. mobile.js uses the
+// same two numbers, so the kiosk and the phone give the same time.
+const WALK_M_PER_MIN = 80;
+const STAIR_MIN_PER_STOREY = 0.25;
+
+function routeStoreys(runs) {
+  let n = 0;
+  for (let i = 1; i < runs.length; i++) n += Math.abs(runs[i].level - runs[i - 1].level);
+  return n;
+}
+
+function walkMinutes(metres, storeys) {
+  return Math.max(1, Math.round(metres / WALK_M_PER_MIN + storeys * STAIR_MIN_PER_STOREY));
+}
+
+const routeSummary = document.getElementById('route-summary');
+
+function showRouteSummary(destination, runs, metres, minutes, endGap) {
+  if (!routeSummary) return;
+  document.getElementById('route-min').textContent = minutes + ' min';
+  document.getElementById('route-dist').textContent = '(' + metres + ' m)';
+  let via = 'Walking from the kiosk';
+  if (runs.length > 1) {
+    const last = runs[runs.length - 1];
+    via += ', stairs ' + (last.level > runs[0].level ? 'up' : 'down') + ' to the ' +
+           (LEVELS[last.level] || 'next floor');
+  }
+  if (endGap > OFFPATH_LIMIT) {
+    via += '. The drawn path ends ' + Math.round(endGap * GEOREF.metresPerUnit) + ' m from it';
+  }
+  document.getElementById('route-via').textContent = via;
+  routeSummary.hidden = false;
+}
+
+// The "3 min" label on the route itself, halfway along the leg that arrives.
+// One small element, placed once per drawing; it moves with the map.
+const WALK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg>';
+
+function addEtaBubble(runs, destLevel, minutes) {
+  const run = runs.filter(r => r.level === destLevel && r.pts.length > 1)
+                  .sort((a, b) => routeLengthUnits(b.pts) - routeLengthUnits(a.pts))[0];
+  if (!run) return;
+  // The point halfway along the leg, by distance rather than by vertex count.
+  const half = routeLengthUnits(run.pts) / 2;
+  let at = run.pts[0], done = 0;
+  for (let i = 1; i < run.pts.length; i++) {
+    const a = run.pts[i - 1], b = run.pts[i];
+    const seg = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (done + seg >= half) {
+      const t = seg ? (half - done) / seg : 0;
+      at = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+      break;
+    }
+    done += seg;
+  }
+  activeRouteLayers.push(L.marker(toLeafletCoords(at), {
+    interactive: false, keyboard: false,
+    opacity: routeRunOpacity(destLevel, activeLevel),
+    icon: L.divIcon({
+      className: 'route-eta',
+      html: '<span class="route-eta-chip">' + WALK_ICON + minutes + ' min</span>',
+      iconSize: null
+    })
+  }).addTo(map));
 }
 
 // ==========================================
