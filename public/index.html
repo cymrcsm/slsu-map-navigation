@@ -391,6 +391,30 @@
     </div>
   </div>
 
+  <!-- After two idle minutes: "Still there?", then the campus slideshow (js/screensaver.js) -->
+  <div id="idle-prompt" class="idle-prompt" role="alertdialog" aria-labelledby="idle-title" hidden>
+    <div class="idle-card">
+      <h3 id="idle-title">Still there?</h3>
+      <p>The map goes back to the start in <strong id="idle-count">10</strong> seconds.</p>
+      <button type="button" class="idle-stay">I'm still here</button>
+    </div>
+  </div>
+
+  <div id="screensaver" class="screensaver" hidden>
+    <div class="ss-photos">
+      <img class="ss-photo" alt="" draggable="false">
+      <img class="ss-photo" alt="" draggable="false">
+    </div>
+    <div class="ss-band">
+      <img class="ss-logo" src="assets/logo.png" alt="" draggable="false">
+      <div class="ss-text">
+        <p class="ss-call">Touch anywhere to find your way</p>
+        <p class="ss-place"><strong id="ss-name"></strong> <span id="ss-inside"></span></p>
+      </div>
+      <p class="ss-credit" id="ss-credit"></p>
+    </div>
+  </div>
+
   <script src="vendor/leaflet/leaflet.js"></script>
   <script src="vendor/qrcode/qrcode.js"></script>
   <script src="js/georef.js"></script>
@@ -400,5 +424,6 @@
   <script src="js/building-labels.js"></script>
   <script src="js/app.js"></script>
   <script src="js/handoff.js"></script>
+  <script src="js/screensaver.js"></script>
 </body>
 </html>
