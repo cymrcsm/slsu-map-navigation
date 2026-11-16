@@ -306,13 +306,18 @@ function flyToView(latlng, zoom) {
   moveView(latlng, zoom);
 }
 
-// Where fitBounds would end up, reached by the same two steps.
-function fitView(bounds, options = {}) {
+// The zoom fitBounds would pick, fitted to the gap between the panels.
+function fitZoom(bounds, options = {}) {
   const pad = L.point(options.padding || [0, 0]);
   const ins = mapInsets();
   let zoom = map.getBoundsZoom(bounds, false, pad.multiplyBy(2).add([ins.left + ins.right, 0]));
   if (options.maxZoom !== undefined) zoom = Math.min(zoom, options.maxZoom);
-  moveView(bounds.getCenter(), zoom);
+  return zoom;
+}
+
+// Where fitBounds would end up, reached by the same two steps.
+function fitView(bounds, options = {}) {
+  moveView(bounds.getCenter(), fitZoom(bounds, options));
 }
 
 // OpenStreetMap requires visible credit wherever its tiles are shown.
@@ -901,6 +906,7 @@ const buildingLabelLayer = MapMarks.addBuildingLabels(map,
 function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   activeSelectedLocation = loc;
   clearActiveRoute();
+  clearBuildingPin();
 
   const cats = loc.categories || [];
   detailBadge.innerHTML = '';
@@ -965,6 +971,8 @@ function selectCategory(id) {
   // back - but the map stays where it is rather than pulling out to the whole
   // campus.
   const stayPut = id === activeCategory && id !== 'ALL';
+  const before = parseFilter(activeCategory);
+  clearBuildingPin();
   activeCategory = stayPut ? 'ALL' : id;
   // "All Buildings" (or Back) puts away whichever building was open.
   if (id === 'ALL' && openBuilding !== null) { openBuilding = null; showOpenBuilding(); }
@@ -1029,11 +1037,76 @@ function selectCategory(id) {
   showPanel(categoryView);
 
   // Frame the pins that are left, so the category is visible at a glance.
+  // A building newly chosen is shown the way a map app finds a place: out to
+  // the whole campus, a red pin dropped on the building, then in to it.
   if (shown.length) {
-    fitView(L.latLngBounds(shown.map(l => toLeafletCoords(l.coords))), {
-      padding: [80, 80], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 0.8
-    });
+    const fitBounds = L.latLngBounds(shown.map(l => toLeafletCoords(l.coords)));
+    const fitOpts = { padding: [80, 80], maxZoom: ROUTE_MAX_ZOOM };
+    const now = parseFilter(activeCategory);
+    if (now && now.building !== CAMPUS_GROUNDS && (!before || before.building !== now.building)) {
+      revealBuilding(now.building, fitBounds, fitOpts);
+    } else {
+      fitView(fitBounds, fitOpts);
+    }
   }
+}
+
+// ---- finding a building: zoom out, drop a pin, zoom in ----
+const REVEAL_OUT_SECONDS = 1.4;    // out to the campus
+const REVEAL_PAUSE_MS = 650;       // the pin drops (style.css .find-pin)
+const REVEAL_IN_SECONDS = 2.4;     // in to the building, slowly
+let buildingPin = null;
+
+function clearBuildingPin() {
+  if (buildingPin) { map.removeLayer(buildingPin); buildingPin = null; }
+}
+
+// Where the pin goes: the building's name on the map (building-labels.js),
+// or the middle of its places when it has no name drawn.
+function buildingPoint(building, fallbackBounds) {
+  const want = building.trim().toLowerCase();
+  const label = (typeof BUILDING_LABELS !== 'undefined' ? BUILDING_LABELS : [])
+    .find(l => !l.gate && l.text.trim().toLowerCase() === want);
+  return label ? toLeafletCoords(label.at) : fallbackBounds.getCenter();
+}
+
+// The red map pin, as map apps mark a place found.
+const FIND_PIN_SVG = '<svg viewBox="0 0 40 54" aria-hidden="true">' +
+  '<path d="M20 1.5C9.8 1.5 1.5 9.6 1.5 19.7c0 13.4 15.6 29.6 17.3 31.4a1.7 1.7 0 0 0 2.4 0C22.9 49.3 38.5 33.1 38.5 19.7 38.5 9.6 30.2 1.5 20 1.5Z" fill="#EA4335" stroke="#B31412" stroke-width="1.5"/>' +
+  '<circle cx="20" cy="19.5" r="6.5" fill="#B31412"/></svg>';
+
+function revealBuilding(building, bounds, fitOpts) {
+  map.stop();
+  const move = ++viewMove;               // any other camera move cancels this one
+  const target = buildingPoint(building, bounds);
+  const inZoom = fitZoom(bounds, fitOpts);
+  const outZoom = Math.min(overviewZoom() + 0.25, inZoom);
+
+  const dropPin = () => {
+    clearBuildingPin();
+    buildingPin = L.marker(target, {
+      icon: L.divIcon({
+        className: 'find-pin-icon',
+        html: '<span class="find-pin">' + FIND_PIN_SVG + '</span>',
+        iconSize: [40, 54], iconAnchor: [20, 52]
+      }),
+      interactive: false, keyboard: false, zIndexOffset: 1000
+    }).addTo(map);
+  };
+  const zoomIn = () => {
+    if (move !== viewMove) return;
+    map.flyTo(centreInGap(bounds.getCenter(), inZoom), inZoom, { duration: REVEAL_IN_SECONDS });
+  };
+  const afterOut = () => {
+    if (move !== viewMove) return;
+    dropPin();
+    setTimeout(zoomIn, REVEAL_PAUSE_MS);
+  };
+
+  // Already out at the campus view: just drop the pin and go in.
+  if (map.getZoom() <= outZoom + 0.15) { afterOut(); return; }
+  map.once('moveend', afterOut);
+  map.flyTo(centreInGap(CAMPUS_CENTER, outZoom), outZoom, { duration: REVEAL_OUT_SECONDS });
 }
 
 // ==========================================
@@ -1648,6 +1721,7 @@ function releaseFilterForSearch() {
   openBuilding = null;
   showOpenBuilding();
   paintCategoryButtons();
+  clearBuildingPin();
   if (!categoryView.classList.contains('hidden')) showPanel(tutorialView);
 }
 
