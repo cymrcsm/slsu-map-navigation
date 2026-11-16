@@ -1204,7 +1204,11 @@ body, html {
   height: 30px;
   border-radius: 50%;
   background: var(--brand-pulse);
-  animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  /* A few pulses when the dot appears (it is re-added on each return to the
+     kiosk's floor), then a still halo. Running forever it kept the Pi's
+     compositor redrawing the screen every frame, even idle and under the
+     screensaver. */
+  animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) 4;
 }
 
 @keyframes pulse-ring {
