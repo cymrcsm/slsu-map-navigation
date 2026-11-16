@@ -1640,7 +1640,19 @@ map.on('click', (e) => {
 });
 
 // --- search ---
+// Typing searches every place: whatever building or category was chosen is
+// let go (the map stays where it is), so a match is never hidden by it.
+function releaseFilterForSearch() {
+  if (activeCategory === 'ALL' && openBuilding === null) return;
+  activeCategory = 'ALL';
+  openBuilding = null;
+  showOpenBuilding();
+  paintCategoryButtons();
+  if (!categoryView.classList.contains('hidden')) showPanel(tutorialView);
+}
+
 searchInput.addEventListener('input', (e) => {
+  if (e.target.value.trim()) releaseFilterForSearch();
   renderSuggestions(e.target.value);
   renderMarkers(activeCategory, e.target.value);
 });
