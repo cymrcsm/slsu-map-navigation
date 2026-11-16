@@ -94,6 +94,10 @@
   --card-shadow-hover: 0 6px 20px rgba(70, 58, 46, 0.16);
 
   --panel-gap: 14px;
+  /* The side panels float over the map (see .panel). These widths also place
+     the keyboard and the map's corner notes between them. */
+  --panel-left-w: 440px;
+  --panel-right-w: 340px;
 }
 
 * {
@@ -113,17 +117,24 @@ body, html {
 }
 
 .kiosk-app {
-  display: flex;
+  position: relative;
   width: 100vw;
   height: 100vh;
   background: var(--bg-color);
 }
 
 /* Navy chrome holding warm paper cards: the brand reads at a glance, while
-   everything you actually read stays on the light, warm surface the map uses. */
+   everything you actually read stays on the light, warm surface the map uses.
+
+   The panels float over a full-screen map rather than sitting beside it, so
+   they can step aside while the map is dragged or zoomed (.panels-aside, set
+   by app.js section 17) and the map behind them never changes size. Camera
+   moves keep their target in the gap between the panels (app.js mapInsets).
+   z 1100: above Leaflet's panes and controls (up to 1000), below the dialogs. */
 .panel {
+  position: absolute;
+  top: var(--panel-gap);
   height: calc(100vh - 2 * var(--panel-gap));
-  margin: var(--panel-gap);
   background: var(--surface-sidebar);
   border: 1px solid var(--slsu-navy-deep);
   border-radius: 16px;
@@ -131,20 +142,26 @@ body, html {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  z-index: 10;
-  flex-shrink: 0;
+  z-index: 1100;
+  /* transform and opacity only: the compositor moves the panel as a picture,
+     nothing is laid out again on the Raspberry Pi. */
+  transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
 .panel-left {
-  width: 400px;
-  min-width: 340px;
+  left: var(--panel-gap);
+  width: var(--panel-left-w);
 }
 
 .panel-right {
-  width: 300px;
-  min-width: 260px;
+  right: var(--panel-gap);
+  width: var(--panel-right-w);
   padding: 18px 0 14px;
 }
+
+.kiosk-app.panels-aside .panel { opacity: 0; pointer-events: none; }
+.kiosk-app.panels-aside .panel-left  { transform: translateX(calc(-100% - var(--panel-gap))); }
+.kiosk-app.panels-aside .panel-right { transform: translateX(calc(100% + var(--panel-gap))); }
 
 .panel-section-label {
   font-size: 13px;
@@ -994,10 +1011,8 @@ body, html {
 }
 
 .map-container {
-  flex: 1;
-  height: 100vh;
-  position: relative;
-  min-width: 0;
+  position: absolute;
+  inset: 0;
 }
 
 #map {
@@ -1015,8 +1030,8 @@ body, html {
 .map-controls {
   position: absolute;
   top: var(--panel-gap);
-  left: 0;
-  right: 0;
+  left: calc(var(--panel-left-w) + 2 * var(--panel-gap));
+  right: calc(var(--panel-right-w) + 2 * var(--panel-gap));
   z-index: 1000;
   display: flex;
   flex-direction: row;
@@ -1069,6 +1084,8 @@ body, html {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.leaflet-bottom.leaflet-left { left: calc(var(--panel-left-w) + 2 * var(--panel-gap)); }
 
 .leaflet-control-attribution {
   font-size: 12.5px;
@@ -1233,7 +1250,7 @@ body, html {
 #coord-inspector {
   position: absolute;
   bottom: 22px;
-  left: 8px;
+  left: calc(var(--panel-left-w) + 2 * var(--panel-gap) + 8px);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1490,8 +1507,8 @@ body, html {
    ========================================================================== */
 .kiosk-keyboard {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: calc(var(--panel-left-w) + 2 * var(--panel-gap));
+  right: calc(var(--panel-right-w) + 2 * var(--panel-gap));
   bottom: 14px;
   /* Above the admin dialog (4000) as well as the map: the keyboard serves the
      dialog's fields too, and must sit over its dimmed backdrop to be tapped. */

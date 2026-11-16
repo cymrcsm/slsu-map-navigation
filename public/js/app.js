@@ -253,12 +253,36 @@ const ZOOM_MIN_SECONDS = 0.6;
 const ZOOM_MAX_SECONDS = 1.6;
 let viewMove = 0;
 
+// The side panels float over the full-screen map, so the part of the map that
+// can be seen is the gap between them. These are the pixels each one covers
+// (offsetLeft/offsetWidth ignore the slide-aside transform: the gap is where
+// the panels come back to).
+function mapInsets() {
+  const left = document.querySelector('.panel-left');
+  const right = document.querySelector('.panel-right');
+  const w = map.getSize().x;
+  return {
+    left: left ? left.offsetLeft + left.offsetWidth : 0,
+    right: right ? w - right.offsetLeft : 0
+  };
+}
+
+// The map centre that puts `latlng` in the middle of that gap at `zoom`.
+function centreInGap(latlng, zoom) {
+  const ins = mapInsets();
+  const shift = L.point((ins.left - ins.right) / 2, 0);
+  return map.unproject(map.project(latlng, zoom).subtract(shift), zoom);
+}
+
 function moveView(latlng, zoom) {
   map.stop();
   const move = ++viewMove;
   zoom = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), zoom));
   const size = map.getSize();
-  const off = map.latLngToContainerPoint(latlng).subtract(size.divideBy(2));
+  const ins = mapInsets();
+  const gapMid = L.point((ins.left + size.x - ins.right) / 2, size.y / 2);
+  const off = map.latLngToContainerPoint(latlng).subtract(gapMid);
+  latlng = centreInGap(latlng, zoom);
   const screens = Math.hypot(off.x / size.x, off.y / size.y);
   const zoomBy = zoom - map.getZoom();
   const zoomSeconds = Math.max(ZOOM_MIN_SECONDS,
@@ -285,7 +309,8 @@ function flyToView(latlng, zoom) {
 // Where fitBounds would end up, reached by the same two steps.
 function fitView(bounds, options = {}) {
   const pad = L.point(options.padding || [0, 0]);
-  let zoom = map.getBoundsZoom(bounds, false, pad.multiplyBy(2));
+  const ins = mapInsets();
+  let zoom = map.getBoundsZoom(bounds, false, pad.multiplyBy(2).add([ins.left + ins.right, 0]));
   if (options.maxZoom !== undefined) zoom = Math.min(zoom, options.maxZoom);
   moveView(bounds.getCenter(), zoom);
 }
@@ -350,7 +375,14 @@ const BLANK_TILE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALA
 
 // The frame's corners - the same for every floor, tiles or SVG.
 const bounds = L.latLngBounds(canvasCornersLatLng(MAP_WIDTH, MAP_HEIGHT));
-map.setMaxBounds(bounds.pad(0.25));
+// Wider east-west than north-south: the map runs under the side panels, so at
+// the campus overview the screen is wider than the campus plus a quarter, and
+// Leaflet would then pin the view to the middle and undo centreInGap().
+(function () {
+  const p = bounds.pad(0.25);
+  const extra = (p.getEast() - p.getWest()) * 0.6;
+  map.setMaxBounds(L.latLngBounds([p.getSouth(), p.getWest() - extra], [p.getNorth(), p.getEast() + extra]));
+})();
 
 // Between whole zoom levels Leaflet scales tiles by a fraction and the browser
 // softens the edges of each one; with zoomSnap: 0 nearly every zoom is in
@@ -438,7 +470,8 @@ const CAMPUS_CENTER = toLeafletCoords([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
 
 function overviewZoom() {
   const size = map.getSize();
-  const usableX = Math.max(1, size.x - FIT_PADDING * 2);
+  const ins = mapInsets();
+  const usableX = Math.max(1, size.x - ins.left - ins.right - FIT_PADDING * 2);
   const usableY = Math.max(1, size.y - FIT_PADDING * 2);
   const scale = Math.min(usableX / MAP_WIDTH, usableY / MAP_HEIGHT) * OVERVIEW_SCALE;
   return Math.max(ZOOM_FLOOR, Math.log2(scale) + GEO_ZOOM_SHIFT);
@@ -448,7 +481,8 @@ function autoCenterCampus(animate = true) {
   // Same reason as flyToView/fitView: the recentre button is next to the floor
   // and directions controls, so it lands mid-animation as often as not.
   if (animate) map.stop();
-  map.setView(CAMPUS_CENTER, overviewZoom(), { animate: animate });
+  const zoom = overviewZoom();
+  map.setView(centreInGap(CAMPUS_CENTER, zoom), zoom, { animate: animate });
 }
 
 function clampZoomOut() {
@@ -1650,8 +1684,16 @@ clearSearchBtn.addEventListener('click', () => {
 });
 
 // Map Controls
-document.getElementById('zoom-in').addEventListener('click', () => map.zoomIn());
-document.getElementById('zoom-out').addEventListener('click', () => map.zoomOut());
+// Zoom about the middle of the gap between the panels, not the middle of the
+// screen, so what is in view stays in view.
+function zoomInGap(by) {
+  const size = map.getSize();
+  const ins = mapInsets();
+  const mid = L.point((ins.left + size.x - ins.right) / 2, size.y / 2);
+  map.setZoomAround(mid, map.getZoom() + by);
+}
+document.getElementById('zoom-in').addEventListener('click', () => { panelsAsideForButton(); zoomInGap(map.options.zoomDelta); });
+document.getElementById('zoom-out').addEventListener('click', () => { panelsAsideForButton(); zoomInGap(-map.options.zoomDelta); });
 document.getElementById('recenter-map-btn').addEventListener('click', () => {
   autoCenterCampus(true);
   showTutorialView();
@@ -2877,3 +2919,58 @@ lockAdmin = function () {
 // as, Print, Inspect - and every one of those leads out of the kiosk. Nothing
 // in the app uses that menu, so it never opens.
 document.addEventListener('contextmenu', e => e.preventDefault());
+
+// ==========================================
+// PANELS STEP ASIDE WHILE THE MAP MOVES
+// ==========================================
+// While a finger drags or pinches the map, the mouse wheel turns, or the zoom
+// buttons are pressed, both side panels slide out of the way so the whole
+// screen is map; they come back once the map has been still for a moment.
+// Moves the app makes by itself (flying to a chosen place, framing a route)
+// leave the panels where they are - the panel is showing what was chosen.
+// The map behind does not change size (the panels float over it, style.css
+// .panel), so nothing is laid out again: the panels move as pictures.
+const PANELS_BACK_MS = 700;
+const kioskAppEl = document.querySelector('.kiosk-app');
+const mapPointers = new Set();
+let mapGestureUntil = 0;
+let panelsBackTimer = 0;
+
+function userMovingMap() {
+  return mapPointers.size > 0 || Date.now() < mapGestureUntil;
+}
+
+function setPanelsAside(aside) {
+  clearTimeout(panelsBackTimer);
+  // Not while the on-screen keyboard is up: its field is in the left panel.
+  if (aside && !kioskKeyboard.hidden) return;
+  kioskAppEl.classList.toggle('panels-aside', aside);
+}
+
+function panelsBackSoon() {
+  clearTimeout(panelsBackTimer);
+  if (!kioskAppEl.classList.contains('panels-aside')) return;
+  panelsBackTimer = setTimeout(() => {
+    // still a finger on the map, holding it mid-drag: wait for it to lift
+    if (mapPointers.size > 0) { panelsBackSoon(); return; }
+    kioskAppEl.classList.remove('panels-aside');
+  }, PANELS_BACK_MS);
+}
+
+function panelsAsideForButton() {
+  mapGestureUntil = Date.now() + 400;
+  setPanelsAside(true);
+}
+
+const mapEl = map.getContainer();
+mapEl.addEventListener('pointerdown', e => mapPointers.add(e.pointerId), true);
+['pointerup', 'pointercancel'].forEach(type =>
+  window.addEventListener(type, e => {
+    if (!mapPointers.delete(e.pointerId)) return;
+    // a drag that never moved the map, or one that has already settled
+    if (mapPointers.size === 0) panelsBackSoon();
+  }, true));
+mapEl.addEventListener('wheel', () => { mapGestureUntil = Date.now() + 400; }, { capture: true, passive: true });
+
+map.on('movestart zoomstart', () => { if (userMovingMap()) setPanelsAside(true); });
+map.on('moveend zoomend', panelsBackSoon);
