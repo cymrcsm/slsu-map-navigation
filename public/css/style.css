@@ -1257,34 +1257,9 @@ body, html {
 }
 .route-eta-chip svg { width: 16px; height: 16px; }
 
-/* Walking time and distance in the information card. */
-.route-summary {
-  margin-top: 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: var(--surface-card);
-  border: 1px solid var(--border-subtle);
-  border-left: 4px solid var(--route-line);
-}
+/* Walking time and distance in the information card: a row like Floor
+   Level and Building / Center (.detail-row). */
 .route-summary[hidden] { display: none; }
-.route-summary-icon {
-  flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--route-line);
-  color: #fff;
-}
-.route-summary-icon svg { width: 22px; height: 22px; }
-.route-summary-time { font-size: 19px; color: var(--text-dark); }
-.route-summary-time strong { font-size: 25px; color: var(--route-line); }
-.route-summary-via { margin-top: 2px; font-size: 15px; line-height: 1.4; color: var(--text-muted); }
 
 .leaflet-interactive.route-connector {
   /* The phone page draws its off-path hops in the same colour as the legs and
