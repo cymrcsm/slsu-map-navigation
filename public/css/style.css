@@ -1605,6 +1605,36 @@ body, html {
 }
 .qr-code svg { width: 100%; height: 100%; display: block; }
 
+/* "1 Connect to the Wi-Fi ... 2 Then scan" above the offline QR. */
+.qr-steps {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--map-stone);
+  text-align: left;
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--text-dark);
+}
+.qr-steps[hidden] { display: none; }
+.qr-steps li { display: flex; gap: 10px; align-items: flex-start; }
+.qr-steps li + li { margin-top: 8px; }
+.qr-steps strong { color: var(--primary-strong); }
+.qr-step-no {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.qr-cap[hidden] { display: none; }
 .qr-cap {
   font-size: 16.5px;
   font-weight: 600;

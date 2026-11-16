@@ -18,8 +18,9 @@
   const capEl = document.getElementById('qr-cap');
   const noteEl = document.getElementById('qr-note');
   const swapEl = document.getElementById('qr-swap');
+  const stepsEl = document.getElementById('qr-steps');
 
-  let cfg = { webUrl: null, localUrl: '', wifiSsid: 'SLSU-Kiosk-Map', https: false };
+  let cfg = { webUrl: null, localUrl: '', wifiSsid: 'SLSU-Kiosk-Map', wifiPassword: 'slsu-campus', https: false };
   fetch('api/config').then(r => r.json()).then(c => { cfg = c; }).catch(() => { /* offline dev */ });
 
   const clean = u => (u || '').replace(/\/+$/, '');
@@ -59,6 +60,8 @@
     if (mode === 'web' && !web) mode = 'local';
     if (mode === 'local' && !local) mode = 'web';
 
+    stepsEl.hidden = mode !== 'local';
+    capEl.hidden = mode === 'local';
     if (mode === 'web') {
       drawQr(web);
       capEl.textContent = 'Scan with your phone camera';
@@ -67,7 +70,11 @@
       swapEl.textContent = 'No mobile data?';
     } else {
       drawQr(local);
-      capEl.textContent = 'Join Wi-Fi “' + (cfg.wifiSsid || 'SLSU-Kiosk-Map') + '”, then scan';
+      // The steps above the code: join the kiosk's Wi-Fi first (the page is
+      // only reachable over it), then scan. An open network shows no password.
+      document.getElementById('qr-wifi-name').textContent = cfg.wifiSsid || 'SLSU-Kiosk-Map';
+      document.getElementById('qr-wifi-pass').textContent = cfg.wifiPassword || '';
+      document.getElementById('qr-wifi-pass-row').hidden = !cfg.wifiPassword;
       if (local.startsWith('http://')) {
         noteEl.textContent = 'Shows the map and route — the moving dot needs the kiosk’s HTTPS.';
         noteEl.hidden = false;

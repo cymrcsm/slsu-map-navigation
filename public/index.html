@@ -407,6 +407,15 @@
       <h3 id="qr-title">Take the directions with you</h3>
       <p class="qr-dest" id="qr-dest-name">Destination</p>
 
+      <!-- The offline QR only works on the kiosk's own Wi-Fi, so it says how to
+           join that first (handoff.js fills in the name and password). -->
+      <ol class="qr-steps" id="qr-steps" hidden>
+        <li><span class="qr-step-no">1</span><span>Connect your phone to the Wi-Fi
+          <strong id="qr-wifi-name">SLSU-Kiosk-Map</strong><span id="qr-wifi-pass-row"><br>Password:
+          <strong id="qr-wifi-pass">slsu-campus</strong></span></span></li>
+        <li><span class="qr-step-no">2</span><span>Then scan this code with your camera</span></li>
+      </ol>
+
       <div id="qr-code" class="qr-code"></div>
 
       <p class="qr-cap" id="qr-cap">Scan with your phone camera</p>

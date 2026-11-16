@@ -74,6 +74,10 @@ function webUrlSource() {
 const WEB_URL = (webUrlSource() || '').replace(/\/+$/, '') || null;
 
 const WIFI_SSID = process.env.KIOSK_WIFI_SSID || 'SLSU-Kiosk-Map';
+// Shown under the offline QR so visitors can join the kiosk's Wi-Fi first. The
+// same default as deploy/kiosk-ap.sh; set KIOSK_WIFI_PASSWORD to match if that
+// was changed, or to an empty string for an open network.
+const WIFI_PASSWORD = process.env.KIOSK_WIFI_PASSWORD !== undefined ? process.env.KIOSK_WIFI_PASSWORD : 'slsu-campus';
 
 app.use(cors());
 app.use(express.json());
@@ -293,6 +297,7 @@ app.get('/api/config', (req, res) => {
     webUrl: WEB_URL,          // public static site, ?d=<slug> form (may be null)
     localUrl: LOCAL_URL,      // this kiosk, /go/<slug> form — the offline fallback
     wifiSsid: WIFI_SSID,
+    wifiPassword: WIFI_PASSWORD,
     https: !!tlsOptions
   });
 });

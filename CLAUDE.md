@@ -38,7 +38,7 @@ Both `.db` files are tracked in git even though `.gitignore` lists `*.db` (they 
 
 ### Server (`server.js`)
 
-Express: static `public/`, captive-portal probes, `/api/*` (locations, search, categories, buildings, overrides, config, health), `/go/:slug` → `mobile.html`, `*` → `index.html`. Admin writes go through `requireAdmin` — the code comes from `KIOSK_ADMIN_CODE` (default `@dm1n123`) and is never sent to the page. `/api/config` exposes `localUrl` (kiosk's own address) and `webUrl` (GitHub Pages copy, from `KIOSK_WEB_URL` or the gitignored `web-url` file) — these drive the two QR codes.
+Express: static `public/`, captive-portal probes, `/api/*` (locations, search, categories, buildings, overrides, config, health), `/go/:slug` → `mobile.html`, `*` → `index.html`. Admin writes go through `requireAdmin` — the code comes from `KIOSK_ADMIN_CODE` (default `@dm1n123`) and is never sent to the page. `/api/config` exposes `localUrl` (kiosk's own address) and `webUrl` (GitHub Pages copy, from `KIOSK_WEB_URL` or the gitignored `web-url` file) — these drive the two QR codes. It also sends `wifiSsid` and `wifiPassword` (`KIOSK_WIFI_PASSWORD`, default `slsu-campus` like `deploy/kiosk-ap.sh`; empty for an open network), shown as "1 connect to the Wi-Fi, 2 scan" steps above the offline QR.
 
 ### Front end
 
