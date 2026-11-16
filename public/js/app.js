@@ -808,7 +808,7 @@ function createMarker(loc) {
     // The tap is read from the raw event: for a circle this small Leaflet
     // reports the circle's own centre as e.containerPoint.
     const id = markerAt(map.mouseEventToLayerPoint(e.originalEvent)) || loc.id;
-    showLocationDetails(PLACES.find(p => p.id === id) || loc);
+    showLocationDetails(PLACES.find(p => p.id === id) || loc, undefined, true);
   });
   markerFor.set(loc.id, marker);
   return marker;
@@ -1089,11 +1089,10 @@ function revealBuilding(building, bounds, fitOpts) {
   revealAt(buildingPoint(building, bounds), bounds.getCenter(), fitZoom(bounds, fitOpts));
 }
 
-// The one way the map finds something chosen from a list - a building, a
-// search result, a recent search, a place in a building's list: out to the
-// campus, the red pin dropped on `target`, then slowly in to `inCentre` at
-// `inZoom`. Tapping a marker on the map does not use it: that place is
-// already in view.
+// The one way the map finds something chosen - a building, a search result,
+// a recent search, a place in a building's list, a marker tapped on the map:
+// out to the campus, the red pin dropped on `target`, then slowly in to
+// `inCentre` at `inZoom`.
 function revealAt(target, inCentre, inZoom) {
   map.stop();
   const move = ++viewMove;               // any other camera move cancels this one
