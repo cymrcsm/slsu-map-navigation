@@ -971,31 +971,9 @@ function showTutorialView() {
   showPanel(activeCategory === 'ALL' ? tutorialView : categoryView);
 }
 
-function selectCategory(id) {
-  // Tapping the choice already made undoes it - every building's places come
-  // back - but the map stays where it is rather than pulling out to the whole
-  // campus.
-  const stayPut = id === activeCategory && id !== 'ALL';
-  const before = parseFilter(activeCategory);
-  clearBuildingPin();
-  activeCategory = stayPut ? 'ALL' : id;
-  // "All Buildings" (or Back) puts away whichever building was open.
-  if (id === 'ALL' && openBuilding !== null) { openBuilding = null; showOpenBuilding(); }
-  paintCategoryButtons();
-
-  activeSelectedLocation = null;
-  clearActiveRoute();
-  searchInput.value = '';
-  closeSuggestions();
-
-  const shown = renderMarkers(activeCategory, '');
-
-  if (activeCategory === 'ALL') {
-    showPanel(tutorialView);
-    if (!stayPut) autoCenterCampus(true);
-    return;
-  }
-
+// The left panel's listing for the current choice (activeCategory): its name,
+// count and one row per place shown.
+function fillCategoryView(shown) {
   // Within one building the building is a given, so each row names the floor
   // instead - the thing that differs between its rooms.
   const inBuilding = !!parseFilter(activeCategory);
@@ -1038,7 +1016,34 @@ function selectCategory(id) {
       categoryResults.appendChild(li);
     });
   }
+}
 
+function selectCategory(id) {
+  // Tapping the choice already made undoes it - every building's places come
+  // back - but the map stays where it is rather than pulling out to the whole
+  // campus.
+  const stayPut = id === activeCategory && id !== 'ALL';
+  const before = parseFilter(activeCategory);
+  clearBuildingPin();
+  activeCategory = stayPut ? 'ALL' : id;
+  // "All Buildings" (or Back) puts away whichever building was open.
+  if (id === 'ALL' && openBuilding !== null) { openBuilding = null; showOpenBuilding(); }
+  paintCategoryButtons();
+
+  activeSelectedLocation = null;
+  clearActiveRoute();
+  searchInput.value = '';
+  closeSuggestions();
+
+  const shown = renderMarkers(activeCategory, '');
+
+  if (activeCategory === 'ALL') {
+    showPanel(tutorialView);
+    if (!stayPut) autoCenterCampus(true);
+    return;
+  }
+
+  fillCategoryView(shown);
   showPanel(categoryView);
 
   // Frame the pins that are left, so the category is visible at a glance.
@@ -1235,8 +1240,27 @@ function chooseSuggestion(index) {
   rememberSearch(loc);
   searchInput.value = loc.name;
   closeSuggestions();
-  renderMarkers(activeCategory, '');
+  selectBuildingOf(loc);
   showLocationDetails(loc, undefined, true);
+}
+
+// A place found by search shows its building chosen in the right panel, just
+// as if it had been picked there - dropdown open, row pressed, the building's
+// places on the map and "Back" leading to its listing - but without the
+// camera move a building pick makes: the map is about to find the place.
+// A place shared by two buildings is filed under the first.
+function selectBuildingOf(loc) {
+  const b = buildingsOf(loc)[0];
+  if (!b || !buildingCounts[b]) { renderMarkers(activeCategory, ''); return; }
+  clearBuildingPin();
+  activeCategory = filterId(b, '*');
+  openBuilding = b;
+  showOpenBuilding();
+  paintCategoryButtons();
+  fillCategoryView(renderMarkers(activeCategory, ''));
+  const group = [...categoryListEl.querySelectorAll('.bldg-group')]
+    .find(g => g.dataset.building === b);
+  if (group) group.scrollIntoView({ block: 'nearest' });
 }
 
 // ---- recent searches ----
@@ -1780,8 +1804,9 @@ map.on('click', (e) => {
 });
 
 // --- search ---
-// Typing searches every place: whatever building or category was chosen is
-// let go (the map stays where it is), so a match is never hidden by it.
+// Typing searches every place, and clearing the box starts over: either way
+// whatever building or category was chosen is let go (the map stays where it
+// is), so a match is never hidden by it.
 function releaseFilterForSearch() {
   if (activeCategory === 'ALL' && openBuilding === null) return;
   activeCategory = 'ALL';
@@ -1789,11 +1814,12 @@ function releaseFilterForSearch() {
   showOpenBuilding();
   paintCategoryButtons();
   clearBuildingPin();
+  backToTutorialBtn.textContent = '← Back to Kiosk Guide';
   if (!categoryView.classList.contains('hidden')) showPanel(tutorialView);
 }
 
 searchInput.addEventListener('input', (e) => {
-  if (e.target.value.trim()) releaseFilterForSearch();
+  releaseFilterForSearch();
   renderSuggestions(e.target.value);
   renderMarkers(activeCategory, e.target.value);
 });
@@ -1840,6 +1866,7 @@ document.addEventListener('click', (e) => {
 
 clearSearchBtn.addEventListener('click', () => {
   searchInput.value = '';
+  releaseFilterForSearch();
   closeSuggestions();
   renderMarkers(activeCategory, '');
   searchInput.focus();
