@@ -11,7 +11,7 @@
 //   LOCATIONS   id, name, acronym, building, categories, floor, hours, coords,
 //               textH (label height hint), description
 //
-// 269 locations (2nd Floor: 9, 3rd Floor: 2, Ground Floor: 258),
+// 270 locations (2nd Floor: 10, 3rd Floor: 2, Ground Floor: 258),
 // 16 categories.
 const CATEGORIES = [
   {
@@ -3119,6 +3119,23 @@ const LOCATIONS = [
   ],
   "textH": 0.73,
   "description": "Administrative office handling university operations and student transactions."
+ },
+ {
+  "id": "office-space",
+  "custom": true,
+  "name": "office space",
+  "acronym": "",
+  "floor": "2nd Floor",
+  "building": "Student Center",
+  "categories": [
+   "admin-offices",
+   "student-orgs",
+   "stock-archives"
+  ],
+  "coords": [
+   140.3,
+   341.6
+  ]
  },
  {
   "id": "open-air-bench",
