@@ -11,7 +11,7 @@
 //   LOCATIONS   id, name, acronym, building, categories, floor, hours, coords,
 //               textH (label height hint), description
 //
-// 270 locations (2nd Floor: 10, 3rd Floor: 2, Ground Floor: 258),
+// 308 locations (2nd Floor: 48, 3rd Floor: 2, Ground Floor: 258),
 // 16 categories.
 const CATEGORIES = [
   {
@@ -363,6 +363,54 @@ const LOCATIONS = [
   "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
+  "id": "aslab-1",
+  "name": "ASLAB-1",
+  "acronym": "ASLAB-1",
+  "building": "Institute of Arts and Sciences Building",
+  "categories": [
+   "laboratories"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   217.7,
+   353
+  ],
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
+ },
+ {
+  "id": "aslab-2",
+  "name": "ASLAB-2",
+  "acronym": "ASLAB-2",
+  "building": "Institute of Arts and Sciences Building",
+  "categories": [
+   "laboratories"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   232.5,
+   353
+  ],
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
+ },
+ {
+  "id": "aslab-3",
+  "name": "ASLAB-3",
+  "acronym": "ASLAB-3",
+  "building": "Institute of Arts and Sciences Building",
+  "categories": [
+   "laboratories"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   238.2,
+   360.3
+  ],
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
+ },
+ {
   "id": "assessment-area",
   "name": "Assessment Area",
   "acronym": "AA",
@@ -450,6 +498,74 @@ const LOCATIONS = [
   "description": "Sports ground or recreation facility open to students and staff."
  },
  {
+  "id": "bsce-faculty-office",
+  "name": "BSCE Faculty Office",
+  "acronym": "BSCEFO",
+  "building": "Engineering Building",
+  "categories": [
+   "faculty-rooms",
+   "academic-departments"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   105.6,
+   387.4
+  ],
+  "description": "Faculty workspace for preparation and student consultation."
+ },
+ {
+  "id": "bscpe-faculty-office",
+  "name": "BSCPE Faculty Office",
+  "acronym": "BSCPEFO",
+  "building": "Engineering Building",
+  "categories": [
+   "faculty-rooms",
+   "academic-departments"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   117.1,
+   387.4
+  ],
+  "description": "Faculty workspace for preparation and student consultation."
+ },
+ {
+  "id": "bsee-faculty-office",
+  "name": "BSEE Faculty Office",
+  "acronym": "BSEEFO",
+  "building": "Engineering Building",
+  "categories": [
+   "faculty-rooms",
+   "academic-departments"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   100.6,
+   387.4
+  ],
+  "description": "Faculty workspace for preparation and student consultation."
+ },
+ {
+  "id": "bsme-faculty-office",
+  "name": "BSME Faculty Office",
+  "acronym": "BSMEFO",
+  "building": "Engineering Building",
+  "categories": [
+   "faculty-rooms",
+   "academic-departments"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   110.8,
+   387.4
+  ],
+  "description": "Faculty workspace for preparation and student consultation."
+ },
+ {
   "id": "business-auxiliary-and-resource-generation-off",
   "name": "Business, Auxiliary, and Resource Generation Office (BARGO)",
   "acronym": "BARGO",
@@ -466,6 +582,39 @@ const LOCATIONS = [
   ],
   "textH": 0.85,
   "description": "Administrative office handling university operations and student transactions."
+ },
+ {
+  "id": "cad-room",
+  "name": "CAD Room",
+  "acronym": "CAD",
+  "building": "Engineering Building",
+  "categories": [
+   "laboratories",
+   "classrooms"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   80,
+   372.3
+  ],
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
+ },
+ {
+  "id": "campus-headliner-office",
+  "name": "Campus Headliner Office",
+  "acronym": "CHO",
+  "building": "Student Center",
+  "categories": [
+   "student-orgs"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   108.4,
+   343.2
+  ],
+  "description": "Office of a recognised student organisation or council."
  },
  {
   "id": "campus-oval",
@@ -602,6 +751,22 @@ const LOCATIONS = [
   "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
+  "id": "chess-room",
+  "name": "Chess Room",
+  "acronym": "CR",
+  "building": "Student Center",
+  "categories": [
+   "sports-recreation"
+  ],
+  "floor": "2nd Floor",
+  "hours": "Open daily, 6:00 AM - 8:00 PM",
+  "coords": [
+   115.5,
+   343.2
+  ],
+  "description": "Sports ground or recreation facility open to students and staff."
+ },
+ {
   "id": "cjso-office",
   "name": "CJSO Office",
   "acronym": "CJSO",
@@ -687,6 +852,38 @@ const LOCATIONS = [
    126
   ],
   "textH": 0.33,
+  "description": "Comfort room and hygiene facility."
+ },
+ {
+  "id": "comfort-room-12",
+  "name": "Comfort Room",
+  "acronym": "CR",
+  "building": "Engineering Building",
+  "categories": [
+   "comfort-rooms"
+  ],
+  "floor": "2nd Floor",
+  "hours": "Open during campus hours",
+  "coords": [
+   75.9,
+   389.1
+  ],
+  "description": "Comfort room and hygiene facility."
+ },
+ {
+  "id": "comfort-room-13",
+  "name": "Comfort Room",
+  "acronym": "CR",
+  "building": "Institute of Arts and Sciences Building",
+  "categories": [
+   "comfort-rooms"
+  ],
+  "floor": "2nd Floor",
+  "hours": "Open during campus hours",
+  "coords": [
+   245.5,
+   350.3
+  ],
   "description": "Comfort room and hygiene facility."
  },
  {
@@ -858,6 +1055,22 @@ const LOCATIONS = [
   "description": "Comfort room and hygiene facility."
  },
  {
+  "id": "comfort-rooms-2",
+  "name": "Comfort Rooms",
+  "acronym": "CR",
+  "building": "Research, Innovation, and Extension Services Building",
+  "categories": [
+   "comfort-rooms"
+  ],
+  "floor": "2nd Floor",
+  "hours": "Open during campus hours",
+  "coords": [
+   175.5,
+   343.5
+  ],
+  "description": "Comfort room and hygiene facility."
+ },
+ {
   "id": "commandants-office",
   "name": "Commandants Office",
   "acronym": "CO",
@@ -908,6 +1121,22 @@ const LOCATIONS = [
    426
   ],
   "textH": 0.92,
+  "description": "Administrative office handling university operations and student transactions."
+ },
+ {
+  "id": "conference-room-2",
+  "name": "Conference Room",
+  "acronym": "CR",
+  "building": "Student Center",
+  "categories": [
+   "admin-offices"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   111.8,
+   343
+  ],
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -1223,6 +1452,23 @@ const LOCATIONS = [
   "description": "Campus food outlet or commercial stall."
  },
  {
+  "id": "ee-room",
+  "name": "EE Room",
+  "acronym": "EE",
+  "building": "Research, Innovation, and Extension Services Building",
+  "categories": [
+   "classrooms",
+   "laboratories"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   169.6,
+   343.3
+  ],
+  "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
   "id": "elt-102",
   "name": "ELT-102",
   "acronym": "ELT-102",
@@ -1329,6 +1575,22 @@ const LOCATIONS = [
   ],
   "textH": 1.16,
   "description": "Campus location."
+ },
+ {
+  "id": "faculty-office",
+  "name": "Faculty Office",
+  "acronym": "FO",
+  "building": "Engineering Building",
+  "categories": [
+   "faculty-rooms"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   80.1,
+   379.5
+  ],
+  "description": "Faculty workspace for preparation and student consultation."
  },
  {
   "id": "faculty-room",
@@ -1690,6 +1952,39 @@ const LOCATIONS = [
   ],
   "textH": 0.57,
   "description": "Security post, campus gate or military training headquarters."
+ },
+ {
+  "id": "guidance-and-counseling-office",
+  "name": "Guidance and Counseling Office",
+  "acronym": "GCO",
+  "building": "Student Center",
+  "categories": [
+   "health-services"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   116.5,
+   341.1
+  ],
+  "description": "Medical, health or student welfare service point."
+ },
+ {
+  "id": "guidance-counselor-office",
+  "name": "Guidance Counselor Office",
+  "acronym": "GCO",
+  "building": "Student Center",
+  "categories": [
+   "health-services",
+   "faculty-rooms"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   111.9,
+   336.1
+  ],
+  "description": "Medical, health or student welfare service point."
  },
  {
   "id": "handwashing-area",
@@ -2813,6 +3108,22 @@ const LOCATIONS = [
   "description": "Classroom or lecture space used for scheduled instruction."
  },
  {
+  "id": "monitoring-and-evaluation-impact-assessment",
+  "name": "Monitoring and Evaluation Impact Assessment",
+  "acronym": "MEIA",
+  "building": "Research, Innovation, and Extension Services Building",
+  "categories": [
+   "admin-offices"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   168.8,
+   346.9
+  ],
+  "description": "Administrative office handling university operations and student transactions."
+ },
+ {
   "id": "multi-faith-room-old-ias-conference-room",
   "name": "Multi-Faith Room/old IAS Conference Room",
   "acronym": "MROICR",
@@ -2925,6 +3236,23 @@ const LOCATIONS = [
   "description": "Administrative office handling university operations and student transactions."
  },
  {
+  "id": "office-of-the-curriculum-development",
+  "name": "Office of the Curriculum Development",
+  "acronym": "OCD",
+  "building": "Student Center",
+  "categories": [
+   "admin-offices",
+   "academic-departments"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   119.2,
+   343.3
+  ],
+  "description": "Administrative office handling university operations and student transactions."
+ },
+ {
   "id": "office-of-the-dean",
   "name": "Office of the Dean",
   "acronym": "OD",
@@ -2942,6 +3270,40 @@ const LOCATIONS = [
   "description": "Department or college office overseeing academic programs and faculty."
  },
  {
+  "id": "office-of-the-dean-for-undergraduate-students",
+  "name": "Office of the Dean for Undergraduate Students",
+  "acronym": "ODUS",
+  "building": "Student Center",
+  "categories": [
+   "academic-departments",
+   "admin-offices"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   119.5,
+   341.1
+  ],
+  "description": "Department or college office overseeing academic programs and faculty."
+ },
+ {
+  "id": "office-of-the-director-for-extension-and-commu",
+  "name": "Office of the Director for Extension and Community Outreach",
+  "acronym": "ODECO",
+  "building": "Research, Innovation, and Extension Services Building",
+  "categories": [
+   "admin-offices",
+   "auxiliary-services"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   177.4,
+   344.2
+  ],
+  "description": "Administrative office handling university operations and student transactions."
+ },
+ {
   "id": "office-of-the-director-for-quality-assurance",
   "name": "Office of the Director for Quality Assurance",
   "acronym": "ODQA",
@@ -2956,6 +3318,22 @@ const LOCATIONS = [
    460.3
   ],
   "textH": 0.55,
+  "description": "Administrative office handling university operations and student transactions."
+ },
+ {
+  "id": "office-of-the-director-for-research-innovation",
+  "name": "Office of the Director for Research, Innovation, and Public Services",
+  "acronym": "ODRIPS",
+  "building": "Research, Innovation, and Extension Services Building",
+  "categories": [
+   "admin-offices"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   172,
+   347.7
+  ],
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -3015,6 +3393,23 @@ const LOCATIONS = [
   "description": "Department or college office overseeing academic programs and faculty."
  },
  {
+  "id": "office-of-the-ojt-coordinator",
+  "name": "Office of the OJT Coordinator",
+  "acronym": "OOJTC",
+  "building": "Student Center",
+  "categories": [
+   "admin-offices",
+   "academic-departments"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   124.1,
+   349.2
+  ],
+  "description": "Administrative office handling university operations and student transactions."
+ },
+ {
   "id": "office-of-the-pice-slsu-student-chapter",
   "name": "Office of the PICE SLSU Student Chapter",
   "acronym": "OPSSC",
@@ -3051,6 +3446,23 @@ const LOCATIONS = [
   "description": "Administrative office handling university operations and student transactions."
  },
  {
+  "id": "office-of-the-scholarship-coordinator",
+  "name": "Office of the Scholarship Coordinator",
+  "acronym": "OSC",
+  "building": "Student Center",
+  "categories": [
+   "admin-offices",
+   "health-services"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   124.1,
+   347.1
+  ],
+  "description": "Administrative office handling university operations and student transactions."
+ },
+ {
   "id": "office-of-the-slsu-peso-manager",
   "name": "Office of the SLSU Peso Manager",
   "acronym": "OSPM",
@@ -3066,6 +3478,41 @@ const LOCATIONS = [
    424.8
   ],
   "textH": 0.86,
+  "description": "Administrative office handling university operations and student transactions."
+ },
+ {
+  "id": "office-of-the-sports-development-and-cultural",
+  "name": "Office of the Sports Development and Cultural Coordinator",
+  "acronym": "OSDCC",
+  "building": "Student Center",
+  "categories": [
+   "admin-offices",
+   "sports-recreation"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   121.9,
+   349.2
+  ],
+  "description": "Administrative office handling university operations and student transactions."
+ },
+ {
+  "id": "office-of-the-student-affairs",
+  "name": "Office of the Student Affairs",
+  "acronym": "OSA",
+  "building": "Student Center",
+  "categories": [
+   "admin-offices",
+   "student-orgs",
+   "health-services"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   105.4,
+   343.1
+  ],
   "description": "Administrative office handling university operations and student transactions."
  },
  {
@@ -3938,6 +4385,22 @@ const LOCATIONS = [
   "description": "Administrative office handling university operations and student transactions."
  },
  {
+  "id": "research-laboratory",
+  "name": "Research Laboratory",
+  "acronym": "RL",
+  "building": "Institute of Arts and Sciences Building",
+  "categories": [
+   "laboratories"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   203.9,
+   353.3
+  ],
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
+ },
+ {
   "id": "ries-ethics-and-review-services-ries-managemen",
   "name": "RIES Ethics and Review Services RIES Management Information Office RIES Communication Office RIES Knowledge Management Office",
   "acronym": "RIES",
@@ -4071,6 +4534,70 @@ const LOCATIONS = [
   ]
  },
  {
+  "id": "room-e-203",
+  "name": "Room E-203",
+  "acronym": "E-203",
+  "building": "Engineering Building",
+  "categories": [
+   "classrooms"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   78.9,
+   348.8
+  ],
+  "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
+  "id": "room-e-204",
+  "name": "Room E-204",
+  "acronym": "E-204",
+  "building": "Engineering Building",
+  "categories": [
+   "classrooms"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   79.2,
+   354.3
+  ],
+  "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
+  "id": "room-e-205",
+  "name": "Room E-205",
+  "acronym": "E-205",
+  "building": "Engineering Building",
+  "categories": [
+   "classrooms"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   79.5,
+   359.9
+  ],
+  "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
+  "id": "room-e-206",
+  "name": "Room E-206",
+  "acronym": "E-206",
+  "building": "Engineering Building",
+  "categories": [
+   "classrooms"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   79.7,
+   365.8
+  ],
+  "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
   "id": "rs-101",
   "name": "RS-101",
   "acronym": "RS-101",
@@ -4154,6 +4681,57 @@ const LOCATIONS = [
   ],
   "textH": 1.57,
   "description": "Security post, campus gate or military training headquarters."
+ },
+ {
+  "id": "science-laboratory-office",
+  "name": "Science Laboratory Office",
+  "acronym": "SLO",
+  "building": "Institute of Arts and Sciences Building",
+  "categories": [
+   "laboratories",
+   "admin-offices"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   210.5,
+   353
+  ],
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
+ },
+ {
+  "id": "science-laboratory-office-2",
+  "name": "Science Laboratory Office",
+  "acronym": "SLO",
+  "building": "Institute of Arts and Sciences Building",
+  "categories": [
+   "laboratories",
+   "admin-offices"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   225.2,
+   353
+  ],
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
+ },
+ {
+  "id": "science-laboratory-office-3",
+  "name": "Science Laboratory Office",
+  "acronym": "SLO",
+  "building": "Institute of Arts and Sciences Building",
+  "categories": [
+   "laboratories",
+   "admin-offices"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   238.5,
+   366.5
+  ],
+  "description": "Specialised laboratory or simulation facility for hands-on technical work."
  },
  {
   "id": "sepak-takraw-court",
@@ -4324,6 +4902,22 @@ const LOCATIONS = [
   "description": "Records, storage and supply area maintained by the university."
  },
  {
+  "id": "student-council-area",
+  "name": "Student Council Area",
+  "acronym": "SCA",
+  "building": "Student Center",
+  "categories": [
+   "student-orgs"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   111.2,
+   337.3
+  ],
+  "description": "Office of a recognised student organisation or council."
+ },
+ {
   "id": "student-dormitory-1",
   "name": "Student Dormitory 1",
   "acronym": "SD1",
@@ -4377,6 +4971,22 @@ const LOCATIONS = [
   ],
   "textH": 0.88,
   "description": "Records, storage and supply area maintained by the university."
+ },
+ {
+  "id": "student-room",
+  "name": "Student Room",
+  "acronym": "SR",
+  "building": "Student Center",
+  "categories": [
+   "student-orgs"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   151.5,
+   341.3
+  ],
+  "description": "Office of a recognised student organisation or council."
  },
  {
   "id": "supply-and-property-building",
@@ -4504,6 +5114,22 @@ const LOCATIONS = [
    171.5,
    348.6
   ]
+ },
+ {
+  "id": "treatment-room",
+  "name": "Treatment Room",
+  "acronym": "TR",
+  "building": "Student Center",
+  "categories": [
+   "health-services"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   105,
+   341.2
+  ],
+  "description": "Medical, health or student welfare service point."
  },
  {
   "id": "twin-s-snack-house",
