@@ -1647,7 +1647,7 @@ function drawRoute(destination, followDestination = false, refit = true) {
   const storeys = routeStoreys(runs);
   const minutes = walkMinutes(metres, storeys);
   showRouteSummary(destination, runs, metres, minutes, endGap);
-  addEtaBubble(runs, activeLevel, minutes);
+  addEtaBubble(runs, activeLevel, minutes, metres);
 
   const changes = runs.length - 1;
   let note = destination.name + ' — about ' + metres + ' m on foot';
@@ -1729,12 +1729,12 @@ function showRouteSummary(destination, runs, metres, minutes, endGap) {
 // The floor buttons' own labels (index.html), for "Tap 3F to see the rest".
 const FLOOR_BUTTON_LABELS = ['GF', '2F', '3F'];
 
-// The "3 min" label on the route itself, halfway along the run on the floor
-// on screen.
+// The "3 min · 220 m" label on the route itself, halfway along the run on the
+// floor on screen.
 // One small element, placed once per drawing; it moves with the map.
 const WALK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg>';
 
-function addEtaBubble(runs, destLevel, minutes) {
+function addEtaBubble(runs, destLevel, minutes, metres) {
   const run = runs.filter(r => r.level === destLevel && r.pts.length > 1)
                   .sort((a, b) => routeLengthUnits(b.pts) - routeLengthUnits(a.pts))[0];
   if (!run) return;
@@ -1756,7 +1756,7 @@ function addEtaBubble(runs, destLevel, minutes) {
     opacity: routeRunOpacity(destLevel, activeLevel),
     icon: L.divIcon({
       className: 'route-eta',
-      html: '<span class="route-eta-chip">' + WALK_ICON + minutes + ' min</span>',
+      html: '<span class="route-eta-chip">' + WALK_ICON + minutes + ' min · ' + metres + ' m</span>',
       iconSize: null
     })
   }).addTo(map));
