@@ -11,7 +11,7 @@
 //   LOCATIONS   id, name, acronym, building, categories, floor, hours, coords,
 //               textH (label height hint), description
 //
-// 369 locations (2nd Floor: 109, 3rd Floor: 2, Ground Floor: 258),
+// 372 locations (2nd Floor: 112, 3rd Floor: 2, Ground Floor: 258),
 // 16 categories.
 const CATEGORIES = [
   {
@@ -135,6 +135,22 @@ const LOCATIONS = [
   ],
   "textH": 0.68,
   "description": "Office of a recognised student organization."
+ },
+ {
+  "id": "ams-office",
+  "name": "AMS Office",
+  "acronym": "AMS",
+  "building": "Graduate Studies Building",
+  "categories": [
+   "admin-offices"
+  ],
+  "floor": "2nd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   248.4,
+   69.9
+  ],
+  "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "archives-center",
@@ -1688,6 +1704,23 @@ const LOCATIONS = [
   "description": "Faculty workspace for preparation and student consultation."
  },
  {
+  "id": "defense-room-2",
+  "name": "Defense Room",
+  "acronym": "DR",
+  "building": "Graduate Studies Building",
+  "categories": [
+   "classrooms",
+   "academic-departments"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   240.4,
+   69.9
+  ],
+  "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
   "id": "department-of-military-science-and-tactics-off",
   "name": "Department of Military Science and Tactics Office",
   "acronym": "DMSTO",
@@ -2423,6 +2456,23 @@ const LOCATIONS = [
   "coords": [
    230.1,
    69.8
+  ],
+  "description": "Classroom or lecture space used for scheduled instruction."
+ },
+ {
+  "id": "graduate-duties-gs-22",
+  "name": "Graduate Duties GS-22",
+  "acronym": "GS-22",
+  "building": "Graduate Studies Building",
+  "categories": [
+   "classrooms",
+   "academic-departments"
+  ],
+  "floor": "2nd Floor",
+  "hours": "7:00 AM - 7:00 PM (Mon - Sat)",
+  "coords": [
+   257.5,
+   71.2
   ],
   "description": "Classroom or lecture space used for scheduled instruction."
  },
