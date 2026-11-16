@@ -246,12 +246,42 @@ map.setView(svgToLatLng([MAP_WIDTH / 2, MAP_HEIGHT / 2]), 18, { animate: false }
 // glides over to the place at the zoom it is already at, then it zooms in
 // gradually. Pulling back - to frame a whole route or a building's rooms - is a
 // single smooth move. Each new move cancels whatever is left of the last.
-const PAN_SECONDS_PER_SCREEN = 0.45;
-const PAN_MAX_SECONDS = 1.1;
-const ZOOM_SECONDS_PER_LEVEL = 0.4;
-const ZOOM_MIN_SECONDS = 0.6;
-const ZOOM_MAX_SECONDS = 1.6;
+// Paced for the Raspberry Pi: a slower move gives it time to draw each frame
+// and to load the tiles it is heading for, and between the steps of a move
+// (pan, then zoom; out, then in) the map waits until the floor and street
+// tiles on screen have loaded (whenMapDrawn), so it never zooms on into a
+// picture that is still blank or blurred.
+const PAN_SECONDS_PER_SCREEN = 0.7;
+const PAN_MAX_SECONDS = 1.6;
+const ZOOM_SECONDS_PER_LEVEL = 0.6;
+const ZOOM_MIN_SECONDS = 0.9;
+const ZOOM_MAX_SECONDS = 2.4;
+const RECENTRE_SECONDS = 1.4;
+const ROUTE_FRAME_SECONDS = 1.8;   // Ask for Directions framing the walk
+const TILE_WAIT_MAX_MS = 1500;   // never wait longer than this for tiles
 let viewMove = 0;
+
+// Run `then` once the tiles the map is showing have loaded - the active floor
+// and, when it is on, the street map - or after TILE_WAIT_MAX_MS, whichever
+// comes first. A frame's delay first: the layers start loading on the same
+// moveend that usually calls this.
+function whenMapDrawn(then) {
+  let done = false;
+  const finish = () => { if (!done) { done = true; then(); } };
+  requestAnimationFrame(() => {
+    const layers = [];
+    if (typeof floorOverlays !== 'undefined' && USE_FLOOR_TILES) {
+      const floor = floorOverlays[activeLevel];
+      if (floor && map.hasLayer(floor)) layers.push(floor);
+    }
+    if (typeof basemap !== 'undefined' && map.hasLayer(basemap)) layers.push(basemap);
+    const loading = layers.filter(l => l.isLoading && l.isLoading());
+    if (!loading.length) { finish(); return; }
+    let left = loading.length;
+    loading.forEach(l => l.once('load', () => { if (--left === 0) finish(); }));
+    setTimeout(finish, TILE_WAIT_MAX_MS);
+  });
+}
 
 // The side panels float over the full-screen map, so the part of the map that
 // can be seen is the gap between them. These are the pixels each one covers
@@ -276,7 +306,8 @@ function centreInGap(latlng, zoom) {
   return map.unproject(map.project(latlng, zoom).subtract(shift), zoom);
 }
 
-function moveView(latlng, zoom) {
+// minSeconds: the shortest the zoom may take (framing a route is given longer).
+function moveView(latlng, zoom, minSeconds = ZOOM_MIN_SECONDS) {
   map.stop();
   const move = ++viewMove;
   zoom = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), zoom));
@@ -287,7 +318,7 @@ function moveView(latlng, zoom) {
   latlng = centreInGap(latlng, zoom);
   const screens = Math.hypot(off.x / size.x, off.y / size.y);
   const zoomBy = zoom - map.getZoom();
-  const zoomSeconds = Math.max(ZOOM_MIN_SECONDS,
+  const zoomSeconds = Math.max(minSeconds,
     Math.min(ZOOM_MAX_SECONDS, Math.abs(zoomBy) * ZOOM_SECONDS_PER_LEVEL));
 
   // Pulling back, or already over the place: one move.
@@ -296,7 +327,10 @@ function moveView(latlng, zoom) {
     return;
   }
   map.once('moveend', () => {
-    if (move === viewMove) map.flyTo(latlng, zoom, { duration: zoomSeconds });
+    if (move !== viewMove) return;
+    whenMapDrawn(() => {
+      if (move === viewMove) map.flyTo(latlng, zoom, { duration: zoomSeconds });
+    });
   });
   map.panTo(latlng, {
     animate: true, easeLinearity: 0.3,
@@ -319,7 +353,7 @@ function fitZoom(bounds, options = {}) {
 
 // Where fitBounds would end up, reached by the same two steps.
 function fitView(bounds, options = {}) {
-  moveView(bounds.getCenter(), fitZoom(bounds, options));
+  moveView(bounds.getCenter(), fitZoom(bounds, options), options.minSeconds);
 }
 
 // OpenStreetMap requires visible credit wherever its tiles are shown.
@@ -422,6 +456,9 @@ const floorOverlays = USE_FLOOR_TILES
       // Mid-pinch, scale the tiles already loaded rather than fetch every level
       // passed through; the right ones load when the fingers lift.
       updateWhenZooming: false,
+      // a wider ring of loaded tiles kept around the screen, so a pan shows
+      // drawing rather than gaps while the next tiles load
+      keepBuffer: 4,
       className: 'campus-overlay'
     }))
   : FLOOR_ASSETS.map(url => new GeoImageOverlay(url, {
@@ -487,9 +524,12 @@ function overviewZoom() {
 function autoCenterCampus(animate = true) {
   // Same reason as flyToView/fitView: the recentre button is next to the floor
   // and directions controls, so it lands mid-animation as often as not.
-  if (animate) map.stop();
   const zoom = overviewZoom();
-  map.setView(centreInGap(CAMPUS_CENTER, zoom), zoom, { animate: animate });
+  const centre = centreInGap(CAMPUS_CENTER, zoom);
+  if (!animate) { map.setView(centre, zoom, { animate: false }); return; }
+  map.stop();
+  ++viewMove;
+  map.flyTo(centre, zoom, { duration: RECENTRE_SECONDS });
 }
 
 function clampZoomOut() {
@@ -1077,9 +1117,9 @@ function selectCategory(id) {
 }
 
 // ---- finding a building: zoom out, drop a pin, zoom in ----
-const REVEAL_OUT_SECONDS = 1.4;    // out to the campus
+const REVEAL_OUT_SECONDS = 1.8;    // out to the campus
 const REVEAL_PAUSE_MS = 650;       // the pin drops (style.css .find-pin)
-const REVEAL_IN_SECONDS = 2.4;     // in to the building, slowly
+const REVEAL_IN_SECONDS = 2.8;     // in to the building, slowly
 let buildingPin = null;
 
 function clearBuildingPin() {
@@ -1133,8 +1173,11 @@ function revealAt(target, inCentre, inZoom) {
   };
   const afterOut = () => {
     if (move !== viewMove) return;
-    dropPin();
-    setTimeout(zoomIn, REVEAL_PAUSE_MS);
+    whenMapDrawn(() => {
+      if (move !== viewMove) return;
+      dropPin();
+      setTimeout(zoomIn, REVEAL_PAUSE_MS);
+    });
   };
 
   // Already out at the campus view: just drop the pin and go in.
@@ -1353,6 +1396,7 @@ function clearActiveRoute() {
 // route is on the map. var and lookups inside: clearActiveRoute runs while
 // the page is still loading.
 var routeFocus = false;
+const PANEL_SLIDE_MS = 300;   // style.css .panel transition (0.25 s), and a frame
 
 function applyRouteFocus() {
   const bar = document.getElementById('route-bar');
@@ -1672,9 +1716,11 @@ function drawRoute(destination, followDestination = false, refit = true) {
     .extend(toLeafletCoords(kioskCoords))
     .extend(toLeafletCoords(destination.coords));
   if (refit) {
-    fitView(b, {
-      padding: [70, 70], maxZoom: ROUTE_MAX_ZOOM, animate: true, duration: 1
-    });
+    // 'after-panels' (Ask for Directions): let the side panels finish sliding
+    // away before the map moves, so the Pi is not doing both at once.
+    const frame = () => fitView(b, { padding: [70, 70], maxZoom: ROUTE_MAX_ZOOM, minSeconds: ROUTE_FRAME_SECONDS });
+    if (refit === 'after-panels') setTimeout(frame, PANEL_SLIDE_MS);
+    else frame();
   }
 
   // A route is now on screen — offer to take it to a phone.
@@ -1787,7 +1833,7 @@ if (basemapBtn) {
 getDirectionsBtn.addEventListener('click', () => {
   if (!activeSelectedLocation) return;
   routeFocus = true;
-  drawRoute(activeSelectedLocation, true);
+  drawRoute(activeSelectedLocation, true, 'after-panels');
 });
 
 // The red x: the route goes, the panels come back, the place stays chosen.
