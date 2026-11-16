@@ -620,16 +620,24 @@ let kioskLevel = readStoredKioskLevel();
 let isSettingKioskLocation = false;
 let kioskMarker = null;
 
-const kioskIcon = L.divIcon({
-  className: 'kiosk-custom-icon',
-  html: '<div class="kiosk-pulsing-marker" title="Current Kiosk Location"></div>',
-  iconSize: [22, 22],
-  iconAnchor: [11, 11]
-});
-
 // The pin that labels the kiosk on the map, inline so it takes the tooltip's
 // own colour the way every other icon on the panel does.
 const KIOSK_TIP_ICON = '<svg class="icon kiosk-tip-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><line x1="12" y1="21.6666" x2="12" y2="16.3333" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></line><path d="M 19 16.3333 c -0.1187 -0.932 -0.424 -2.3467 -1.292 -3.8333 -0.4467 -0.7653 -0.9373 -1.3707 -1.3747 -1.8333 V 5 c 0 -1.4733 -1.1933 -2.6667 -2.6667 -2.6667 h -3.3333 c -1.4733 0 -2.6667 1.1933 -2.6667 2.6667 v 5.6667 c -0.4387 0.4627 -0.9293 1.068 -1.3747 1.8333 -0.8667 1.4867 -1.1733 2.9013 -1.292 3.8333 H 19 Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>';
+
+// The "You Are Here (Kiosk)" label is part of the marker's own icon, drawn
+// with Leaflet's tooltip look (style.css .kiosk-label). It used to be a
+// permanent Leaflet tooltip, and Leaflet places a tooltip by reading its width
+// and height on every frame of a zoom - each read made the browser lay out the
+// whole page again, which was most of the time a camera move took on the Pi.
+// As part of the icon it simply moves with the marker.
+const kioskIcon = L.divIcon({
+  className: 'kiosk-custom-icon',
+  html: '<span class="leaflet-tooltip leaflet-tooltip-top kiosk-label"><span class="kiosk-tip">' +
+        KIOSK_TIP_ICON + '<span>You Are Here (Kiosk)</span></span></span>' +
+        '<div class="kiosk-pulsing-marker" title="Current Kiosk Location"></div>',
+  iconSize: [22, 22],
+  iconAnchor: [11, 11]
+});
 
 function renderKioskMarker() {
   const leafletPos = toLeafletCoords(kioskCoords);
@@ -637,8 +645,6 @@ function renderKioskMarker() {
     kioskMarker.setLatLng(leafletPos);
   } else {
     kioskMarker = L.marker(leafletPos, { icon: kioskIcon, zIndexOffset: 1000 });
-    kioskMarker.bindTooltip('<span class="kiosk-tip">' + KIOSK_TIP_ICON + '<span>You Are Here (Kiosk)</span></span>',
-                            { permanent: true, direction: 'top', offset: [0, -12] });
   }
   // "You are here" is only true on the floor the kiosk stands on.
   const shouldShow = activeLevel === kioskLevel;

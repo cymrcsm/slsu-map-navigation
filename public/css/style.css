@@ -1287,6 +1287,17 @@ body, html {
   border-top-color: var(--map-paper) !important;
 }
 
+/* The kiosk's "You Are Here" label, inside the kiosk marker's icon (app.js
+   kioskIcon): centred above the dot where Leaflet put it as a tooltip - its
+   arrow tip 12px above the dot's centre - at the tooltip's 0.9 opacity. */
+.kiosk-label {
+  left: 50%;
+  bottom: calc(100% + 7px);
+  margin-top: 0;
+  transform: translateX(-50%);
+  opacity: 0.9;
+}
+
 /* The kiosk's own label on the map. */
 .kiosk-tip {
   display: inline-flex;
