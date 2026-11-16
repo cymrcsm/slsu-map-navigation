@@ -669,11 +669,11 @@ body, html {
 
 /* 2. Room Details View */
 /* "Back" is the way out of every listing and place, so it is a real button:
-   navy, full width, at the top of the card. */
+   red, full width, at the top of the card - the same red as the route bar's x. */
 .back-btn {
   width: 100%;
   min-height: 50px;
-  background: var(--primary-strong);
+  background: #D93025;
   border: none;
   border-radius: 10px;
   color: var(--map-paper);
@@ -688,7 +688,7 @@ body, html {
   text-align: left;
   box-shadow: var(--card-shadow);
 }
-.back-btn:active { background: var(--primary-color); transform: scale(0.99); }
+.back-btn:active { background: var(--danger-color); transform: scale(0.99); }
 
 /* The red pin dropped on a building found from the list (app.js
    revealBuilding). It falls in once and bounces; no animation after that. */
