@@ -168,7 +168,7 @@ async function syncWithServer() {
   recountCategories();
   if (typeof refreshCategoryCounts === 'function') refreshCategoryCounts();
   if (typeof refreshBuildingOptions === 'function') refreshBuildingOptions();
-  renderMarkers(activeCategory, searchInput ? searchInput.value : '');
+  renderMarkers(activeCategory, markerQuery);
   return ok;
 }
 
@@ -868,7 +868,16 @@ PLACES.forEach(createMarker);
 
 let visibleIds = new Set(PLACES.map(l => l.id));
 
+// The search text the markers were last filtered by. Only typing filters them
+// (the search box's input handler); once a result is chosen they show its
+// building (selectBuildingOf, query ''), though the box still holds the
+// result's name. A redraw for another reason - a floor change, a server sync -
+// keeps this rather than re-reading the box, which after a search for a
+// second-floor room used to leave that one room alone on the map.
+var markerQuery = '';
+
 function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
+  markerQuery = searchQuery;
   const q = searchQuery.trim().toLowerCase();
   const matches = PLACES.filter(loc => {
     if (!inCategory(loc, selectedCategory)) return false;
@@ -903,7 +912,7 @@ function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
 // showing a choice (a building, a category, a search), so a filtered result is
 // never hidden.
 function syncMarkerVisibility(searchQuery) {
-  const q = searchQuery !== undefined ? searchQuery : (searchInput ? searchInput.value : '');
+  const q = searchQuery !== undefined ? searchQuery : markerQuery;
   const want = map.getZoom() >= MARKER_ZOOM || activeCategory !== 'ALL' || !!q.trim();
   if (want && !map.hasLayer(markerLayer)) markerLayer.addTo(map);
   else if (!want && map.hasLayer(markerLayer)) map.removeLayer(markerLayer);
@@ -2046,7 +2055,7 @@ function setActiveLevel(level, redrawRoute = true) {
   document.querySelectorAll('.floor-btn').forEach(b => {
     b.classList.toggle('active', (parseInt(b.dataset.floor, 10) - 1) === level);
   });
-  renderMarkers(activeCategory, searchInput ? searchInput.value : '');
+  renderMarkers(activeCategory, markerQuery);
   renderKioskMarker();
   // The route spans floors, so which part is drawn solid depends on this. The
   // map is left where it is: the floor changed, not the route.
