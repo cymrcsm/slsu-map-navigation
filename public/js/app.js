@@ -810,7 +810,9 @@ function createMarker(loc) {
     // The tap is read from the raw event: for a circle this small Leaflet
     // reports the circle's own centre as e.containerPoint.
     const id = markerAt(map.mouseEventToLayerPoint(e.originalEvent)) || loc.id;
-    showLocationDetails(PLACES.find(p => p.id === id) || loc, undefined, true);
+    // in, never out: if the map is already closer than the reading zoom, stay
+    const tapped = PLACES.find(p => p.id === id) || loc;
+    showLocationDetails(tapped, Math.max(map.getZoom(), readableZoom(tapped)), 'pin');
   });
   markerFor.set(loc.id, marker);
   return marker;
@@ -905,8 +907,9 @@ const buildingLabelLayer = MapMarks.addBuildingLabels(map,
 // 9. DETAIL PANEL
 // ==========================================
 
-// reveal: found from a list or search, so the map finds it the long way
-// (revealAt) rather than gliding straight over.
+// reveal: true when found from a list or search - the map finds it the long
+// way (revealAt); 'pin' for a marker tapped on the map - the red pin drops and
+// the map zooms straight in; false - it just glides over.
 function showLocationDetails(loc, flyZoom = readableZoom(loc), reveal = false) {
   activeSelectedLocation = loc;
   clearActiveRoute();
@@ -956,8 +959,18 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc), reveal = false) {
 
   showPanel(detailView);
   const at = toLeafletCoords(loc.coords);
-  if (reveal) revealAt(at, at, flyZoom);
-  else flyToView(at, flyZoom, { animate: true, duration: 0.8 });
+  if (reveal === true) revealAt(at, at, flyZoom);
+  else if (reveal === 'pin' && flyZoom - map.getZoom() <= 0.05) {
+    // tapped on the map at reading zoom or closer: slide it to the middle,
+    // no zoom at all (a fly arcs out and back even over a short hop)
+    dropFindPin(at);
+    map.stop();
+    ++viewMove;
+    map.panTo(centreInGap(at, map.getZoom()), { animate: true, duration: 0.6 });
+  } else {
+    if (reveal === 'pin') dropFindPin(at);
+    flyToView(at, flyZoom, { animate: true, duration: 0.8 });
+  }
 }
 
 // Only one of the three left-panel views is visible at a time.
@@ -1091,26 +1104,29 @@ function revealBuilding(building, bounds, fitOpts) {
   revealAt(buildingPoint(building, bounds), bounds.getCenter(), fitZoom(bounds, fitOpts));
 }
 
-// The one way the map finds something chosen - a building, a search result,
-// a recent search, a place in a building's list, a marker tapped on the map:
-// out to the campus, the red pin dropped on `target`, then slowly in to
-// `inCentre` at `inZoom`.
+// The way the map finds something chosen from a list - a building, a search
+// result, a recent search, a place in a building's list: out to the campus,
+// the red pin dropped on `target`, then slowly in to `inCentre` at
+// `inZoom`. A marker tapped on the map is already in view, so it gets the
+// red pin and a zoom straight in (showLocationDetails, reveal 'pin').
+function dropFindPin(target) {
+  clearBuildingPin();
+  buildingPin = L.marker(target, {
+    icon: L.divIcon({
+      className: 'find-pin-icon',
+      html: '<span class="find-pin">' + FIND_PIN_SVG + '</span>',
+      iconSize: [40, 54], iconAnchor: [20, 52]
+    }),
+    interactive: false, keyboard: false, zIndexOffset: 1000
+  }).addTo(map);
+}
+
 function revealAt(target, inCentre, inZoom) {
   map.stop();
   const move = ++viewMove;               // any other camera move cancels this one
   const outZoom = Math.min(overviewZoom() + 0.25, inZoom);
 
-  const dropPin = () => {
-    clearBuildingPin();
-    buildingPin = L.marker(target, {
-      icon: L.divIcon({
-        className: 'find-pin-icon',
-        html: '<span class="find-pin">' + FIND_PIN_SVG + '</span>',
-        iconSize: [40, 54], iconAnchor: [20, 52]
-      }),
-      interactive: false, keyboard: false, zIndexOffset: 1000
-    }).addTo(map);
-  };
+  const dropPin = () => dropFindPin(target);
   const zoomIn = () => {
     if (move !== viewMove) return;
     map.flyTo(centreInGap(inCentre, inZoom), inZoom, { duration: REVEAL_IN_SECONDS });
