@@ -628,19 +628,27 @@ body, html {
 }
 
 /* 2. Room Details View */
+/* "Back" is the way out of every listing and place, so it is a real button:
+   navy, full width, at the top of the card. */
 .back-btn {
-  background: transparent;
+  width: 100%;
+  min-height: 50px;
+  background: var(--primary-strong);
   border: none;
-  color: var(--primary-strong);
-  font-size: 15.5px;
-  font-weight: 600;
+  border-radius: 10px;
+  color: var(--map-paper);
+  font-size: 17px;
+  font-weight: 700;
   cursor: pointer;
-  margin-bottom: 14px;
-  padding: 0;
-  display: inline-flex;
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
+  text-align: left;
+  box-shadow: var(--card-shadow);
 }
+.back-btn:active { background: var(--primary-color); transform: scale(0.99); }
 .detail-badge {
   display: flex;
   flex-wrap: wrap;
