@@ -123,6 +123,35 @@ const MapMarks = (function () {
   const LABEL_INK = '#12294D';                      // --slsu-navy-deep
   const LABEL_HALO = 'rgba(254, 253, 249, 0.92)';   // --map-paper
   const LABEL_MAX_WIDTH = 9;                        // wrap after about this many ems
+  const GATE_COLOUR = '#3F7A4B';                    // --slsu-green, the seal's green
+  const GATE_INK = '#2C5A36';                       // the same green, darker, for text
+
+  // A gate's sign: a green disc with a white archway and two bars, drawn above
+  // its name so the ways in and out of the campus stand out from buildings.
+  function drawGateIcon(ctx, cx, cy, r) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = GATE_COLOUR;
+    ctx.fill();
+    ctx.lineWidth = Math.max(2, r * 0.16);
+    ctx.strokeStyle = LABEL_HALO;
+    ctx.stroke();
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineCap = 'round';
+    ctx.lineWidth = Math.max(1.5, r * 0.17);
+    const w = r * 0.5, top = cy - r * 0.08, foot = cy + r * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(cx - w, foot);
+    ctx.lineTo(cx - w, top);
+    ctx.arc(cx, top, w, Math.PI, 0);
+    ctx.lineTo(cx + w, foot);
+    ctx.stroke();
+    ctx.lineWidth = Math.max(1, r * 0.1);
+    ctx.beginPath();
+    [-w / 3, w / 3].forEach(dx => { ctx.moveTo(cx + dx, top - w * 0.55); ctx.lineTo(cx + dx, foot); });
+    ctx.stroke();
+    ctx.lineCap = 'butt';
+  }
 
   // 10px over the whole campus (zoom ~1.2 above GEO_ZOOM_SHIFT), 18px from ~3.5 in.
   function labelPx(map) {
@@ -167,14 +196,18 @@ const MapMarks = (function () {
       const r = this._renderer;
       if (!r._drawing || this._empty()) return;
       const ctx = r._ctx;
+      const gate = this.options.gate;
       const px = Math.round(labelPx(this._map) * this.options.scale);
       ctx.font = this.options.font.replace('{px}', px);
       const lines = wrapLabel(ctx, this.options.text, px * LABEL_MAX_WIDTH);
       const lineH = px * 1.15;
       const w = Math.max(...lines.map(l => ctx.measureText(l).width));
       const h = lineH * lines.length;
-      const p = this._point;
-      const box = [p.x - w / 2 - 4, p.y - h / 2 - 3, p.x + w / 2 + 4, p.y + h / 2 + 3];
+      // a gate's icon sits on its point and the name hangs below it
+      const iconR = gate ? px * 0.95 : 0;
+      const p = gate ? this._point.add([0, iconR + 3 + h / 2]) : this._point;
+      const top = gate ? this._point.y - iconR - 2 : p.y - h / 2 - 3;
+      const box = [p.x - Math.max(w / 2, iconR) - 4, top, p.x + Math.max(w / 2, iconR) + 4, p.y + h / 2 + 3];
       if (r._placed.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) return;
       r._placed.push(box);
 
@@ -183,12 +216,13 @@ const MapMarks = (function () {
       ctx.lineJoin = 'round';
       ctx.lineWidth = Math.max(3, px / 4);
       ctx.strokeStyle = LABEL_HALO;
-      ctx.fillStyle = LABEL_INK;
+      ctx.fillStyle = gate ? GATE_INK : LABEL_INK;
       lines.forEach((line, i) => {
         const y = p.y - h / 2 + lineH * (i + 0.5);
         ctx.strokeText(line, p.x, y);
         ctx.fillText(line, p.x, y);
       });
+      if (gate) drawGateIcon(ctx, this._point.x, this._point.y, iconR);
     },
 
     _containsPoint: function () { return false; }
