@@ -903,7 +903,9 @@ const buildingLabelLayer = MapMarks.addBuildingLabels(map,
 // 9. DETAIL PANEL
 // ==========================================
 
-function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
+// reveal: found from a list or search, so the map finds it the long way
+// (revealAt) rather than gliding straight over.
+function showLocationDetails(loc, flyZoom = readableZoom(loc), reveal = false) {
   activeSelectedLocation = loc;
   clearActiveRoute();
   clearBuildingPin();
@@ -951,7 +953,9 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc)) {
   if (typeof setActiveLevel === 'function') setActiveLevel(levelOfFloor(loc.floor), false);
 
   showPanel(detailView);
-  flyToView(toLeafletCoords(loc.coords), flyZoom, { animate: true, duration: 0.8 });
+  const at = toLeafletCoords(loc.coords);
+  if (reveal) revealAt(at, at, flyZoom);
+  else flyToView(at, flyZoom, { animate: true, duration: 0.8 });
 }
 
 // Only one of the three left-panel views is visible at a time.
@@ -963,6 +967,7 @@ function showPanel(view) {
 function showTutorialView() {
   activeSelectedLocation = null;
   clearActiveRoute();
+  clearBuildingPin();
   showPanel(activeCategory === 'ALL' ? tutorialView : categoryView);
 }
 
@@ -1026,9 +1031,9 @@ function selectCategory(id) {
       text.append(name, sub);
 
       li.append(swatch, text);
-      li.addEventListener('click', () => showLocationDetails(loc));
+      li.addEventListener('click', () => showLocationDetails(loc, undefined, true));
       li.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showLocationDetails(loc); }
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showLocationDetails(loc, undefined, true); }
       });
       categoryResults.appendChild(li);
     });
@@ -1076,10 +1081,17 @@ const FIND_PIN_SVG = '<svg viewBox="0 0 40 54" aria-hidden="true">' +
   '<circle cx="20" cy="19.5" r="6.5" fill="#B31412"/></svg>';
 
 function revealBuilding(building, bounds, fitOpts) {
+  revealAt(buildingPoint(building, bounds), bounds.getCenter(), fitZoom(bounds, fitOpts));
+}
+
+// The one way the map finds something chosen from a list - a building, a
+// search result, a recent search, a place in a building's list: out to the
+// campus, the red pin dropped on `target`, then slowly in to `inCentre` at
+// `inZoom`. Tapping a marker on the map does not use it: that place is
+// already in view.
+function revealAt(target, inCentre, inZoom) {
   map.stop();
   const move = ++viewMove;               // any other camera move cancels this one
-  const target = buildingPoint(building, bounds);
-  const inZoom = fitZoom(bounds, fitOpts);
   const outZoom = Math.min(overviewZoom() + 0.25, inZoom);
 
   const dropPin = () => {
@@ -1095,7 +1107,7 @@ function revealBuilding(building, bounds, fitOpts) {
   };
   const zoomIn = () => {
     if (move !== viewMove) return;
-    map.flyTo(centreInGap(bounds.getCenter(), inZoom), inZoom, { duration: REVEAL_IN_SECONDS });
+    map.flyTo(centreInGap(inCentre, inZoom), inZoom, { duration: REVEAL_IN_SECONDS });
   };
   const afterOut = () => {
     if (move !== viewMove) return;
@@ -1224,7 +1236,7 @@ function chooseSuggestion(index) {
   searchInput.value = loc.name;
   closeSuggestions();
   renderMarkers(activeCategory, '');
-  showLocationDetails(loc);
+  showLocationDetails(loc, undefined, true);
 }
 
 // ---- recent searches ----
