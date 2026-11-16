@@ -857,7 +857,8 @@ function markerAt(layerPoint) {
 // page: a canvas pane (z 450) above the floor drawing, routes and pins, under
 // the kiosk marker, and never in the way of a tap.
 const buildingLabelLayer = MapMarks.addBuildingLabels(map,
-  typeof BUILDING_LABELS !== 'undefined' ? BUILDING_LABELS : [], toLeafletCoords);
+  typeof BUILDING_LABELS !== 'undefined' ? BUILDING_LABELS : [], toLeafletCoords,
+  { scale: 1.25 });   // read from a step back: a size up from the phone's
 
 // ==========================================
 // 9. DETAIL PANEL

@@ -160,14 +160,14 @@ const MapMarks = (function () {
     // Generous, so a name is never culled while any of it is on screen.
     _updateBounds: function () {
       const p = this._point;
-      this._pxBounds = L.bounds(p.subtract([140, 50]), p.add([140, 50]));
+      this._pxBounds = L.bounds(p.subtract([180, 70]), p.add([180, 90]));
     },
 
     _updatePath: function () {
       const r = this._renderer;
       if (!r._drawing || this._empty()) return;
       const ctx = r._ctx;
-      const px = labelPx(this._map) - (this.options.gate ? 1 : 0);
+      const px = Math.round(labelPx(this._map) * this.options.scale);
       ctx.font = this.options.font.replace('{px}', px);
       const lines = wrapLabel(ctx, this.options.text, px * LABEL_MAX_WIDTH);
       const lineH = px * 1.15;
@@ -197,14 +197,17 @@ const MapMarks = (function () {
   // Names sit above the floor drawing and the routes and pins (pane z 450), and
   // under the page-element markers (markerPane 600, tooltipPane 650). Taps go
   // straight through to whatever is underneath, so a name never blocks a pin.
-  function addBuildingLabels(map, labels, toLatLng) {
+  // options.scale: text size relative to the default (the kiosk, read from a
+  // step back, draws them larger than the phone).
+  function addBuildingLabels(map, labels, toLatLng, options) {
+    const scale = (options && options.scale) || 1;
     map.createPane('labelPane');
     map.getPane('labelPane').style.zIndex = 450;
     map.getPane('labelPane').style.pointerEvents = 'none';
     const font = '700 {px}px ' + getComputedStyle(document.body).fontFamily;
     const renderer = new LabelCanvas({ pane: 'labelPane', padding: 0.2 });
     const layer = L.layerGroup((labels || []).map(l =>
-      new BuildingLabel(toLatLng(l.at), { renderer: renderer, text: l.text, gate: !!l.gate, font: font }))
+      new BuildingLabel(toLatLng(l.at), { renderer: renderer, text: l.text, gate: !!l.gate, font: font, scale: scale }))
     ).addTo(map);
     // The size changes with the zoom, so every name is re-measured once the
     // zoom settles (the renderer repaints on the moveend that follows).
