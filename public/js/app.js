@@ -1005,18 +1005,47 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc), reveal = false) {
 
   showPanel(detailView);
   const at = toLeafletCoords(loc.coords);
+  // Already zoomed in near the place - a room picked from the list of the
+  // building being looked at, or a search for the room next door: no trip out
+  // to the campus and back. It is found the way a tapped marker is: the pin
+  // drops and the map slides over, zooming in only if it has to, never out.
+  if (reveal === true && zoomedInNear(at)) {
+    reveal = 'pin';
+    flyZoom = Math.max(map.getZoom(), flyZoom);
+  }
   if (reveal === true) revealAt(at, at, flyZoom);
   else if (reveal === 'pin' && flyZoom - map.getZoom() <= 0.05) {
-    // tapped on the map at reading zoom or closer: slide it to the middle,
-    // no zoom at all (a fly arcs out and back even over a short hop)
+    // at reading zoom or closer: slide it to the middle, no zoom at all (a fly
+    // arcs out and back even over a short hop)
     dropFindPin(at);
     map.stop();
     ++viewMove;
-    map.panTo(centreInGap(at, map.getZoom()), { animate: true, duration: 0.6 });
+    map.panTo(centreInGap(at, map.getZoom()), {
+      animate: true, easeLinearity: 0.3,
+      duration: Math.min(PAN_MAX_SECONDS, 0.35 + screensAway(at) * PAN_SECONDS_PER_SCREEN)
+    });
   } else {
     if (reveal === 'pin') dropFindPin(at);
     flyToView(at, flyZoom, { animate: true, duration: 0.8 });
   }
+}
+
+// How far `latlng` is from the middle of the gap between the panels, in
+// screens (1 = a screen's width or height).
+function screensAway(latlng) {
+  const ins = mapInsets();
+  const size = map.getSize();
+  const mid = L.point((ins.left + size.x - ins.right) / 2, size.y / 2);
+  const off = map.latLngToContainerPoint(latlng).subtract(mid);
+  return Math.hypot(off.x / size.x, off.y / size.y);
+}
+
+// Zoomed in to pin level, and `latlng` no more than a screen and a half away -
+// near enough to slide over at this zoom. Further off, the long way (out to the
+// campus and in again) shows where it is better than a long blur of a pan.
+const NEAR_SCREENS = 1.5;
+function zoomedInNear(latlng) {
+  return map.getZoom() >= PIN_ZOOM && screensAway(latlng) <= NEAR_SCREENS;
 }
 
 // Only one of the three left-panel views is visible at a time.
