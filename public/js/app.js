@@ -258,6 +258,8 @@ let viewMove = 0;
 // (offsetLeft/offsetWidth ignore the slide-aside transform: the gap is where
 // the panels come back to).
 function mapInsets() {
+  // a route shown on its own has the whole screen (routeFocus, section 11)
+  if (typeof routeFocus !== 'undefined' && routeFocus && activeRouteLayers.length) return { left: 0, right: 0 };
   const left = document.querySelector('.panel-left');
   const right = document.querySelector('.panel-right');
   const w = map.getSize().x;
@@ -1323,6 +1325,27 @@ function clearActiveRoute() {
   if (sendToPhoneBtn) sendToPhoneBtn.hidden = true;
   const summary = document.getElementById('route-summary');
   if (summary) summary.hidden = true;
+  applyRouteFocus();
+}
+
+// ---- the route on its own ----
+// "Ask for Directions" sends both side panels aside so the map shows only the
+// route; the bar at the bottom (index.html #route-bar) carries the walking
+// time, the phone hand-off and a red x. The x clears the route and the panels
+// come back. Anything else that ends the route (another place, a building,
+// the idle reset) brings them back too, since the panels follow whether a
+// route is on the map. var and lookups inside: clearActiveRoute runs while
+// the page is still loading.
+var routeFocus = false;
+
+function applyRouteFocus() {
+  const bar = document.getElementById('route-bar');
+  const on = routeFocus && activeRouteLayers.length > 0;
+  document.querySelector('.kiosk-app').classList.toggle('route-focus', on);
+  if (!bar) return;
+  bar.hidden = !on;
+  const phone = document.getElementById('route-bar-phone');
+  if (phone) phone.hidden = !sendToPhoneBtn || sendToPhoneBtn.hidden;
 }
 
 function routeLengthUnits(points) {
@@ -1640,6 +1663,7 @@ function drawRoute(destination, followDestination = false, refit = true) {
 
   // A route is now on screen — offer to take it to a phone.
   if (sendToPhoneBtn) sendToPhoneBtn.hidden = false;
+  applyRouteFocus();
 }
 
 // ---- Walking time, as a map app shows it ----
@@ -1680,6 +1704,10 @@ function showRouteSummary(destination, runs, metres, minutes, endGap) {
   }
   document.getElementById('route-via').textContent = via;
   routeSummary.hidden = false;
+  // the same, in the bar shown while the panels are aside
+  document.getElementById('route-bar-min').textContent = minutes + ' min';
+  document.getElementById('route-bar-dist').textContent = '(' + metres + ' m)';
+  document.getElementById('route-bar-via').textContent = via;
 }
 
 // The floor buttons' own labels (index.html), for "Tap 3F to see the rest".
@@ -1741,7 +1769,19 @@ if (basemapBtn) {
 }
 
 getDirectionsBtn.addEventListener('click', () => {
-  if (activeSelectedLocation) drawRoute(activeSelectedLocation, true);
+  if (!activeSelectedLocation) return;
+  routeFocus = true;
+  drawRoute(activeSelectedLocation, true);
+});
+
+// The red x: the route goes, the panels come back, the place stays chosen.
+document.getElementById('route-bar-close').addEventListener('click', () => {
+  routeFocus = false;
+  clearActiveRoute();
+});
+// The bar's phone button is the panel's, pressed from here (handoff.js).
+document.getElementById('route-bar-phone').addEventListener('click', () => {
+  if (sendToPhoneBtn) sendToPhoneBtn.click();
 });
 
 setKioskBtn.addEventListener('click', () => {

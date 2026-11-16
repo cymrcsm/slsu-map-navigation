@@ -159,9 +159,14 @@ body, html {
   padding: 18px 0 14px;
 }
 
-.kiosk-app.panels-aside .panel { opacity: 0; pointer-events: none; }
-.kiosk-app.panels-aside .panel-left  { transform: translateX(calc(-100% - var(--panel-gap))); }
-.kiosk-app.panels-aside .panel-right { transform: translateX(calc(100% + var(--panel-gap))); }
+/* .route-focus: a route is being shown on its own (app.js routeFocus); the
+   panels stay aside until the route bar's x is pressed. */
+.kiosk-app.panels-aside .panel,
+.kiosk-app.route-focus .panel { opacity: 0; pointer-events: none; }
+.kiosk-app.panels-aside .panel-left,
+.kiosk-app.route-focus .panel-left  { transform: translateX(calc(-100% - var(--panel-gap))); }
+.kiosk-app.panels-aside .panel-right,
+.kiosk-app.route-focus .panel-right { transform: translateX(calc(100% + var(--panel-gap))); }
 
 .panel-section-label {
   font-size: 13px;
@@ -1316,6 +1321,77 @@ body, html {
   height: 15px;
   color: var(--primary-color);
 }
+
+/* The bar under a route shown on its own: time, phone, and the red x. */
+.route-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: calc(100vw - 48px);
+  padding: 12px 14px 12px 20px;
+  background: var(--map-paper);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  box-shadow: var(--card-shadow-hover);
+}
+.route-bar[hidden] { display: none; }
+/* With the panels away, the OpenStreetMap credit moves to the screen's edge,
+   clear of the bar; the inspector line repeats the bar, so it goes. */
+.kiosk-app.route-focus .leaflet-bottom.leaflet-left { left: 0; }
+.kiosk-app.route-focus #coord-inspector { display: none; }
+.route-bar-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--route-line);
+  color: #FFFFFF;
+}
+.route-bar-icon svg { width: 26px; height: 26px; }
+.route-bar-text { min-width: 0; max-width: 520px; }
+.route-bar-time { font-size: 18px; color: var(--text-dark); }
+.route-bar-time strong { font-size: 24px; color: var(--route-line); }
+.route-bar-via { margin-top: 2px; font-size: 15px; line-height: 1.35; color: var(--text-muted); }
+.route-bar-phone {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--surface-card);
+  color: var(--text-dark);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.route-bar-phone[hidden] { display: none; }
+.route-bar-phone .icon { width: 22px; height: 22px; }
+.route-bar-phone:active { background: var(--surface-hover); }
+.route-bar-close {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  border: 3px solid #FFFFFF;
+  border-radius: 50%;
+  background: #D93025;
+  color: #FFFFFF;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(150, 38, 31, 0.35);
+}
+.route-bar-close svg { width: 28px; height: 28px; }
+.route-bar-close:active { background: var(--danger-color); transform: scale(0.96); }
 
 #coord-inspector {
   position: absolute;
