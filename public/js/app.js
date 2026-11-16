@@ -1534,12 +1534,15 @@ function drawRoute(destination, followDestination = false, refit = true) {
   clearActiveRoute();
 
   const destLevel = levelOfFloor(destination.floor);
-  // Asking for directions moves to the floor the room is on, because that is
-  // the part the user came for. Redraws that were triggered by the user picking
-  // a floor pass false, so their choice stands. Passing false to setActiveLevel
-  // stops it from calling straight back into drawRoute.
-  if (followDestination && destLevel !== activeLevel) {
-    setActiveLevel(destLevel, false);
+  // Asking for directions shows the floor the walk starts on - the kiosk's -
+  // because that is the part to follow first; the card then says which floor
+  // button shows the rest, as a map app gives directions step by step. (The
+  // red pin still marks the room, on whatever floor is showing.) Redraws that
+  // were triggered by the user picking a floor pass false, so their choice
+  // stands. Passing false to setActiveLevel stops it from calling straight
+  // back into drawRoute.
+  if (followDestination && kioskLevel !== activeLevel) {
+    setActiveLevel(kioskLevel, false);
   }
   const path = findWalkingPath(kioskCoords, destination.coords, kioskLevel, destLevel);
 
@@ -1548,18 +1551,15 @@ function drawRoute(destination, followDestination = false, refit = true) {
     return;
   }
 
-  // A route across floors is two separate walks joined by a stair. Draw the run
-  // the user is looking at solid and the rest faint, so the floor on screen is
-  // always the one being explained. Weight and dash stay tied to the room's own
-  // floor instead, so the leg that actually arrives stays recognisable as the
-  // answer while the user looks over the floors below it.
-  // The arriving leg is drawn the way a map app draws a route: a solid blue
-  // line on a white edge, so it stands out over the dark roads and the pale
-  // floors alike. The other floors' legs stay thin and dashed.
+  // A route across floors is two separate walks joined by a stair. The run on
+  // the floor on screen is drawn the way a map app draws a route - a solid
+  // blue line on a white edge, so it stands out over the dark roads and the
+  // pale floors alike - and the other floors' runs thin, dashed and faint, so
+  // the floor on screen is always the one being explained.
   const runs = splitByLevel(path);
   runs.forEach(run => {
     if (run.pts.length < 2) return;
-    const arrival = run.level === destLevel;
+    const arrival = run.level === activeLevel;   // the one to follow now
     const opacity = routeRunOpacity(run.level, activeLevel);
     const pts = run.pts.map(toLeafletCoords);
     if (arrival) {
@@ -1608,7 +1608,7 @@ function drawRoute(destination, followDestination = false, refit = true) {
   const storeys = routeStoreys(runs);
   const minutes = walkMinutes(metres, storeys);
   showRouteSummary(destination, runs, metres, minutes, endGap);
-  addEtaBubble(runs, destLevel, minutes);
+  addEtaBubble(runs, activeLevel, minutes);
 
   const changes = runs.length - 1;
   let note = destination.name + ' — about ' + metres + ' m on foot';
@@ -1670,6 +1670,10 @@ function showRouteSummary(destination, runs, metres, minutes, endGap) {
     const last = runs[runs.length - 1];
     via += ', stairs ' + (last.level > runs[0].level ? 'up' : 'down') + ' to the ' +
            (LEVELS[last.level] || 'next floor');
+    // which floor button to press next: the room's, unless it is the one shown
+    const next = activeLevel !== last.level ? last.level : runs[0].level;
+    via += '. Tap ' + (FLOOR_BUTTON_LABELS[next] || LEVELS[next]) + ' to see ' +
+           (next === last.level ? 'the rest' : 'the start');
   }
   if (endGap > OFFPATH_LIMIT) {
     via += '. The drawn path ends ' + Math.round(endGap * GEOREF.metresPerUnit) + ' m from it';
@@ -1678,7 +1682,11 @@ function showRouteSummary(destination, runs, metres, minutes, endGap) {
   routeSummary.hidden = false;
 }
 
-// The "3 min" label on the route itself, halfway along the leg that arrives.
+// The floor buttons' own labels (index.html), for "Tap 3F to see the rest".
+const FLOOR_BUTTON_LABELS = ['GF', '2F', '3F'];
+
+// The "3 min" label on the route itself, halfway along the run on the floor
+// on screen.
 // One small element, placed once per drawing; it moves with the map.
 const WALK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg>';
 
