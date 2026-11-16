@@ -421,8 +421,8 @@ body, html {
 }
 
 .ctrl-btn .icon {
-  width: 19px;
-  height: 19px;
+  width: 24px;
+  height: 24px;
 }
 
 .search-input-wrapper input {
@@ -1007,34 +1007,40 @@ body, html {
   background-color: var(--bg-color) !important;
 }
 
+/* One row along the top of the map, centred between the panels: street map,
+   floors, zoom, recentre. */
 .map-controls {
   position: absolute;
-  bottom: 22px;
-  right: 4px;
+  top: var(--panel-gap);
+  left: 0;
+  right: 0;
   z-index: 1000;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  pointer-events: none;
 }
 
 .ctrl-group {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   background: var(--map-paper);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: var(--card-shadow-hover);
   border: 1px solid var(--border-subtle);
+  pointer-events: auto;
 }
 
 .ctrl-group .ctrl-btn + .ctrl-btn {
-  border-top: 1px solid var(--border-subtle);
+  border-left: 1px solid var(--border-subtle);
 }
 
 .ctrl-btn {
-  width: 42px;
-  height: 40px;
+  width: 56px;
+  height: 52px;
   background: transparent;
   border: none;
   color: var(--text-dark);
@@ -1562,11 +1568,11 @@ body, html {
 
 /* "Cancel changes", floating over the map while the admin panel has stepped
    aside for a task - placing the kiosk, moving a pin, filling the add form.
-   Top centre, clear of the control strip on the right, the inspector at the
+   Top centre, under the control row, the inspector at the
    bottom left, and a docked keyboard at the bottom. */
 .admin-cancel-float {
   position: absolute;
-  top: 14px;
+  top: 84px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1001;
