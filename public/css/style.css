@@ -1112,6 +1112,14 @@ body, html {
   cursor: not-allowed;
 }
 
+/* Auto centre: the seal's green, so the way back to the whole campus is the
+   one button that stands out in the row. Darker under the finger. */
+#recenter-map-btn {
+  background: var(--slsu-green);
+  color: var(--map-paper);
+}
+#recenter-map-btn:active { background: #2C5A36; }
+
 .leaflet-bottom.leaflet-left { left: calc(var(--panel-left-w) + 2 * var(--panel-gap)); }
 
 .leaflet-control-attribution {
