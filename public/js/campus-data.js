@@ -11,7 +11,7 @@
 //   LOCATIONS   id, name, acronym, building, categories, floor, hours, coords,
 //               textH (label height hint), description
 //
-// 372 locations (2nd Floor: 112, 3rd Floor: 2, Ground Floor: 258),
+// 376 locations (2nd Floor: 112, 3rd Floor: 6, Ground Floor: 258),
 // 16 categories.
 const CATEGORIES = [
   {
@@ -1967,6 +1967,22 @@ const LOCATIONS = [
   "description": "Records, storage and supply area maintained by the university."
  },
  {
+  "id": "electrical-room-2",
+  "name": "Electrical Room",
+  "acronym": "ER",
+  "building": "Research, Innovation, and Extension Services Building",
+  "categories": [
+   "stock-archives"
+  ],
+  "floor": "3rd Floor",
+  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "coords": [
+   167.9,
+   343
+  ],
+  "description": "Records, storage and supply area maintained by the university."
+ },
+ {
   "id": "elt-102",
   "name": "ELT-102",
   "acronym": "ELT-102",
@@ -2581,6 +2597,54 @@ const LOCATIONS = [
   ],
   "textH": 0.57,
   "description": "Security post, campus gate or military training headquarters."
+ },
+ {
+  "id": "guest-room-301",
+  "name": "Guest Room-301",
+  "acronym": "GR-301",
+  "building": "Research, Innovation, and Extension Services Building",
+  "categories": [
+   "lodging"
+  ],
+  "floor": "3rd Floor",
+  "hours": "Open daily",
+  "coords": [
+   171,
+   344.1
+  ],
+  "description": "Residential or guest lodging facility."
+ },
+ {
+  "id": "guest-room-302",
+  "name": "Guest Room-302",
+  "acronym": "GR-302",
+  "building": "Research, Innovation, and Extension Services Building",
+  "categories": [
+   "lodging"
+  ],
+  "floor": "3rd Floor",
+  "hours": "Open daily",
+  "coords": [
+   175.5,
+   344
+  ],
+  "description": "Residential or guest lodging facility."
+ },
+ {
+  "id": "guest-room-303",
+  "name": "Guest Room-303",
+  "acronym": "GR-303",
+  "building": "Research, Innovation, and Extension Services Building",
+  "categories": [
+   "lodging"
+  ],
+  "floor": "3rd Floor",
+  "hours": "Open daily",
+  "coords": [
+   179.7,
+   344
+  ],
+  "description": "Residential or guest lodging facility."
  },
  {
   "id": "guidance-and-counseling-office",
