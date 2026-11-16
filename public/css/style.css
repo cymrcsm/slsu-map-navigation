@@ -546,6 +546,41 @@ body, html {
   padding: 0 1px;
 }
 
+/* Recent searches (app.js renderHistory): shown in the same list when the
+   search box is tapped while empty. */
+.history-head {
+  padding: 8px 10px 4px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+.suggestion.history-row { align-items: center; }
+.history-row .suggestion-text { flex: 1; }
+.history-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+/* Big enough for a finger, though it looks like a small x. */
+.history-remove {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: -6px -6px -6px 0;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.history-remove svg { width: 20px; height: 20px; }
+.history-remove:active { background: var(--surface-hover); color: var(--danger-color); }
+
 .suggestion-empty {
   padding: 10px;
   font-size: 15px;

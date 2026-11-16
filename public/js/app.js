@@ -1171,15 +1171,17 @@ function renderSuggestions(query) {
 
   if (!suggestions.length) {
     if (q) {
+      showingHistory = false;
       suggestionList.innerHTML = '<li class="suggestion-empty">No match for “' + escapeHtml(query.trim()) + '”</li>';
       suggestionList.classList.remove('hidden');
       searchInput.setAttribute('aria-expanded', 'true');
     } else {
-      closeSuggestions();
+      renderHistory();
     }
     return;
   }
 
+  showingHistory = false;
   suggestionList.innerHTML = suggestions.map((loc, i) => {
     const color = locationColor(loc);
     const sub = loc.acronym && !loc.name.includes(loc.acronym)
@@ -1198,6 +1200,7 @@ function renderSuggestions(query) {
 }
 
 function closeSuggestions() {
+  showingHistory = false;
   suggestionList.classList.add('hidden');
   suggestionList.innerHTML = '';
   suggestions = [];
@@ -1217,10 +1220,62 @@ function highlightSuggestion(index) {
 function chooseSuggestion(index) {
   const loc = suggestions[index];
   if (!loc) return;
+  rememberSearch(loc);
   searchInput.value = loc.name;
   closeSuggestions();
   renderMarkers(activeCategory, '');
   showLocationDetails(loc);
+}
+
+// ---- recent searches ----
+// Like a map app's search box: tapped while empty, it lists the places found
+// by search lately, newest first, each with an x to forget it. Kept in this
+// page only, not on the server, and cleared when the kiosk resets after two
+// idle minutes (screensaver.js), so the next visitor does not see the last
+// one's searches.
+const SEARCH_HISTORY_MAX = 6;
+let searchHistory = [];          // place ids, newest first
+let showingHistory = false;
+
+const HISTORY_ICON = '<svg class="history-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+  '<circle cx="12" cy="12" r="9.25" stroke="currentColor" stroke-width="1.6"/>' +
+  '<path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const REMOVE_ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+  '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+function rememberSearch(loc) {
+  searchHistory = [loc.id].concat(searchHistory.filter(id => id !== loc.id)).slice(0, SEARCH_HISTORY_MAX);
+}
+
+function forgetSearch(id) {
+  searchHistory = searchHistory.filter(h => h !== id);
+  renderHistory();
+}
+
+function clearSearchHistory() {
+  searchHistory = [];
+  if (showingHistory) closeSuggestions();
+}
+
+function renderHistory() {
+  const locs = searchHistory.map(id => PLACES.find(l => l.id === id)).filter(Boolean);
+  if (!locs.length) { closeSuggestions(); return; }
+  suggestions = locs;
+  activeSuggestion = -1;
+  showingHistory = true;
+  suggestionList.innerHTML = '<li class="history-head" aria-hidden="true">Recent searches</li>' +
+    locs.map((loc, i) =>
+      '<li class="suggestion history-row" role="option" id="sug-' + i + '" data-index="' + i + '">' +
+        HISTORY_ICON +
+        '<span class="suggestion-text">' +
+          '<strong>' + escapeHtml(loc.name) + '</strong>' +
+          '<small>' + escapeHtml(buildingText(loc)) + '</small>' +
+        '</span>' +
+        '<button type="button" class="history-remove" data-id="' + escapeHtml(loc.id) + '"' +
+          ' aria-label="Remove ' + escapeHtml(loc.name) + ' from recent searches">' + REMOVE_ICON + '</button>' +
+      '</li>').join('');
+  suggestionList.classList.remove('hidden');
+  searchInput.setAttribute('aria-expanded', 'true');
 }
 
 // ==========================================
@@ -1733,6 +1788,7 @@ searchInput.addEventListener('input', (e) => {
 
 searchInput.addEventListener('focus', () => {
   if (searchInput.value.trim()) renderSuggestions(searchInput.value);
+  else renderHistory();
 });
 
 searchInput.addEventListener('keydown', (e) => {
@@ -1752,6 +1808,14 @@ searchInput.addEventListener('keydown', (e) => {
 });
 
 suggestionList.addEventListener('mousedown', (e) => {
+  // the x on a recent search forgets it and leaves the list open
+  const rm = e.target.closest('.history-remove');
+  if (rm) {
+    e.preventDefault();
+    e.stopPropagation();
+    forgetSearch(rm.dataset.id);
+    return;
+  }
   const li = e.target.closest('.suggestion');
   if (!li) return;
   e.preventDefault();                       // keep focus, avoid the blur race
@@ -1759,7 +1823,7 @@ suggestionList.addEventListener('mousedown', (e) => {
 });
 
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.search-box')) closeSuggestions();
+  if (e.target.isConnected && !e.target.closest('.search-box')) closeSuggestions();
 });
 
 clearSearchBtn.addEventListener('click', () => {
@@ -1767,6 +1831,7 @@ clearSearchBtn.addEventListener('click', () => {
   closeSuggestions();
   renderMarkers(activeCategory, '');
   searchInput.focus();
+  renderHistory();
 });
 
 // Map Controls
