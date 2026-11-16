@@ -87,6 +87,18 @@ app.get('/connecttest.txt', (req, res) => res.type('text/plain').send('Microsoft
 app.get(['/hotspot-detect.html', '/library/test/success.html'], (req, res) =>         // Apple
   res.type('html').send('<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>'));
 
+// Map tiles and the vendored libraries do not change between deploys, so the
+// browser may keep them instead of asking again (max-age=0, express's default,
+// made every tile scrolled back into view a request the Pi had to answer).
+// The kiosk browser's cache is in RAM and is emptied whenever the browser
+// restarts (deploy/kiosk-browser.sh), so rebuilt floor tiles still show after
+// a deploy; they get a day all the same, the street map and libraries a month.
+const keep = (dir, maxAge) =>
+  app.use('/' + dir, express.static(path.join(__dirname, 'public', dir), { maxAge }));
+keep('tiles', '30d');
+keep('vendor', '30d');
+keep('floor-tiles', '1d');
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const route = handler => (req, res) => {
@@ -300,7 +312,9 @@ app.get('/go/:slug', (req, res) => {
 // Floor tiles that would be fully transparent are never written
 // (tools/build-floor-tiles.mjs), so asking for one is a plain 404 rather
 // than the app page; the kiosk draws nothing there.
-app.use('/floor-tiles', (req, res) => res.status(404).end());
+// Cached like the tiles themselves, so the browser does not ask again for the
+// same empty square each time it scrolls back into view.
+app.use('/floor-tiles', (req, res) => res.set('Cache-Control', 'public, max-age=86400').status(404).end());
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
