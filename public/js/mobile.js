@@ -39,7 +39,6 @@ const STAIR_MIN_PER_STOREY = 0.25;
 // and the kiosk's colour for a location with no category.
 const ME_COLOUR = '#3E7CB1';          // --slsu-sky
 const BEELINE_COLOUR = '#B0691E';     // --warm-amber
-const UNCATEGORISED_COLOUR = '#7C736A';   // UNCATEGORISED_COLOR in app.js
 const SNAP_LIMIT = 12;     // pull the live dot onto a walkway within this
 // Farther than this from every line of an upper floor, the walker is not on
 // it. The corridors drawn for a floor run through the whole of each building
@@ -150,7 +149,6 @@ function showFloor(level) {
   if (overlay) map.removeLayer(overlay);
   overlay = next;
   overlay.addTo(map);
-  paintPlaces();
   paintFloorButtons();
   applyFloorVisibility();
   applyRouteEmphasis();
@@ -244,13 +242,6 @@ function resolveDestination(id) {
   return base ? Object.assign({}, base) : null;
 }
 
-// The pin's colour is the destination's category colour, the same rule the
-// kiosk map draws it by, so the room is marked alike on both screens.
-function destColour() {
-  const id = dest.categories && dest.categories[0];
-  const cat = id && CATEGORIES.find(c => c.id === id);
-  return cat && cat.color ? cat.color : UNCATEGORISED_COLOUR;
-}
 const dest = resolveDestination(slug);
 
 if (!dest) {
@@ -259,72 +250,11 @@ if (!dest) {
   throw new Error('unknown slug: ' + slug);
 }
 
-// --- the kiosk's map marks: every place, and the building names ---------
-// Drawn by MapMarks (map-marks.js), the same code the kiosk draws them with:
-// a dot in the place's category colour, a pin from PIN_ZOOM in, hidden
-// below MARKER_ZOOM where the building names say more. Only the places on
-// the floor on screen are drawn. A tap names the place.
-const PIN_ZOOM = 2.4 + GEO_ZOOM_SHIFT;      // = PIN_ZOOM in app.js
-const MARKER_ZOOM = 1.9 + GEO_ZOOM_SHIFT;   // = MARKER_ZOOM in app.js
-
+// --- the building names --------------------------------------------------
+// Drawn by MapMarks (map-marks.js), as on the kiosk. The other places are not
+// drawn: this page is one route handed off from the kiosk, so the map shows
+// only where the walker is going (the red pin), the kiosk and the walker.
 MapMarks.addBuildingLabels(map, typeof BUILDING_LABELS !== 'undefined' ? BUILDING_LABELS : [], svgToLatLng);
-
-// var, not const: showFloor() may ask for a repaint before this line has run.
-var placeLayer = L.layerGroup();
-var placeRenderer = L.canvas({ padding: 0.2, tolerance: 0 });
-
-function placeColour(loc) {
-  const id = loc.categories && loc.categories[0];
-  const cat = id && CATEGORIES.find(c => c.id === id);
-  return cat && cat.color ? cat.color : UNCATEGORISED_COLOUR;
-}
-
-function paintPlaces() {
-  if (!placeLayer) return;
-  placeLayer.clearLayers();
-  LOCATIONS
-    .filter(l => l.id !== dest.id && Array.isArray(l.coords) &&
-                 WalkRouting.levelOfFloor(l.floor) === shownFloor)
-    // northernmost first, so a pin lower on screen is painted over the one above
-    .sort((a, b) => a.coords[1] - b.coords[1])
-    .forEach(l => {
-      const m = MapMarks.placeMarker(svgToLatLng(l.coords), placeColour(l), placeRenderer, PIN_ZOOM);
-      m.place = l;
-      m.on('click', e => nameNearestPlace(e));
-      placeLayer.addLayer(m);
-    });
-  syncPlaces();
-}
-
-function syncPlaces() {
-  const want = map.getZoom() >= MARKER_ZOOM;
-  if (want && !map.hasLayer(placeLayer)) placeLayer.addTo(map);
-  else if (!want && map.hasLayer(placeLayer)) map.removeLayer(placeLayer);
-}
-map.on('zoomend', syncPlaces);
-map.on('click', () => map.closePopup());
-MapMarks.redrawOnPinZoom(map, placeLayer, PIN_ZOOM);
-
-// Where marks overlap, the one nearest the finger is named (as the kiosk's
-// markerAt() does).
-function nameNearestPlace(e) {
-  const at = map.mouseEventToLayerPoint(e.originalEvent);
-  let best = null, bestD = Infinity;
-  placeLayer.eachLayer(m => {
-    if (!m._point) return;
-    const d = m._aim().distanceTo(at);
-    if (d < bestD) { bestD = d; best = m; }
-  });
-  if (!best) return;
-  const l = best.place;
-  // closeOnClick off: the map sees the same tap as a click of its own and
-  // would close the name as soon as it opened. A tap on the map closes it.
-  L.popup({ closeButton: false, autoPan: false, closeOnClick: false, offset: [0, best._map.getZoom() >= PIN_ZOOM ? -24 : -4] })
-    .setLatLng(best.getLatLng())
-    .setContent('<strong>' + esc(l.name) + '</strong><br><span class="pop-sub">' +
-                esc(buildingText(l.building)) + ' · ' + esc(l.floor) + '</span>')
-    .openOn(map);
-}
 
 let destLevel = 0;
 // Marker artwork, inlined rather than fetched: this page is opened on a phone
@@ -380,10 +310,10 @@ function render() {
     (dest.description ? '<div>' + esc(dest.description) + '</div>' : '');
 
   if (destMarker) map.removeLayer(destMarker);
-  // The kiosk's pin in the room's category colour, a size up from the rest
-  // so the destination stands out among them. Its tip (30/32 down) is on the room.
+  // The red pin the kiosk drops on a place it finds (MapMarks.FIND_PIN_SVG),
+  // so the destination is marked alike on both screens. Its tip is on the room.
   destMarker = L.marker(svgToLatLng(dest.coords), {
-    icon: L.divIcon({ className: '', html: '<div class="dest-pin">' + MapMarks.pinSvg(destColour()) + '</div>', iconSize: [36, 48], iconAnchor: [18, 45] }),
+    icon: L.divIcon({ className: '', html: '<div class="dest-pin">' + MapMarks.FIND_PIN_SVG + '</div>', iconSize: [40, 54], iconAnchor: [20, 52] }),
     zIndexOffset: 1000
   }).addTo(map).bindTooltip(dest.name, { direction: 'top', offset: [0, -42] });
 

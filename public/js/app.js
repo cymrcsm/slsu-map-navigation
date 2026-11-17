@@ -1184,10 +1184,9 @@ function buildingPoint(building, fallbackBounds) {
   return label ? toLeafletCoords(label.at) : fallbackBounds.getCenter();
 }
 
-// The red map pin, as map apps mark a place found.
-const FIND_PIN_SVG = '<svg viewBox="0 0 40 54" aria-hidden="true">' +
-  '<path d="M20 1.5C9.8 1.5 1.5 9.6 1.5 19.7c0 13.4 15.6 29.6 17.3 31.4a1.7 1.7 0 0 0 2.4 0C22.9 49.3 38.5 33.1 38.5 19.7 38.5 9.6 30.2 1.5 20 1.5Z" fill="#EA4335" stroke="#B31412" stroke-width="1.5"/>' +
-  '<circle cx="20" cy="19.5" r="6.5" fill="#B31412"/></svg>';
+// The red map pin, as map apps mark a place found (map-marks.js: the phone
+// marks its destination with the same pin).
+const FIND_PIN_SVG = MapMarks.FIND_PIN_SVG;
 
 function revealBuilding(building, bounds, fitOpts) {
   revealAt(buildingPoint(building, bounds), bounds.getCenter(), fitZoom(bounds, fitOpts));

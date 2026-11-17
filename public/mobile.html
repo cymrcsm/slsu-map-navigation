@@ -103,13 +103,19 @@
     }
     .leaflet-tooltip-top:before { border-top-color:var(--map-paper); }
 
-    /* The markers as the kiosk draws them. Places and building names are
-       canvas (js/map-marks.js); these three are page elements. The
-       destination is the kiosk's pin in its category colour, a size up; the
-       kiosk is the kiosk's own navy "you are here" dot (.kiosk-pulsing-marker
-       in style.css); the walker is the same dot in the seal's sky blue. */
-    .dest-pin { display:block; width:36px; height:48px; filter:drop-shadow(0 2px 3px rgba(51,51,51,.35)); }
+    /* The marks as the kiosk draws them. Building names are canvas
+       (js/map-marks.js); these three are page elements. The destination is the
+       kiosk's red pin (.find-pin in style.css), dropped in once; the kiosk is
+       the kiosk's own navy "you are here" dot (.kiosk-pulsing-marker in
+       style.css); the walker is the same dot in the seal's sky blue. No other
+       places are drawn: the page is about one route. */
+    .dest-pin { display:block; width:40px; height:54px; filter:drop-shadow(0 3px 3px rgba(51,51,51,.35));
+                transform-origin:50% 100%; animation:dest-pin-drop .6s cubic-bezier(.3,.8,.4,1) both; }
     .dest-pin svg { width:100%; height:100%; display:block; }
+    @keyframes dest-pin-drop {
+      0% { transform:translateY(-70px); opacity:0; } 55% { transform:translateY(0); opacity:1; }
+      75% { transform:translateY(-9px); } 100% { transform:translateY(0); }
+    }
     .kiosk-dot, .me-dot {
       position:relative; width:20px; height:20px; border-radius:50%;
       border:3px solid var(--map-paper); box-shadow:0 0 10px rgba(18,41,77,.35);
@@ -124,12 +130,6 @@
     @keyframes pulse-ring { 0% { transform:scale(.6); opacity:1; } 100% { transform:scale(1.8); opacity:0; } }
     .kiosk-tip { display:inline-flex; align-items:center; gap:6px; }
     .kiosk-tip svg { width:15px; height:15px; color:var(--slsu-navy); }
-
-    /* A tapped place's name, in the tooltip's paper style. */
-    .leaflet-popup-content-wrapper { background:var(--map-paper); border-radius:10px; box-shadow:var(--card-shadow-hover); }
-    .leaflet-popup-content { margin:8px 12px; font-size:13px; line-height:1.35; color:var(--slsu-ink); }
-    .leaflet-popup-tip { background:var(--map-paper); }
-    .pop-sub { color:var(--text-muted); font-size:12px; }
 
     /* "Which floor are you on?" - the public copy asks this before it draws
        the route, because the route starts on that floor and the phone cannot

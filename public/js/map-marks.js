@@ -249,5 +249,13 @@ const MapMarks = (function () {
     return layer;
   }
 
-  return { placeMarker, redrawOnPinZoom, pinSvg, addBuildingLabels, MARK_EDGE };
+  // The red map pin, as map apps mark a place found: the kiosk drops it on what
+  // was chosen (app.js dropFindPin) and the phone marks its destination with
+  // it, so the place is marked alike on both screens. Draw it 40x54, tip at
+  // (20, 52); style.css .find-pin and mobile.html .dest-pin drop it in once.
+  const FIND_PIN_SVG = '<svg viewBox="0 0 40 54" aria-hidden="true">' +
+    '<path d="M20 1.5C9.8 1.5 1.5 9.6 1.5 19.7c0 13.4 15.6 29.6 17.3 31.4a1.7 1.7 0 0 0 2.4 0C22.9 49.3 38.5 33.1 38.5 19.7 38.5 9.6 30.2 1.5 20 1.5Z" fill="#EA4335" stroke="#B31412" stroke-width="1.5"/>' +
+    '<circle cx="20" cy="19.5" r="6.5" fill="#B31412"/></svg>';
+
+  return { placeMarker, redrawOnPinZoom, pinSvg, addBuildingLabels, MARK_EDGE, FIND_PIN_SVG };
 })();
