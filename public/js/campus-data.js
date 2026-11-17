@@ -21,82 +21,82 @@ const CATEGORIES = [
   {
     "id": "admin-offices",
     "name": "Administrative & Management Offices",
-    "color": "#8A6A45"
+    "color": "#133A5E"
   },
   {
     "id": "academic-departments",
     "name": "Academic Departments & College Deans",
-    "color": "#4E6B7C"
+    "color": "#462997"
   },
   {
     "id": "faculty-rooms",
     "name": "Faculty Rooms & Consultation Desks",
-    "color": "#5E7F8C"
+    "color": "#5A6CCD"
   },
   {
     "id": "classrooms",
     "name": "Instructional Classrooms & Lecture Halls",
-    "color": "#3F6B8A"
+    "color": "#1460A9"
   },
   {
     "id": "laboratories",
     "name": "Specialized Technical & Simulation Laboratories",
-    "color": "#2F6E6B"
+    "color": "#057567"
   },
   {
     "id": "student-orgs",
     "name": "Student Organizations & Leadership Offices",
-    "color": "#7A5C8E"
+    "color": "#823679"
   },
   {
     "id": "libraries",
     "name": "Libraries & Information Centers",
-    "color": "#4A5D8F"
+    "color": "#653A13"
   },
   {
     "id": "health-services",
     "name": "Medical, Health & Student Support Services",
-    "color": "#A85C6B"
+    "color": "#CA3B4F"
   },
   {
     "id": "food-commercial",
     "name": "Canteens, Food Hubs & Commercial Centers",
-    "color": "#C97F3A"
+    "color": "#C64D01"
   },
   {
     "id": "comfort-rooms",
     "name": "Comfort Rooms & Hygiene Facilities (CR)",
-    "color": "#6E8A9A"
+    "color": "#017D98"
   },
   {
     "id": "lodging",
     "name": "Lodging, Residential & Dormitory Facilities",
-    "color": "#9A6E4E"
+    "color": "#BD4279"
   },
   {
     "id": "sports-recreation",
     "name": "Sports Grounds, Gymnasiums & Recreation",
-    "color": "#4F7A5E"
+    "color": "#366E32"
   },
   {
     "id": "security-gates",
     "name": "Security, Gates & Military Headquarters",
-    "color": "#6B4F3A"
+    "color": "#283741"
   },
   {
     "id": "parking-waiting",
     "name": "Parking & Transit Waiting Areas",
-    "color": "#6E7A6F"
+    "color": "#637583"
   },
   {
     "id": "auxiliary-services",
     "name": "Auxiliary & Community Services",
-    "color": "#8E7A4E"
+    "color": "#706400"
   },
   {
     "id": "stock-archives",
     "name": "Stock Rooms, Bodegas & Archives",
-    "color": "#6E6257"
+    "color": "#766D5C"
   }
 ];
 
