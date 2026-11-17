@@ -428,25 +428,47 @@
   <!-- After two idle minutes: "Still there?", then the campus slideshow (js/screensaver.js) -->
   <div id="idle-prompt" class="idle-prompt" role="alertdialog" aria-labelledby="idle-title" hidden>
     <div class="idle-card">
+      <!-- the seconds left, in a ring that empties once a second -->
+      <div class="idle-ring" aria-hidden="true">
+        <svg viewBox="0 0 100 100"><circle class="idle-ring-track" cx="50" cy="50" r="44"/><circle class="idle-ring-fill" id="idle-ring-fill" cx="50" cy="50" r="44"/></svg>
+        <strong id="idle-count">10</strong>
+      </div>
       <h3 id="idle-title">Still there?</h3>
-      <p>The map goes back to the start in <strong id="idle-count">10</strong> seconds.</p>
+      <p>The map goes back to the start in a few seconds.</p>
       <button type="button" class="idle-stay">I'm still here</button>
     </div>
   </div>
 
+  <!-- A campus photo across the screen, fading into navy at the bottom where
+       the place's name sits; the university's mark at the top. -->
   <div id="screensaver" class="screensaver" hidden>
     <div class="ss-photos">
       <img class="ss-photo" alt="" draggable="false">
       <img class="ss-photo" alt="" draggable="false">
     </div>
-    <div class="ss-band">
+    <div class="ss-scrim"></div>
+    <div class="ss-brand">
       <img class="ss-logo" src="assets/logo.png" alt="" draggable="false">
-      <div class="ss-text">
-        <p class="ss-call">Touch anywhere to find your way</p>
-        <p class="ss-place"><strong id="ss-name"></strong> <span id="ss-inside"></span></p>
+      <div>
+        <p class="ss-brand-name">Southern Leyte State University</p>
+        <p class="ss-brand-sub">Main Campus · Interactive Campus Map</p>
       </div>
-      <p class="ss-credit" id="ss-credit"></p>
     </div>
+    <div class="ss-bottom">
+      <div class="ss-info" id="ss-info">
+        <div class="ss-meta">
+          <span class="ss-count" id="ss-count"></span>
+          <span class="ss-dots" id="ss-dots"></span>
+        </div>
+        <h2 class="ss-name" id="ss-name"></h2>
+        <p class="ss-inside" id="ss-inside"></p>
+      </div>
+      <div class="ss-cta">
+        <span class="ss-cta-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M9 11.5V5.75a1.75 1.75 0 1 1 3.5 0V10l4.06.68A2.25 2.25 0 0 1 18.5 13v1.6c0 .8-.17 1.6-.5 2.33L16.8 19.6a2.5 2.5 0 0 1-2.28 1.4h-3.1a2.5 2.5 0 0 1-1.97-.96L6.2 17.1a1.6 1.6 0 0 1 2.3-2.2l.5.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 6.5a5 5 0 0 1 9.2-2.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+        <span>Touch anywhere to find your way</span>
+      </div>
+    </div>
+    <p class="ss-credit" id="ss-credit"></p>
   </div>
 
   <script src="vendor/leaflet/leaflet.js"></script>

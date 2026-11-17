@@ -10,8 +10,11 @@
 // it does not reach the map underneath.
 //
 // Light on the Pi: one photo change every 8 s, crossfaded by opacity (done by
-// the graphics chip), nothing animating in between, and no timers at all
-// while someone is using the kiosk other than the one idle timeout.
+// the graphics chip) while the caption rises in once, nothing animating in
+// between, and no timers at all while someone is using the kiosk other than
+// the one idle timeout. The look (style.css SCREENSAVER): the photo across the
+// top fading into navy, the place's name large over it, "01 / 05" and a dash
+// per photo, and a white "Touch anywhere" button.
 //
 // Loaded after app.js and uses its functions (selectCategory, lockAdmin, ...).
 
@@ -50,8 +53,18 @@ const SCREENSAVER_PHOTOS = [
   const nameEl   = document.getElementById('ss-name');
   const insideEl = document.getElementById('ss-inside');
   const creditEl = document.getElementById('ss-credit');
+  const infoEl   = document.getElementById('ss-info');
+  const slideNo  = document.getElementById('ss-count');
+  const dotsEl   = document.getElementById('ss-dots');
   const prompt   = document.getElementById('idle-prompt');
   const countEl  = document.getElementById('idle-count');
+  const ringEl   = document.getElementById('idle-ring-fill');
+  const RING     = 2 * Math.PI * 44;     // the ring's circumference (index.html r=44)
+
+  // One dash per photo; the current one is long and amber.
+  dotsEl.innerHTML = SCREENSAVER_PHOTOS.map(() => '<i></i>').join('');
+  const dots = dotsEl.querySelectorAll('i');
+  const pad2 = n => String(n).padStart(2, '0');
 
   let idleTimer = null;
   let countTimer = null;
@@ -73,14 +86,22 @@ const SCREENSAVER_PHOTOS = [
     document.addEventListener(type, activity, { capture: true, passive: true }));
 
   // --- "Still there?" ---
+  // The ring empties a step each second (a 1 s CSS transition between steps).
+  function setRing(left, animate) {
+    ringEl.style.transition = animate ? '' : 'none';
+    ringEl.style.strokeDashoffset = String(RING * (1 - left / COUNTDOWN_S));
+  }
+
   function askStillThere() {
     let left = COUNTDOWN_S;
     countEl.textContent = left;
+    setRing(left, false);
     prompt.hidden = false;
     clearInterval(countTimer);
     countTimer = setInterval(() => {
       left -= 1;
       countEl.textContent = left;
+      setRing(left, true);
       if (left <= 0) {
         clearInterval(countTimer);
         prompt.hidden = true;
@@ -136,6 +157,12 @@ const SCREENSAVER_PHOTOS = [
       nameEl.textContent = p.name;
       insideEl.textContent = p.inside || '';
       creditEl.textContent = p.credit ? 'Photo: ' + p.credit : '';
+      slideNo.textContent = pad2(i + 1) + ' / ' + pad2(SCREENSAVER_PHOTOS.length);
+      dots.forEach((d, k) => d.classList.toggle('on', k === i));
+      // the caption rises in with its photo (restart the one-shot animation)
+      infoEl.classList.remove('is-in');
+      void infoEl.offsetWidth;
+      infoEl.classList.add('is-in');
     };
     // A photo that will not load is skipped; with none, the navy card and the
     // band still say what to do.
@@ -155,6 +182,8 @@ const SCREENSAVER_PHOTOS = [
     nameEl.textContent = '';
     insideEl.textContent = '';
     creditEl.textContent = '';
+    slideNo.textContent = '';
+    infoEl.classList.remove('is-in');
     nextSlide();
     clearInterval(slideTimer);
     slideTimer = setInterval(nextSlide, SLIDE_MS);

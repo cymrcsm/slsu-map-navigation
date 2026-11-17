@@ -1783,8 +1783,11 @@ body, html {
    SCREENSAVER (js/screensaver.js)
    ==========================================
    Above everything, the keyboard included. Opaque, so the map underneath is
-   not repainted while it shows. The only motion is the 1 s opacity crossfade
-   between photos - no blur, nothing that runs forever. */
+   not repainted while it shows. What moves: the 1.2 s opacity crossfade between
+   photos and a 0.8 s fade-in of the caption, once per slide - no blur, nothing
+   that runs forever (the Pi would composite the screen every frame for hours).
+   The photos are 1920x880 and kept at that size, top-aligned, so they are never
+   enlarged and softened; the scrim fades each one into the navy below it. */
 .idle-prompt {
   position: fixed;
   inset: 0;
@@ -1792,93 +1795,185 @@ body, html {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(30, 42, 51, 0.62);
+  background: rgba(12, 24, 46, 0.66);
 }
 .idle-prompt[hidden] { display: none; }
 .idle-card {
-  width: min(88vw, 420px);
+  width: min(88vw, 440px);
   background: var(--surface-box);
-  border-radius: 18px;
-  padding: 30px 28px 24px;
+  border-radius: 24px;
+  padding: 34px 32px 28px;
   text-align: center;
-  box-shadow: 0 18px 50px rgba(20, 30, 28, 0.35);
+  box-shadow: 0 24px 60px rgba(8, 18, 38, 0.45);
 }
-.idle-card h3 { font-size: 24px; color: var(--slsu-navy-deep); }
-.idle-card p { margin: 10px 0 20px; font-size: 16px; color: var(--text-dark); }
+.idle-ring {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  margin: 0 auto 16px;
+}
+.idle-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.idle-ring circle { fill: none; stroke-width: 7; }
+.idle-ring-track { stroke: var(--map-stone); }
+.idle-ring-fill {
+  stroke: var(--slsu-navy);
+  stroke-linecap: round;
+  stroke-dasharray: 276.46;          /* 2 * pi * 44 */
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear;
+}
+.idle-ring strong {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--slsu-navy-deep);
+}
+.idle-card h3 { font-size: 28px; color: var(--slsu-navy-deep); }
+.idle-card p { margin: 8px 0 24px; font-size: 17px; color: var(--text-muted); }
 .idle-stay {
+  width: 100%;
   border: none;
-  border-radius: 12px;
-  padding: 14px 28px;
-  font-size: 17px;
+  border-radius: 999px;
+  padding: 16px 28px;
+  font-size: 18px;
   font-weight: 700;
   color: #fff;
-  background: var(--accent-strong);
+  background: var(--slsu-navy);
 }
-.idle-stay:active { background: var(--accent-dark); }
+.idle-stay:active { background: var(--slsu-navy-deep); }
 
 .screensaver {
+  --ss-ink: #0C1C3A;                 /* the navy the photos fade into */
   position: fixed;
   inset: 0;
   z-index: 5100;
-  display: flex;
-  flex-direction: column;
-  background: var(--slsu-navy-deep);
+  overflow: hidden;
+  background: var(--ss-ink);
+  color: #fff;
   cursor: none;
   user-select: none;
 }
 .screensaver[hidden] { display: none; }
-.ss-photos {
-  position: relative;
-  flex: 1;
-  overflow: hidden;
-}
+.ss-photos { position: absolute; inset: 0; }
 .ss-photo {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 1920 / 880;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 1s ease;
+  transition: opacity 1.2s ease;
 }
 .ss-photo.is-shown { opacity: 1; }
-.ss-band {
+/* Dark at the bottom for the caption, a little at the top for the mark; solid
+   navy over the seam where the photo ends (it is 81% of a 1080 screen tall). */
+.ss-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(12, 28, 58, 0.55) 0%, rgba(12, 28, 58, 0) 18%),
+    linear-gradient(to top, var(--ss-ink) 0%, var(--ss-ink) 24%,
+                    rgba(12, 28, 58, 0.82) 38%, rgba(12, 28, 58, 0.35) 55%, rgba(12, 28, 58, 0) 70%);
+}
+
+.ss-brand {
+  position: absolute;
+  top: 40px;
+  left: 56px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+/* logo.png is a 400x160 canvas with the 109x110 mark at x146,y26 (see .panel-logo img). */
+.ss-logo { width: 109px; height: 110px; object-fit: none; object-position: -146px -26px; flex: none;
+           transform: scale(0.72); transform-origin: left center; margin-right: -30px; }
+.ss-brand-name { font-size: 22px; font-weight: 700; letter-spacing: 0.01em; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35); }
+.ss-brand-sub { margin-top: 2px; font-size: 15px; color: rgba(255, 255, 255, 0.78); text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35); }
+
+.ss-bottom {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  bottom: 84px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 48px;
+}
+.ss-info { min-width: 0; max-width: 1080px; }
+.ss-info.is-in { animation: ss-rise 0.8s ease-out both; }
+@keyframes ss-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+.ss-meta { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+.ss-count {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.7);
+  font-variant-numeric: tabular-nums;
+}
+.ss-dots { display: flex; gap: 8px; }
+.ss-dots i {
+  display: block;
+  width: 10px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.35);
+}
+.ss-dots i.on { width: 34px; background: var(--accent-color); }
+.ss-name {
+  font-size: 60px;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+.ss-inside {
+  margin-top: 14px;
+  font-size: 24px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.82);
+}
+.ss-cta {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 24px;
-  min-height: 180px;
-  padding: 20px 40px;
-  background: var(--slsu-navy-deep);
-  color: var(--on-brand);
-  border-top: 4px solid var(--accent-color);
+  gap: 14px;
+  padding: 20px 32px 20px 24px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--slsu-navy-deep);
+  font-size: 24px;
+  font-weight: 700;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 }
-/* logo.png is a 400x160 canvas with the 109x110 mark at x146,y26 (see .panel-logo img). */
-.ss-logo { width: 109px; height: 110px; object-fit: none; object-position: -146px -26px; flex: none; }
-.ss-text { flex: 1; min-width: 0; }
-.ss-call {
-  font-size: 40px;
-  font-weight: 800;
-  line-height: 1.15;
+.ss-cta-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--slsu-navy);
   color: #fff;
 }
-.ss-place {
-  margin-top: 8px;
-  font-size: 20px;
-  line-height: 1.4;
-  color: var(--on-brand);
-}
-.ss-place strong { color: #fff; }
+.ss-cta-icon svg { width: 28px; height: 28px; }
 .ss-credit {
-  align-self: flex-end;
-  flex: none;
-  max-width: 24%;
+  position: absolute;
+  right: 56px;
+  bottom: 28px;
   font-size: 13px;
-  text-align: right;
-  color: var(--on-brand-muted);
+  color: rgba(255, 255, 255, 0.55);
 }
 @media (max-height: 700px) {
-  .ss-band { min-height: 130px; padding: 14px 28px; }
-  .ss-call { font-size: 30px; }
-  .ss-place { font-size: 16px; }
+  .ss-bottom { left: 48px; right: 48px; bottom: 56px; }
+  .ss-name { font-size: 40px; }
+  .ss-inside { font-size: 18px; }
+  .ss-cta { font-size: 18px; padding: 14px 24px 14px 16px; }
 }
