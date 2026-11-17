@@ -367,7 +367,12 @@ const basemapBtn = document.getElementById('basemap-btn');
 // The OpenStreetMap credit stays: it is an ODbL licence condition and does not
 // lapse because the tiles are served locally. It is text, not a link: on the
 // kiosk a tap on a link would leave the app, and kiosk mode has no back button.
-const basemap = L.tileLayer('tiles/{z}/{x}/{y}.png', {
+// The campus grounds on these tiles are recoloured from OpenStreetMap's school
+// cream to its lawn green (tools/recolor-campus-tiles.py). TILE_VERSION is
+// part of each tile's address: bump it whenever the tiles change, so a browser
+// holding the old ones (they are cached for 30 days, server.js) fetches anew.
+const TILE_VERSION = 2;
+const basemap = L.tileLayer('tiles/{z}/{x}/{y}.png?v=' + TILE_VERSION, {
   minNativeZoom: 15,
   maxNativeZoom: 19,
   maxZoom: MAX_ZOOM,

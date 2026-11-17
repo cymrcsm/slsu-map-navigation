@@ -104,7 +104,9 @@ const map = L.map('map', {
 map.setView(svgToLatLng([W / 2, H / 2]), Z_FOLLOW, { animate: false });
 L.control.attribution({ position: 'bottomleft', prefix: false }).addTo(map);
 
-L.tileLayer('tiles/{z}/{x}/{y}.png', {
+// ?v=: the tiles' version, as in app.js (TILE_VERSION) - bump both together
+// when the tiles change so a cached old copy is not shown.
+L.tileLayer('tiles/{z}/{x}/{y}.png?v=2', {
   minNativeZoom: 15, maxNativeZoom: 19, maxZoom: Z_MAX,
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
