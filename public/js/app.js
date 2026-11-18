@@ -197,9 +197,12 @@ const MIN_ROOM_ZOOM = 3 + GEO_ZOOM_SHIFT;
 // distance to walk rather than drawn as a line nobody surveyed.
 const OFFPATH_LIMIT = 2;
 
-// The drawing is opaque, so it would hide the street map completely. Easing it
-// back while the basemap is on lets the surrounding roads read through.
-const OVERLAY_OPACITY_OVER_BASEMAP = 0.85;
+// The floor drawing over the street map. Full strength: the drawing is solid
+// only where it draws something (outside it the street map's roads and grounds
+// show anyway), and at 0.85 OpenStreetMap's own building names - "Student
+// Center", "Office of the President", "Clinic" - showed through faintly
+// behind the buildings, under the kiosk's own names.
+const OVERLAY_OPACITY_OVER_BASEMAP = 1;
 
 function readableZoom(loc) {
   const h = loc && loc.textH > 0 ? loc.textH : 0.75;

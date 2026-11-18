@@ -126,8 +126,10 @@ let floorPinned = false;
 const overlays = [];
 function overlayFor(level) {
   if (!overlays[level]) {
+    // Full strength, as on the kiosk: see-through, the street map's own
+    // building names showed faintly behind the drawing's buildings.
     overlays[level] = new GeoImageOverlay(FLOOR_ASSETS[level] || FLOOR_ASSETS[0], {
-      canvasWidth: W, canvasHeight: H, bearingDeg: GEOREF.bearingDeg, opacity: 0.85
+      canvasWidth: W, canvasHeight: H, bearingDeg: GEOREF.bearingDeg, opacity: 1
     });
   }
   return overlays[level];
