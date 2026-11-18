@@ -1123,6 +1123,17 @@ body, html {
   border-left: 1px solid var(--border-subtle);
 }
 
+/* The floors stand apart from the other controls: an upright stack on the
+   right edge of the map, the way map apps offer a building's floors. */
+.ctrl-group.floor-group {
+  position: fixed;   /* the screen, not the control row it sits in */
+  top: 50%;
+  right: calc(var(--panel-right-w) + 2 * var(--panel-gap) + 8px);
+  transform: translateY(-50%);
+  flex-direction: column;
+}
+.floor-group .ctrl-btn + .ctrl-btn { border-left: none; border-top: 1px solid var(--border-subtle); }
+
 .ctrl-btn {
   width: 56px;
   height: 52px;
