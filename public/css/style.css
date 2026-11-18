@@ -1388,6 +1388,62 @@ body, html {
 .route-bar-close svg { width: 28px; height: 28px; }
 .route-bar-close:active { background: var(--danger-color); transform: scale(0.96); }
 
+/* The map key: a small button in the bottom-right corner of the map, between
+   the panels; tapped, it opens the list of pin symbols above itself. Out of
+   the way of a route shown on its own (its bar sits bottom-centre). */
+.map-key {
+  position: absolute;
+  right: calc(var(--panel-right-w) + 2 * var(--panel-gap) + 8px);
+  bottom: 22px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.kiosk-app.route-focus .map-key { display: none; }
+.map-key-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px 0 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--map-paper);
+  color: var(--text-dark);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+}
+.map-key-btn .icon { width: 22px; height: 22px; color: var(--primary-color); }
+.map-key-btn:active, .map-key-btn[aria-expanded="true"] { background: var(--surface-hover); }
+.map-key-card {
+  width: 290px;
+  padding: 14px 16px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--map-paper);
+  box-shadow: var(--card-shadow-hover);
+}
+.map-key-card[hidden] { display: none; }
+.map-key-title {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.map-key-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.map-key-list li { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-dark); }
+.map-key-list .quick-icon { width: 30px; height: 30px; }
+.map-key-list .quick-icon svg { width: 18px; height: 18px; }
+.map-key-list .key-dot { background: var(--text-muted); }
+.map-key-list .key-dot::after { content: ''; width: 9px; height: 9px; border-radius: 50%; background: #FFFFFF; }
+
 /* An admin tool (the coordinates of a tap, placement prompts): shown only while
    the admin panel is unlocked (app.js adds .admin-on), never to visitors. */
 .kiosk-app:not(.admin-on) #coord-inspector { display: none; }

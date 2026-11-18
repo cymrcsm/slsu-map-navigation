@@ -851,11 +851,21 @@ const markerRenderer = L.canvas({ padding: 0.2, tolerance: 0 });
 
 const markerFor = new Map();   // location id -> PlaceMarker
 
+// The symbol in a place's pin (MapMarks.ICONS): its category's, if that has
+// one. "Parking & Transit Waiting Areas" holds the waiting areas too, and a P
+// on a bench would send someone looking for a car park, so those get a bench.
+function pinIconFor(loc) {
+  const cat = primaryCategory(loc);
+  if (cat === 'parking-waiting' && !/parking/i.test(loc.name)) return 'waiting';
+  return cat;
+}
+
 function createMarker(loc) {
   const color = getCategoryColor(primaryCategory(loc));
   // A tap on a marker is the marker's, not also the map's (the map's own
   // click handlers would otherwise run under it): bubblingMouseEvents is off.
-  const marker = MapMarks.placeMarker(toLeafletCoords(loc.coords), color, markerRenderer, PIN_ZOOM);
+  const marker = MapMarks.placeMarker(toLeafletCoords(loc.coords), color, markerRenderer, PIN_ZOOM,
+                                      pinIconFor(loc));
   marker.on('click', e => {
     // While a location is being added, the pins are scenery: opening one would
     // swap the form out from under the user, and a tap meant for the spot
@@ -3326,8 +3336,44 @@ map.on('movestart zoomstart', () => { if (userMovingMap()) setPanelsAside(true);
 map.on('moveend zoomend', panelsBackSoon);
 
 // ==========================================
-// ADMIN-ONLY COORDINATES
+// MAP KEY, ADMIN-ONLY COORDINATES
 // ==========================================
+// The symbols on the pins (MapMarks.ICONS), each in its category's colour.
+function quickIcon(cat, colourCat) {
+  return '<span class="quick-icon" style="background:' + getCategoryColor(colourCat || cat) + '">' +
+         MapMarks.iconSvg(cat) + '</span>';
+}
+
+// The map key: what each pin symbol means. Folded to a button until tapped.
+const MAP_KEY = [
+  ['comfort-rooms', 'Comfort rooms'],
+  ['food-commercial', 'Canteens & food'],
+  ['health-services', 'Clinic & health'],
+  ['admin-offices', 'Offices'],
+  ['classrooms', 'Classrooms'],
+  ['laboratories', 'Laboratories'],
+  ['libraries', 'Libraries'],
+  ['parking-waiting', 'Parking'],
+  ['waiting', 'Waiting areas', 'parking-waiting']
+];
+const mapKeyBtn = document.getElementById('map-key-btn');
+const mapKeyCard = document.getElementById('map-key-card');
+document.getElementById('map-key-list').innerHTML =
+  MAP_KEY.map(([icon, label, colourCat]) => '<li>' + quickIcon(icon, colourCat) + escapeHtml(label) + '</li>').join('') +
+  '<li><span class="quick-icon key-dot"></span>Everything else, in its category\u2019s colour</li>';
+
+function closeMapKey() {
+  mapKeyCard.hidden = true;
+  mapKeyBtn.setAttribute('aria-expanded', 'false');
+}
+mapKeyBtn.addEventListener('click', () => {
+  const open = mapKeyCard.hidden;
+  mapKeyCard.hidden = !open;
+  mapKeyBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+// A tap on the map puts it away again.
+map.on('click', closeMapKey);
+
 // The coordinate readout under the map is an admin tool: shown only while the
 // admin panel is unlocked (style.css .admin-on), never to visitors.
 const showAdminToolsKeyBase = showAdminTools;

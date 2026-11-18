@@ -18,11 +18,49 @@ const MapMarks = (function () {
   const MARK_EDGE = '#FEFDF9';                  // --map-paper, the pins' outline
   const DOT_R = 6;
 
-  // One stamp per colour, drawn once: the pin with its outline, white eye and
-  // a soft shadow.
+  // A white symbol in the pin's head for the places visitors look for most, so
+  // a pin says what it is without learning sixteen colours; other categories
+  // keep the plain white eye. Filled shapes on a 24x24 grid (evenodd), one
+  // definition for the canvas pins, the quick-find tiles and the map key.
+  const ICONS = {
+    'comfort-rooms':                       // a man and a woman
+      'M8.6 4.4a1.9 1.9 0 1 1-3.8 0a1.9 1.9 0 1 1 3.8 0Z M4.6 7.4h4.2a1 1 0 0 1 1 1V15H8.5v6.6H6.9V15H5.6v6.6H4V15H3.6V8.4a1 1 0 0 1 1-1Z' +
+      'M19.2 4.4a1.9 1.9 0 1 1-3.8 0a1.9 1.9 0 1 1 3.8 0Z M15.8 7.4h3.4l2.6 8.4h-2.4v5.8h-1.5v-5.8h-0.8v5.8h-1.5v-5.8h-2.4Z',
+    'food-commercial':                     // fork and knife
+      'M5 2h1.5v5.5h1V2H9v5.5h1V2h1.5v7a3 3 0 0 1-2.2 2.9V22H7.2V11.9A3 3 0 0 1 5 9Z M17.6 2C20 3.5 20.5 7 20.5 10.5H18.4V22h-2.1V2.2Z',
+    'health-services':                     // a cross
+      'M9.4 3h5.2v6.4H21v5.2h-6.4V21H9.4v-6.4H3V9.4h6.4Z',
+    'waiting':                             // a bench (waiting areas, filed under parking)
+      'M3 9.5h18v3H3Z M4.5 12.5h2.2V19H4.5Z M17.3 12.5h2.2V19h-2.2Z M4.5 5h15v2.8h-15Z',
+    'parking-waiting':                     // P
+      'M6 3h7.2a5.6 5.6 0 0 1 0 11.2H9.6V21H6Z M9.6 6.3v4.6h3.4a2.3 2.3 0 0 0 0-4.6Z',
+    'libraries':                           // an open book
+      'M2.5 5.2c3.2-1.2 6.4-.9 8.6.9v14.4c-2.3-1.5-5.5-1.7-8.6-.6Z M21.5 5.2c-3.2-1.2-6.4-.9-8.6.9v14.4c2.3-1.5 5.5-1.7 8.6-.6Z',
+    'laboratories':                        // a flask
+      'M8.6 2h6.8v2h-1.3v4.7l5.8 10.1A2.2 2.2 0 0 1 18 22H6a2.2 2.2 0 0 1-1.9-3.2L9.9 8.7V4H8.6Z',
+    'admin-offices':                       // a briefcase
+      'M9 3h6a1.6 1.6 0 0 1 1.6 1.6V6.5H20a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.5a2 2 0 0 1 2-2h3.4V4.6A1.6 1.6 0 0 1 9 3Z M9.4 5v1.5h5.2V5Z',
+    'classrooms':                          // a graduation cap
+      'M12 3.5 1 9l11 5.5L21 10v6h2V9Z M5.6 13v3.9C7.3 18.6 9.6 19.5 12 19.5s4.7-.9 6.4-2.6V13L12 16.2Z'
+  };
+  const iconPaths = {};
+  function iconPath(cat) {
+    if (!ICONS[cat]) return null;
+    return iconPaths[cat] || (iconPaths[cat] = new Path2D(ICONS[cat]));
+  }
+  // The same symbol as an SVG, white on nothing - for page elements.
+  function iconSvg(cat) {
+    if (!ICONS[cat]) return '';
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="' +
+      ICONS[cat] + '"/></svg>';
+  }
+
+  // One stamp per colour and symbol, drawn once: the pin with its outline, its
+  // white symbol or eye, and a soft shadow.
   const stamps = {};
-  function pinStamp(color) {
-    if (stamps[color]) return stamps[color];
+  function pinStamp(color, icon) {
+    const key = color + '|' + (iconPath(icon) ? icon : '');
+    if (stamps[key]) return stamps[key];
     const dpr = window.devicePixelRatio || 1;
     const c = document.createElement('canvas');
     c.width = (PIN_W + PIN_PAD * 2) * dpr;
@@ -41,11 +79,21 @@ const MapMarks = (function () {
     ctx.lineJoin = 'round';
     ctx.strokeStyle = MARK_EDGE;
     ctx.stroke(shape);
-    ctx.beginPath();
-    ctx.arc(12, PIN_HEAD_Y, 4.1, 0, Math.PI * 2);
     ctx.fillStyle = MARK_EDGE;
-    ctx.fill();
-    return (stamps[color] = c);
+    const symbol = iconPath(icon);
+    if (symbol) {
+      // 13px across, centred on the head
+      ctx.save();
+      ctx.translate(12 - 6.5, PIN_HEAD_Y - 6.5);
+      ctx.scale(13 / 24, 13 / 24);
+      ctx.fill(symbol, 'evenodd');
+      ctx.restore();
+    } else {
+      ctx.beginPath();
+      ctx.arc(12, PIN_HEAD_Y, 4.1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    return (stamps[key] = c);
   }
 
   // The same pin as an SVG, for a marker that is a page element - the
@@ -77,7 +125,7 @@ const MapMarks = (function () {
       const r = this._renderer;
       if (!r._drawing || this._empty()) return;
       const p = this._point;
-      r._ctx.drawImage(pinStamp(this.options.fillColor),
+      r._ctx.drawImage(pinStamp(this.options.fillColor, this.options.icon),
         p.x - PIN_W / 2 - PIN_PAD, p.y - PIN_TIP - PIN_PAD,
         PIN_W + PIN_PAD * 2, PIN_H + PIN_PAD * 2);
     },
@@ -95,10 +143,11 @@ const MapMarks = (function () {
     }
   });
 
-  function placeMarker(latlng, color, renderer, pinZoom) {
+  // icon: the place's category id - its symbol, if it has one (ICONS)
+  function placeMarker(latlng, color, renderer, pinZoom, icon) {
     return new PlaceMarker(latlng, {
       renderer: renderer, radius: DOT_R, weight: 1.5, color: MARK_EDGE,
-      fillColor: color, fillOpacity: 1, pinZoom: pinZoom,
+      fillColor: color, fillOpacity: 1, pinZoom: pinZoom, icon: icon,
       // a tap on a marker is the marker's, not also the map's
       bubblingMouseEvents: false
     });
@@ -257,5 +306,5 @@ const MapMarks = (function () {
     '<path d="M20 1.5C9.8 1.5 1.5 9.6 1.5 19.7c0 13.4 15.6 29.6 17.3 31.4a1.7 1.7 0 0 0 2.4 0C22.9 49.3 38.5 33.1 38.5 19.7 38.5 9.6 30.2 1.5 20 1.5Z" fill="#EA4335" stroke="#B31412" stroke-width="1.5"/>' +
     '<circle cx="20" cy="19.5" r="6.5" fill="#B31412"/></svg>';
 
-  return { placeMarker, redrawOnPinZoom, pinSvg, addBuildingLabels, MARK_EDGE, FIND_PIN_SVG };
+  return { placeMarker, redrawOnPinZoom, pinSvg, addBuildingLabels, MARK_EDGE, FIND_PIN_SVG, ICONS, iconSvg };
 })();

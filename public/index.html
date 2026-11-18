@@ -257,6 +257,19 @@
         <button type="button" id="route-bar-close" class="route-bar-close" aria-label="Clear the route"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
       </div>
 
+      <!-- What the symbols in the pins mean (app.js MAP KEY). Folded to a small
+           button so it costs the map nothing until someone wants it. -->
+      <div class="map-key" id="map-key">
+        <div class="map-key-card" id="map-key-card" hidden>
+          <p class="map-key-title">Map key</p>
+          <ul class="map-key-list" id="map-key-list"></ul>
+        </div>
+        <button type="button" class="map-key-btn" id="map-key-btn" aria-expanded="false" aria-controls="map-key-card">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.2" fill="currentColor"/></svg>
+          <span>Map key</span>
+        </button>
+      </div>
+
       <div id="coord-inspector">Click map to log coordinates</div>
 
       <!-- On-screen keyboard for the touch screen. Shown when a text field is
