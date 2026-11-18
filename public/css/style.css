@@ -1128,7 +1128,7 @@ body, html {
   height: 52px;
   background: transparent;
   border: none;
-  color: var(--text-dark);
+  color: var(--primary-color);
   font-size: 17.5px;
   font-weight: 600;
   cursor: pointer;
@@ -1154,13 +1154,13 @@ body, html {
   cursor: not-allowed;
 }
 
-/* Auto centre: the seal's green, so the way back to the whole campus is the
-   one button that stands out in the row. Darker under the finger. */
+/* Home (back to the whole campus): the same white button with a navy symbol
+   as every other control - one style across the bar. */
 #recenter-map-btn {
-  background: var(--slsu-green);
-  color: var(--map-paper);
+  background: transparent;
+  color: var(--primary-color);
 }
-#recenter-map-btn:active { background: #2C5A36; }
+#recenter-map-btn:active { background: var(--surface-hover); }
 
 .leaflet-bottom.leaflet-left { left: calc(var(--panel-left-w) + 2 * var(--panel-gap)); }
 
