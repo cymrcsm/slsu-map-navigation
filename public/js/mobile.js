@@ -105,7 +105,7 @@ L.control.attribution({ position: 'bottomleft', prefix: false }).addTo(map);
 
 // ?v=: the tiles' version, as in app.js (TILE_VERSION) - bump both together
 // when the tiles change so a cached old copy is not shown.
-L.tileLayer('tiles/{z}/{x}/{y}.png?v=2', {
+L.tileLayer('tiles/{z}/{x}/{y}.png?v=3', {
   minNativeZoom: 15, maxNativeZoom: 19, maxZoom: Z_MAX,
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
