@@ -1164,13 +1164,16 @@ body, html {
 
 .leaflet-bottom.leaflet-left { left: calc(var(--panel-left-w) + 2 * var(--panel-gap)); }
 
+/* The OpenStreetMap credit sits on the map's bottom edge; it moves up out of
+   the way only while the admin-only coordinate readout is shown under it. */
 .leaflet-control-attribution {
   font-size: 12.5px;
-  margin: 0 0 52px 8px !important;
+  margin: 0 0 8px 8px !important;
   background: rgba(254, 253, 249, 0.9);
   border-radius: 6px;
   padding: 2px 7px;
 }
+.kiosk-app.admin-on .leaflet-control-attribution { margin-bottom: 52px !important; }
 
 .leaflet-control-attribution a { color: var(--primary-color); }
 
@@ -1385,6 +1388,9 @@ body, html {
 .route-bar-close svg { width: 28px; height: 28px; }
 .route-bar-close:active { background: var(--danger-color); transform: scale(0.96); }
 
+/* An admin tool (the coordinates of a tap, placement prompts): shown only while
+   the admin panel is unlocked (app.js adds .admin-on), never to visitors. */
+.kiosk-app:not(.admin-on) #coord-inspector { display: none; }
 #coord-inspector {
   position: absolute;
   bottom: 22px;

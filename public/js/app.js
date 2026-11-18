@@ -3324,3 +3324,19 @@ mapEl.addEventListener('wheel', () => { mapGestureUntil = Date.now() + 400; }, {
 
 map.on('movestart zoomstart', () => { if (userMovingMap()) setPanelsAside(true); });
 map.on('moveend zoomend', panelsBackSoon);
+
+// ==========================================
+// ADMIN-ONLY COORDINATES
+// ==========================================
+// The coordinate readout under the map is an admin tool: shown only while the
+// admin panel is unlocked (style.css .admin-on), never to visitors.
+const showAdminToolsKeyBase = showAdminTools;
+showAdminTools = function () {
+  showAdminToolsKeyBase.apply(this, arguments);
+  kioskAppEl.classList.add('admin-on');
+};
+const lockAdminKeyBase = lockAdmin;
+lockAdmin = function () {
+  lockAdminKeyBase.apply(this, arguments);
+  kioskAppEl.classList.remove('admin-on');
+};
