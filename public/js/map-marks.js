@@ -40,6 +40,8 @@ const MapMarks = (function () {
       'M8.6 2h6.8v2h-1.3v4.7l5.8 10.1A2.2 2.2 0 0 1 18 22H6a2.2 2.2 0 0 1-1.9-3.2L9.9 8.7V4H8.6Z',
     'admin-offices':                       // a briefcase
       'M9 3h6a1.6 1.6 0 0 1 1.6 1.6V6.5H20a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.5a2 2 0 0 1 2-2h3.4V4.6A1.6 1.6 0 0 1 9 3Z M9.4 5v1.5h5.2V5Z',
+    'lodging':                             // a bed (dormitories, guest rooms)
+      'M2.5 5h2.2v7.2h16.8V20h-2.2v-2.6H4.7V20H2.5Z M9.6 9.6a2.1 2.1 0 1 1-4.2 0a2.1 2.1 0 1 1 4.2 0Z M10.8 8h7.2a3.5 3.5 0 0 1 3.5 3.5v.2H10.8Z',
     'classrooms':                          // a graduation cap
       'M12 3.5 1 9l11 5.5L21 10v6h2V9Z M5.6 13v3.9C7.3 18.6 9.6 19.5 12 19.5s4.7-.9 6.4-2.6V13L12 16.2Z'
   };

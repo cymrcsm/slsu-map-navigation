@@ -2652,6 +2652,7 @@ const LOCATIONS = [
   "acronym": "GCO",
   "building": "Student Center",
   "categories": [
+   "admin-offices",
    "health-services"
   ],
   "floor": "2nd Floor",
@@ -2660,7 +2661,7 @@ const LOCATIONS = [
    116.5,
    341.1
   ],
-  "description": "Medical, health or student welfare service point."
+  "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "guidance-counselor-office",
@@ -2668,6 +2669,7 @@ const LOCATIONS = [
   "acronym": "GCO",
   "building": "Student Center",
   "categories": [
+   "admin-offices",
    "health-services",
    "faculty-rooms"
   ],
@@ -2677,7 +2679,7 @@ const LOCATIONS = [
    111.9,
    336.1
   ],
-  "description": "Medical, health or student welfare service point."
+  "description": "Administrative office handling university operations and student transactions."
  },
  {
   "id": "handwashing-area",
@@ -3910,8 +3912,8 @@ const LOCATIONS = [
   "acronym": "MC",
   "building": "Student Center",
   "categories": [
-   "admin-offices",
    "health-services",
+   "admin-offices",
    "auxiliary-services"
   ],
   "floor": "Ground Floor",
@@ -3921,7 +3923,7 @@ const LOCATIONS = [
    349.9
   ],
   "textH": 0.76,
-  "description": "Administrative office handling university operations and student transactions."
+  "description": "Medical, health or student welfare service point."
  },
  {
   "id": "messhall-1",
@@ -4047,8 +4049,8 @@ const LOCATIONS = [
   "acronym": "MROICR",
   "building": "Institute of Arts and Sciences Building",
   "categories": [
-   "health-services",
-   "auxiliary-services"
+   "auxiliary-services",
+   "health-services"
   ],
   "floor": "Ground Floor",
   "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
@@ -4057,7 +4059,7 @@ const LOCATIONS = [
    390
   ],
   "textH": 0.71,
-  "description": "Medical, health or student welfare service point."
+  "description": "Auxiliary unit or community service provided by the university."
  },
  {
   "id": "multi-media-center-mmc",
@@ -5938,18 +5940,18 @@ const LOCATIONS = [
   "acronym": "SD1",
   "building": "Student Dormitory 1",
   "categories": [
-   "health-services",
    "lodging",
+   "health-services",
    "auxiliary-services"
   ],
   "floor": "Ground Floor",
-  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "hours": "Open daily",
   "coords": [
    199,
    63.4
   ],
   "textH": 0.97,
-  "description": "Medical, health or student welfare service point."
+  "description": "Residential or guest lodging facility."
  },
  {
   "id": "student-dormitory-2",
@@ -5957,18 +5959,18 @@ const LOCATIONS = [
   "acronym": "SD2",
   "building": "Student Dormitory 2",
   "categories": [
-   "health-services",
    "lodging",
+   "health-services",
    "auxiliary-services"
   ],
   "floor": "Ground Floor",
-  "hours": "8:00 AM - 5:00 PM (Mon - Fri)",
+  "hours": "Open daily",
   "coords": [
    153.4,
    59.4
   ],
   "textH": 1.07,
-  "description": "Medical, health or student welfare service point."
+  "description": "Residential or guest lodging facility."
  },
  {
   "id": "student-records-archives",
@@ -6152,6 +6154,7 @@ const LOCATIONS = [
   "acronym": "TR",
   "building": "Student Center",
   "categories": [
+   "auxiliary-services",
    "health-services"
   ],
   "floor": "2nd Floor",
@@ -6160,7 +6163,7 @@ const LOCATIONS = [
    105,
    341.2
   ],
-  "description": "Medical, health or student welfare service point."
+  "description": "Auxiliary unit or community service provided by the university."
  },
  {
   "id": "twin-s-snack-house",

@@ -3353,6 +3353,7 @@ const MAP_KEY = [
   ['classrooms', 'Classrooms'],
   ['laboratories', 'Laboratories'],
   ['libraries', 'Libraries'],
+  ['lodging', 'Dormitories & lodging'],
   ['parking-waiting', 'Parking'],
   ['waiting', 'Waiting areas', 'parking-waiting']
 ];
