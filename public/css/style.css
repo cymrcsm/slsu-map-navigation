@@ -83,7 +83,7 @@
   --accent-dark: var(--warm-amber-dark);
   --danger-color: #96261F;      /* 7.95:1, kept clearly apart from the amber */
 
-  --surface-sidebar: var(--slsu-navy);   /* the panel chrome carries the brand */
+  --surface-sidebar: var(--map-paper);   /* one flat light surface per panel */
   --surface-box: var(--map-paper);
   --surface-input: var(--map-paper);
   --surface-card: var(--map-paper);
@@ -96,8 +96,8 @@
   --panel-gap: 14px;
   /* The side panels float over the map (see .panel). These widths also place
      the keyboard and the map's corner notes between them. */
-  --panel-left-w: 440px;
-  --panel-right-w: 340px;
+  --panel-left-w: 400px;
+  --panel-right-w: 300px;
 }
 
 * {
@@ -136,9 +136,9 @@ body, html {
   top: var(--panel-gap);
   height: calc(100vh - 2 * var(--panel-gap));
   background: var(--surface-sidebar);
-  border: 1px solid var(--slsu-navy-deep);
-  border-radius: 16px;
-  box-shadow: var(--card-shadow-hover);
+  border: none;
+  border-radius: 18px;
+  box-shadow: 0 10px 34px rgba(18, 41, 77, 0.18);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -177,14 +177,15 @@ body, html {
   margin-bottom: 10px;
 }
 
-/* This one sits directly on the navy chrome rather than on a paper card. */
 .panel-right-label {
-  padding: 0 18px;
-  color: var(--on-brand-muted);
+  padding: 0 20px;
+  color: var(--text-muted);
 }
 
 .panel-search {
-  padding: 18px 18px 12px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 14px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -234,15 +235,16 @@ body, html {
   pointer-events: none;
 }
 
+/* The panel's content straight on its own surface - no card inside the card. */
 .panel-body {
   flex: 1;
-  margin: 0 16px 16px;
-  background: var(--surface-box);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  padding: 16px 18px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 4px 20px 20px;
   overflow-y: auto;
-  box-shadow: var(--card-shadow);
+  box-shadow: none;
   scrollbar-width: thin;
   scrollbar-color: var(--map-stone-deep) transparent;
 }
@@ -257,13 +259,13 @@ body, html {
 .category-list {
   flex: 1;
   overflow-y: scroll;
-  padding: 0 8px 6px 12px;
+  padding: 0 8px 6px 14px;
   margin-right: 6px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
   scrollbar-width: auto;
-  scrollbar-color: var(--on-brand-muted) rgba(237, 231, 220, 0.12);
+  scrollbar-color: var(--map-stone-deep) rgba(18, 41, 77, 0.06);
   scrollbar-gutter: stable;
 }
 
@@ -274,8 +276,8 @@ body, html {
   width: 100%;
   padding: 9px 11px;
   text-align: left;
-  background: var(--surface-card);
-  border: 1px solid var(--border-subtle);
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: 10px;
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
@@ -331,6 +333,9 @@ body, html {
 }
 .bldg-group.open .bldg-chevron { transform: rotate(90deg); }
 .bldg-group.open > .bldg-btn { border-color: var(--primary-strong); }
+/* rows of the flat list, split by a hairline */
+.bldg-group > .bldg-btn { border-bottom-color: var(--border-subtle); border-radius: 0; }
+.bldg-group.open > .bldg-btn { border-radius: 10px; }
 
 .bldg-subs {
   display: flex;
@@ -338,9 +343,49 @@ body, html {
   gap: 4px;
   margin-left: 14px;
   padding-left: 8px;
-  border-left: 2px solid var(--on-brand-edge);
+  border-left: 2px solid var(--border-subtle);
 }
 .bldg-subs[hidden] { display: none; }
+
+/* The right panel folds to a slim "Buildings" tab, giving the map its width
+   (app.js foldBuildings). Everything placed by --panel-right-w - the map
+   controls, the floors, the map key, the camera's aim - follows it. */
+.panel-fold {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  background: var(--map-paper);
+  color: var(--primary-color);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+.panel-fold:active { background: var(--surface-hover); }
+.panel-right .panel-right-label { padding-right: 64px; min-height: 40px; display: flex; align-items: center; margin-top: -6px; }
+.kiosk-app.right-folded { --panel-right-w: 64px; }
+.kiosk-app.right-folded .panel-right .category-list,
+.kiosk-app.right-folded .panel-right .panel-right-label { display: none; }
+.kiosk-app.right-folded .panel-fold { right: 11px; }
+.kiosk-app.right-folded .panel-right::after {
+  content: 'BUILDINGS';
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+}
 
 .cat-btn.sub-btn { padding: 7px 10px; }
 .cat-btn.sub-btn.active { padding: 6px 9px; }
@@ -622,7 +667,9 @@ body, html {
   line-height: 1.2;
   text-align: left;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(70, 58, 46, 0.08);
+  box-shadow: none;
+  background: rgba(18, 41, 77, 0.04);
+  border-color: transparent;
 }
 .quick-tile:active { background: var(--surface-hover); transform: scale(0.98); }
 .quick-icon {

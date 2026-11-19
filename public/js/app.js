@@ -3428,3 +3428,14 @@ lockAdmin = function () {
   lockAdminKeyBase.apply(this, arguments);
   kioskAppEl.classList.remove('admin-on');
 };
+
+// The right panel folds to a slim "Buildings" tab, giving the map its width;
+// a tap on the tab's button brings it back. The idle reset unfolds it.
+const panelFoldBtn = document.getElementById('panel-fold');
+function foldBuildings(fold) {
+  kioskAppEl.classList.toggle('right-folded', fold);
+  panelFoldBtn.textContent = fold ? '‹' : '›';
+  panelFoldBtn.setAttribute('aria-expanded', fold ? 'false' : 'true');
+  panelFoldBtn.setAttribute('aria-label', fold ? 'Show the building list' : 'Hide the building list');
+}
+panelFoldBtn.addEventListener('click', () => foldBuildings(!kioskAppEl.classList.contains('right-folded')));
