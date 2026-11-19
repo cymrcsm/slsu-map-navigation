@@ -1023,7 +1023,7 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc), reveal = false) {
 
   // Coming from a category listing, "back" should return to that listing.
   backToTutorialBtn.textContent = activeCategory === 'ALL'
-    ? '← Back to Kiosk Guide'
+    ? '← Back to Start'
     : '← Back to ' + filterName(activeCategory);
 
   // Show the floor this room is on, otherwise its pin is filtered out and the
@@ -1984,7 +1984,7 @@ function releaseFilterForSearch() {
   showOpenBuilding();
   paintCategoryButtons();
   clearBuildingPin();
-  backToTutorialBtn.textContent = '← Back to Kiosk Guide';
+  backToTutorialBtn.textContent = '← Back to Start';
   if (!categoryView.classList.contains('hidden')) showPanel(tutorialView);
 }
 
