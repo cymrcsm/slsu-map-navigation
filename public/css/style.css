@@ -597,39 +597,64 @@ body, html {
   display: none;
 }
 
-/* 1. Tutorial / Quick Guide View */
-.tutorial-header h3 {
-  font-size: 20px;
-  font-weight: 700;
+/* 1. Start view: Quick Find tiles and a short guide */
+/* What visitors look for most, one tap each (app.js QUICK_FIND). Each tile's
+   symbol is the one on that kind of pin, in the category's colour. */
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 2px 0 20px;
+}
+.quick-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 68px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--map-paper);
   color: var(--text-dark);
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  font: inherit;
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(70, 58, 46, 0.08);
 }
-
-.tutorial-header p {
-  font-size: 15px;
-  color: var(--text-muted);
-  margin-bottom: 14px;
+.quick-tile:active { background: var(--surface-hover); transform: scale(0.98); }
+.quick-icon {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #FFFFFF;
 }
+.quick-icon svg { width: 24px; height: 24px; }
 
-.tutorial-steps {
+/* The guide, one line per step. Read, not operated: no press response. */
+.guide-label { margin-top: 2px; }
+.guide-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-
-/* The four guide cards are read, not operated - they carry no hover or press
-   response, so nothing on this panel invites a touch that does nothing. */
-.step-card {
+.guide-steps li {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  background: var(--map-stone);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 12px 14px;
-  box-shadow: 0 2px 6px rgba(70, 58, 46, 0.06);
+  gap: 10px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--text-color);
 }
+.guide-steps strong { color: var(--text-dark); }
 
 .step-number {
   width: 26px;
@@ -643,28 +668,6 @@ body, html {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.step-content > strong {
-  color: var(--primary-strong);
-  display: block;
-  font-size: 16.5px;
-  color: var(--text-dark);
-  margin-bottom: 2px;
-}
-
-/* --text-muted is tuned against --map-paper and only reaches 3.81:1 on the
-   stone ground these cards now use. --text-color restores it to 7.70:1. */
-.step-content p {
-  font-size: 14.5px;
-  color: var(--text-color);
-  line-height: 1.4;
-}
-
-.step-content em {
-  color: var(--primary-strong);
-  font-style: normal;
-  font-weight: 600;
 }
 
 /* 2. Room Details View */

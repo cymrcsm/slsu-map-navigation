@@ -3340,13 +3340,50 @@ map.on('movestart zoomstart', () => { if (userMovingMap()) setPanelsAside(true);
 map.on('moveend zoomend', panelsBackSoon);
 
 // ==========================================
-// MAP KEY, ADMIN-ONLY COORDINATES
+// QUICK FIND, MAP KEY, ADMIN-ONLY COORDINATES
 // ==========================================
-// The symbols on the pins (MapMarks.ICONS), each in its category's colour.
+// The start view's tiles: what visitors look for most, one tap each. A
+// category shows all of its places, as if picked from a list; a single place
+// is found on the map the way a search result is (out, red pin, in). Each
+// tile wears the symbol its pins carry (MapMarks.ICONS), in the category's
+// colour, so the tiles also teach what the pins mean.
+const QUICK_FIND = [
+  { label: 'Comfort Rooms',   category: 'comfort-rooms' },
+  { label: 'Canteens & Food', category: 'food-commercial' },
+  { label: 'Registrar',       place: 'registrar',             icon: 'admin-offices' },
+  { label: 'Library',         place: 'library',               icon: 'libraries' },
+  { label: 'Clinic',          place: 'medical-dental-clinic', icon: 'health-services' },
+  { label: 'Parking',         category: 'parking-waiting',    icon: 'parking-waiting' }
+];
+
 function quickIcon(cat, colourCat) {
   return '<span class="quick-icon" style="background:' + getCategoryColor(colourCat || cat) + '">' +
          MapMarks.iconSvg(cat) + '</span>';
 }
+
+function buildQuickFind() {
+  const grid = document.getElementById('quick-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  QUICK_FIND.forEach(q => {
+    const icon = q.icon || q.category;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'quick-tile';
+    btn.innerHTML = quickIcon(icon) + '<span>' + escapeHtml(q.label) + '</span>';
+    btn.addEventListener('click', () => {
+      if (q.category) { selectCategory(q.category); return; }
+      const loc = PLACES.find(p => p.id === q.place);
+      if (!loc) return;
+      searchInput.value = '';
+      closeSuggestions();
+      selectBuildingOf(loc);
+      showLocationDetails(loc, undefined, true);
+    });
+    grid.appendChild(btn);
+  });
+}
+buildQuickFind();
 
 // The map key: what each pin symbol means. Folded to a button until tapped.
 const MAP_KEY = [

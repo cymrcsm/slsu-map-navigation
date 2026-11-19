@@ -34,48 +34,20 @@
 
       <div class="panel-body">
 
-        <!-- 1. DEFAULT VIEW: KIOSK QUICK GUIDE -->
+        <!-- 1. DEFAULT VIEW: QUICK FIND + A SHORT GUIDE -->
         <div id="tutorial-view" class="info-view">
-          <div class="panel-section-label">Kiosk Quick Guide</div>
-          <div class="tutorial-header">
-            <h3>How to Navigate the Campus</h3>
-            <p>Follow these quick steps to find your destination:</p>
-          </div>
+          <!-- What visitors look for most, one tap each (app.js QUICK_FIND):
+               a category shows all of its places, a place is found on the map. -->
+          <div class="panel-section-label">Quick Find</div>
+          <div class="quick-grid" id="quick-grid"></div>
 
-          <div class="tutorial-steps">
-            <div class="step-card">
-              <div class="step-number">1</div>
-              <div class="step-content">
-                <strong>Search or Browse</strong>
-                <p>Start typing an office, room code, building or acronym — matching places
-                   appear as you type. Or tap a building on the right and choose what you are looking for inside it.</p>
-              </div>
-            </div>
-
-            <div class="step-card">
-              <div class="step-number">2</div>
-              <div class="step-content">
-                <strong>Tap Location Pins</strong>
-                <p>Touch any location pin icon on the map to view room details, the building it belongs to, and descriptions.</p>
-              </div>
-            </div>
-
-            <div class="step-card">
-              <div class="step-number">3</div>
-              <div class="step-content">
-                <strong>Ask for Directions</strong>
-                <p>Select any destination pin and tap <strong>Ask for Directions</strong> to view an active route line from your current kiosk position.</p>
-              </div>
-            </div>
-
-            <div class="step-card">
-              <div class="step-number">4</div>
-              <div class="step-content">
-                <strong>Reset View</strong>
-                <p>Tap the home button at the right end of the control bar along the top of the map, anytime to return to the full campus overview.</p>
-              </div>
-            </div>
-          </div>
+          <div class="panel-section-label guide-label">How to Use the Kiosk</div>
+          <ol class="guide-steps">
+            <li><span class="step-number">1</span><span><strong>Search or browse.</strong> Type a name or room code, or pick a building on the right.</span></li>
+            <li><span class="step-number">2</span><span><strong>Tap a pin</strong> to see its floor, building and details.</span></li>
+            <li><span class="step-number">3</span><span><strong>Ask for Directions</strong> for the walking route from this kiosk.</span></li>
+            <li><span class="step-number">4</span><span><strong>Home button</strong> (top of the map) shows the whole campus again.</span></li>
+          </ol>
         </div>
 
         <!-- 2. CATEGORY VIEW: EVERY ROOM IN THE CHOSEN CATEGORY -->
