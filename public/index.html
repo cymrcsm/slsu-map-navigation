@@ -384,6 +384,14 @@
         </div>
         <p id="remove-msg" class="form-msg"></p>
         </div>
+
+        <!-- The usage log (js/usage-log.js, db/usage-log.js): anonymous records of
+             how the kiosk is used, for the study. Read and exported here only. -->
+        <div class="panel-section-label usage-label">Usage log</div>
+        <p id="usage-summary" class="usage-summary">—</p>
+        <button type="button" id="usage-export-btn" class="action-btn secondary-btn admin-action">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.75v11.5M7.5 10.75 12 15.25l4.5-4.5M4.75 19.25h14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Export usage log (CSV)</span>
+        </button>
       </div>
     </div>
   </div>
@@ -468,6 +476,7 @@
   <script src="js/building-labels.js"></script>
   <script src="js/map-marks.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/usage-log.js"></script>
   <script src="js/handoff.js"></script>
   <script src="js/screensaver.js"></script>
 </body>

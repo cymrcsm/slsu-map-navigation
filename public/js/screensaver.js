@@ -180,6 +180,8 @@ const SCREENSAVER_PHOTOS = [
 
   function startScreensaver() {
     clearTimeout(idleTimer);
+    // the visitor's session ends here (js/usage-log.js)
+    if (typeof KioskLog !== 'undefined') KioskLog.endSession('screensaver');
     saver.hidden = false;
     nameEl.textContent = '';
     insideEl.textContent = '';

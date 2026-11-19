@@ -1690,6 +1690,9 @@ body, html {
 }
 
 .admin-tools .edit-panel { gap: 11px; }
+/* The usage log's line in the admin panel (js/usage-log.js). */
+.admin-tools .usage-label { margin: 18px 0 4px; }
+.usage-summary { font-size: 14px; line-height: 1.45; color: var(--text-color); margin: 0 0 8px; }
 
 #admin-target {
   padding: 9px 10px;

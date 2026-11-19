@@ -92,10 +92,15 @@
     mode = cfg.webUrl ? 'web' : 'local';
     render();
     overlay.classList.remove('hidden');
+    if (typeof KioskLog !== 'undefined') KioskLog.event('qr-open', { id: activeSelectedLocation.id, qr: mode });
   }
   function close() { overlay.classList.add('hidden'); }
 
-  swapEl.addEventListener('click', () => { mode = mode === 'web' ? 'local' : 'web'; render(); });
+  swapEl.addEventListener('click', () => {
+    mode = mode === 'web' ? 'local' : 'web';
+    render();
+    if (typeof KioskLog !== 'undefined') KioskLog.event('qr-swap', { qr: mode });
+  });
   btn.addEventListener('click', open);
   // The close button is the only way out. Someone lining their phone camera up
   // with the code leans over the screen, and a stray touch on the dimmed area

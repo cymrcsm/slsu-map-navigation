@@ -252,6 +252,18 @@ if (!dest) {
   throw new Error('unknown slug: ' + slug);
 }
 
+// The kiosk's usage log (db/usage-log.js): a phone that opened this page from
+// the kiosk's own Wi-Fi tells the kiosk the hand-off arrived. Anonymous - the
+// destination only. The public copy on GitHub Pages cannot reach the kiosk and
+// sends nothing.
+if (ON_KIOSK) {
+  fetch('api/log', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ source: 'phone', events: [{ ts: new Date().toISOString(), type: 'phone-open', data: { id: dest.id } }] })
+  }).catch(() => {});
+}
+
 // --- the building names --------------------------------------------------
 // Drawn by MapMarks (map-marks.js), as on the kiosk. The other places are not
 // drawn: this page is one route handed off from the kiosk, so the map shows

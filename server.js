@@ -8,6 +8,7 @@ const cors = require('cors');
 const crypto = require('crypto');
 const db = require('./database');
 const overrides = require('./db/overrides');
+const usageLog = require('./db/usage-log');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -203,6 +204,24 @@ app.get('/api/overrides', route(async (req, res) => {
 }));
 
 app.post('/api/admin/verify', requireAdmin, (req, res) => res.json({ ok: true }));
+
+// The usage log (db/usage-log.js): the kiosk page and the kiosk-served phone
+// page send batches of anonymous events; only the admin can read them back.
+app.post('/api/log', express.json({ limit: '64kb' }), route(async (req, res) => {
+  const source = req.body && req.body.source === 'phone' ? 'phone' : 'kiosk';
+  await usageLog.record(source, req.body && req.body.events);
+  res.status(204).end();
+}));
+app.get('/api/admin/logs/summary', requireAdmin, route(async (req, res) => {
+  res.json(await usageLog.summary());
+}));
+app.get('/api/admin/logs.csv', requireAdmin, route(async (req, res) => {
+  const stamp = new Date().toISOString().slice(0, 10);
+  res.set('Content-Type', 'text/csv; charset=utf-8');
+  res.set('Content-Disposition', 'attachment; filename="kiosk-usage-log-' + stamp + '.csv"');
+  res.send(await usageLog.exportCsv());
+}));
+usageLog.startServerHeartbeat();
 
 app.post('/api/locations', requireAdmin, route(async (req, res) => {
   const body = req.body || {};

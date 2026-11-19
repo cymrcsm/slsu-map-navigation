@@ -61,5 +61,12 @@ P('captive-portal probe answered', captive.status === 204);
 const noAuth = await fetch(base + '/api/locations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
 P('admin write without code -> 401', noAuth.status === 401);
 
+// The usage log takes batches (an empty one here, so a smoke run adds nothing
+// to the kiosk's real log) and is readable by the admin only.
+const logPost = await fetch(base + '/api/log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"events":[]}' });
+P('usage log accepts a batch', logPost.status === 204, String(logPost.status));
+const logRead = await fetch(base + '/api/admin/logs.csv');
+P('usage log export without code -> 401', logRead.status === 401, String(logRead.status));
+
 console.log('\n' + pass + ' ok, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);
