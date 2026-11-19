@@ -2801,6 +2801,10 @@ async function unlockAdmin() {
     adminCodeInput.value = '';
     setAdminMsg('');
     showAdminTools();
+    // Signed in: the code field is gone, so is the keyboard it called up. A
+    // wrong code leaves both for another try.
+    adminCodeInput.blur();
+    hideKeyboard();
   } catch (err) {
     setAdminMsg(err.message, 'err');
     adminCodeInput.select();
