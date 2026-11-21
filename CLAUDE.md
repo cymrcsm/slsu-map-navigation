@@ -18,6 +18,7 @@ npm run clean:svg         # tools/clean-floor-svg.js: hide routing strokes / tra
 npm run build:tiles       # tools/build-floor-tiles.mjs: floor SVGs → public/floor-tiles, the kiosk's map tiles (needs playwright)
 npm run db:init           # rebuilds db/slsu_directory.db FROM campus-data.js (destructive; rarely needed)
 npm run phone-test        # LAN https server for testing live GPS on a real phone
+tools\update-kiosk.cmd    # on SLSU-Kiosk-Map: back up the Pi's DBs, git push kiosk main, restart app + browser
 node --check public/js/app.js   # the only syntax gate for front-end edits
 node tools/build-web.mjs        # assemble web/ (GitHub Pages static copy of the phone page)
 ```

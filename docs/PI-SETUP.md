@@ -143,6 +143,9 @@ Other commands: `... kiosk-ap.sh off` (back to joining Plenary Hall or Casem),
    git push kiosk main
    ```
    The Pi's files update as if it had pulled; then `sudo systemctl restart slsu-kiosk`.
+   Or do it all in one go: double-click `tools\update-kiosk.cmd` on the laptop. It
+   saves a copy of the Pi's `kiosk_overrides.db` and `kiosk_logs.db` in `db/pi-backups/`,
+   shows the new commits, pushes, and restarts the app (asks the Pi's password) and the browser.
    The push is refused if the Pi has uncommitted changes, such as admin edits in
    `db/`. Copy `db/kiosk_overrides.db` back to the laptop, commit it, and push again.
 2. **Ethernet (bigger jobs).** Cable the Pi to a router or a wall port. It gets
