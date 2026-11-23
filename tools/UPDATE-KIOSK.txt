@@ -1,0 +1,108 @@
+UPDATING THE KIOSK FROM A LAPTOP
+================================
+
+The kiosk (the Raspberry Pi) has no internet, so updates are sent to it from a
+laptop over the kiosk's own Wi-Fi. The script tools\update-kiosk.cmd does all of
+it: it backs up the kiosk's data, sends the new work, and restarts the kiosk.
+
+Only COMMITTED work is sent. Anything not yet committed stays on the laptop.
+
+
+BEFORE YOU START
+----------------
+  - A Windows laptop with this project folder (thesis-map-navigation), up to date.
+    If you have internet, get the latest first:   git pull
+  - The Pi's password (for the restart).
+  - Optional: your phone and a USB cable, if you want internet on the laptop
+    while it is on the kiosk's Wi-Fi.
+
+
+STEPS
+-----
+  1. If you want internet while you work: plug your phone into the laptop by USB
+     and turn on USB tethering.
+
+  2. Connect the laptop's Wi-Fi to:   SLSU-Kiosk-Map
+     Stay near the kiosk.
+
+  3. In File Explorer, open the project folder, then the "tools" folder.
+
+  4. Double-click:   update-kiosk.cmd
+     A black window opens and shows:
+
+        == Checking this laptop
+        == Looking for the kiosk at 10.42.0.1
+        Kiosk is on commit 4867c3d.
+        == Saving a copy of the kiosk's admin edits and usage log
+           saved db\pi-backups\2026-11-21_1430\kiosk_overrides.db
+           saved db\pi-backups\2026-11-21_1430\kiosk_logs.db
+        == New on this laptop, to be sent to the kiosk
+        f2fcd86 Update the kiosk from the laptop with one double-click ...
+        c7ba0f3 Screensaver photos framed lower ...
+        Send these to the kiosk? (y/N):
+
+  5. Read the list of changes. Type  y  and press Enter.
+     (Anything else cancels, and nothing on the kiosk changes.)
+
+  6. Wait until it shows   main -> main   (the changes have been sent).
+
+  7. When it asks:   [sudo] password for pi:
+     type the Pi's password and press Enter. Nothing shows while you type -
+     that is normal. It then shows:   kiosk app is running (HTTP 200)
+
+  8. Wait about 10 seconds while the kiosk browser restarts. The kiosk screen
+     goes black for a moment and comes back. The window shows:
+        browser restarted
+        Done. Check the kiosk screen.
+
+  9. Press any key to close the window. Check the kiosk screen.
+
+
+IF IT STOPS
+-----------
+  "The kiosk does not answer at 10.42.0.1"
+      The laptop is not on SLSU-Kiosk-Map, or it is too far away.
+      Reconnect, move closer, and double-click again.
+
+  "You are on branch '...'"
+      Switch back to the main branch (git checkout main) and run it again.
+
+  "The kiosk answers but would not let this laptop in over SSH"
+      This laptop cannot log in to the Pi. Check the password with:
+          ssh pi@10.42.0.1
+      in PowerShell. Laptops without the kiosk key are asked for the
+      password a few times during the update; that is expected.
+
+  "The kiosk has changes of its own that are not committed"
+      Someone added or edited places in the kiosk's admin panel. Nothing was
+      changed. A copy of those edits is already saved in db\pi-backups\.
+      Do NOT delete anything on the kiosk. Those edits have to be merged into
+      the project first (compare db\pi-backups\...\kiosk_overrides.db with
+      db\kiosk_overrides.db, commit what is real), then run this again.
+
+  "The kiosk has commits this laptop does not have"
+      Someone else updated the kiosk from another laptop. Get internet, run
+          git pull
+      and then run this again.
+
+  "The kiosk already has everything on this laptop"
+      It is already up to date. Type y only if you want to restart it anyway.
+
+  "The app was not restarted (wrong password?)"
+      The files were already sent. Run it again and type the password carefully.
+
+  "browser NOT running"
+      Touch the kiosk screen or wait a minute. If the screen stays blank,
+      run the script again; it only restarts.
+
+
+GOOD TO KNOW
+------------
+  - Every run saves the kiosk's usage log (the study's data) and its admin edits
+    to db\pi-backups\<date and time>\ on the laptop. These copies never go to
+    GitHub. Running the script after a testing day is a good way to back up the
+    data.
+  - The script never deletes anything on the kiosk and never forces an update.
+  - Without the double-click, the same thing from PowerShell, in the project folder:
+        powershell -ExecutionPolicy Bypass -File tools\update-kiosk.ps1
+  - More about the kiosk's setup: docs\PI-SETUP.md
