@@ -3547,3 +3547,31 @@ function foldBuildings(fold) {
   panelFoldBtn.setAttribute('aria-label', fold ? 'Show the building list' : 'Hide the building list');
 }
 panelFoldBtn.addEventListener('click', () => foldBuildings(!kioskAppEl.classList.contains('right-folded')));
+
+// The left panel folds the same way, to a slim "Search" tab. It opens again by
+// itself when it has something to show - a place tapped on the map - and at
+// the idle reset.
+const panelFoldLeftBtn = document.getElementById('panel-fold-left');
+function foldSearch(fold) {
+  kioskAppEl.classList.toggle('left-folded', fold);
+  panelFoldLeftBtn.textContent = fold ? '›' : '‹';
+  panelFoldLeftBtn.setAttribute('aria-expanded', fold ? 'false' : 'true');
+  panelFoldLeftBtn.setAttribute('aria-label', fold ? 'Show the search panel' : 'Hide the search panel');
+  if (fold) { closeSuggestions(); searchInput.blur(); hideKeyboard(); }
+}
+panelFoldLeftBtn.addEventListener('click', () => foldSearch(!kioskAppEl.classList.contains('left-folded')));
+
+// A folded tab is a thin target: a tap anywhere on it, not only on its round
+// button, opens it.
+document.querySelector('.panel-left').addEventListener('click', e => {
+  if (kioskAppEl.classList.contains('left-folded') && !e.target.closest('.panel-fold')) foldSearch(false);
+});
+document.querySelector('.panel-right').addEventListener('click', e => {
+  if (kioskAppEl.classList.contains('right-folded') && !e.target.closest('.panel-fold')) foldBuildings(false);
+});
+
+const showLocationDetailsFoldBase = showLocationDetails;
+showLocationDetails = function () {
+  if (kioskAppEl.classList.contains('left-folded')) foldSearch(false);
+  return showLocationDetailsFoldBase.apply(this, arguments);
+};

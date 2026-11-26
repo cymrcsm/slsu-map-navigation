@@ -138,6 +138,7 @@ const SCREENSAVER_PHOTOS = [
       if (typeof clearSearchHistory === 'function') clearSearchHistory();   // the last visitor's searches
       if (typeof closeMapKey === 'function') closeMapKey();
       if (typeof foldBuildings === 'function') foldBuildings(false);   // building list back out
+      if (typeof foldSearch === 'function') foldSearch(false);         // and the search panel
       setActiveLevel(kioskLevel);   // the floor the kiosk stands on
       autoCenterCampus(false);
       if (document.activeElement && document.activeElement.blur) document.activeElement.blur();

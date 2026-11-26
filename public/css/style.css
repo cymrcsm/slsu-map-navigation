@@ -192,11 +192,11 @@ body, html {
 .panel-search {
   min-height: var(--panel-band-h);
   background: var(--slsu-navy);
-  padding: 16px 20px;
+  padding: 16px 14px 16px 18px;
   margin-bottom: 14px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 /* Brand mark in the card chrome, to the left of the search bar. It sits
@@ -391,8 +391,22 @@ body, html {
 .kiosk-app.right-folded { --panel-right-w: 64px; }
 .kiosk-app.right-folded .panel-right .category-list { display: none; }
 .kiosk-app.right-folded .panel-right .panel-right-label { font-size: 0; padding: 0; }
-.kiosk-app.right-folded .panel-fold { right: 11px; }
-.kiosk-app.right-folded .panel-right::after {
+.kiosk-app.right-folded .panel-right .panel-fold { right: 11px; }
+
+/* The left panel folds the same way (app.js foldSearch): its button sits at
+   the end of the navy band, and folded, only the band's button and a vertical
+   "SEARCH" are left. A tap anywhere on a folded tab opens it again. */
+.panel-search .panel-fold { position: static; flex: none; }
+.kiosk-app.left-folded { --panel-left-w: 64px; }
+.kiosk-app.left-folded .panel-left > :not(.panel-search),
+.kiosk-app.left-folded .panel-left .panel-logo,
+.kiosk-app.left-folded .panel-left .search-box { display: none; }
+.kiosk-app.left-folded .panel-left .panel-search { padding: 0; justify-content: center; }
+.kiosk-app.left-folded .panel-left,
+.kiosk-app.right-folded .panel-right { cursor: pointer; }
+
+.kiosk-app.right-folded .panel-right::after,
+.kiosk-app.left-folded .panel-left::after {
   content: 'BUILDINGS';
   position: absolute;
   top: calc(var(--panel-band-h) + 20px);
@@ -407,6 +421,7 @@ body, html {
   line-height: 1;
   color: var(--text-muted);
 }
+.kiosk-app.left-folded .panel-left::after { content: 'SEARCH'; }
 
 .cat-btn.sub-btn { padding: 7px 10px; }
 .cat-btn.sub-btn.active { padding: 6px 9px; }

@@ -164,6 +164,8 @@ document.getElementById('map-key-btn').addEventListener('click', () =>
   KioskLog.event('ui', { what: 'map-key', open: !document.getElementById('map-key-card').hidden }));
 document.getElementById('panel-fold').addEventListener('click', () =>
   KioskLog.event('ui', { what: 'fold', folded: kioskAppEl.classList.contains('right-folded') }));
+document.getElementById('panel-fold-left').addEventListener('click', () =>
+  KioskLog.event('ui', { what: 'fold-search', folded: kioskAppEl.classList.contains('left-folded') }));
 document.getElementById('recenter-map-btn').addEventListener('click', () => KioskLog.event('ui', { what: 'home' }));
 
 // ---- the admin panel's "Usage log" section ----
