@@ -2,7 +2,7 @@
 // SCREENSAVER (after the kiosk is left alone)
 // ==========================================
 //
-// Two minutes with no touch brings up "Still there?" with a ten-second count.
+// One minute with no touch brings up "Still there?" with a ten-second count.
 // Nobody answers: the kiosk is put back the way a new visitor should find it -
 // search, open place, route, building, floor, keyboard, admin session and the
 // QR dialog all cleared, the map back over the whole campus - and a slideshow
@@ -44,7 +44,7 @@ const SCREENSAVER_PHOTOS = [
 (function () {
   // ?idle=20 (seconds) shortens the wait, for trying it out.
   const idleParam = Number(new URLSearchParams(location.search).get('idle'));
-  const IDLE_MS = idleParam > 0 ? idleParam * 1000 : 2 * 60 * 1000;
+  const IDLE_MS = idleParam > 0 ? idleParam * 1000 : 60 * 1000;   // 1 min (was 2, shortened after the expert review)
   const COUNTDOWN_S = 10;
   const SLIDE_MS = 8000;
 
