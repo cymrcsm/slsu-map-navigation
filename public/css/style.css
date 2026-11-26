@@ -397,11 +397,14 @@ body, html {
   position: absolute;
   top: calc(var(--panel-band-h) + 20px);
   left: 50%;
-  transform: translateX(-50%) rotate(180deg);
+  transform: translateX(-50%);
+  /* letters stacked upright, one under the other, read top to bottom */
   writing-mode: vertical-rl;
-  font-size: 14px;
+  text-orientation: upright;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.02em;
+  line-height: 1;
   color: var(--text-muted);
 }
 
