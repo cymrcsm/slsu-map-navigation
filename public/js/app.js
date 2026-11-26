@@ -3216,7 +3216,14 @@ document.addEventListener('pointerdown', e => {
 }, true);
 
 document.addEventListener('click', e => {
-  const input = e.target.closest('input');
+  let input = e.target.closest('input');
+  // A tap on the search box around the text - its magnifier or padding - counts
+  // as a tap on the field (the x inside it is a button of its own).
+  const searchWrap = !input && !e.target.closest('button') && e.target.closest('.search-input-wrapper');
+  if (searchWrap) {
+    input = searchWrap.querySelector('input');
+    if (input) input.focus();
+  }
   if (keyboardEligible(input)) showKeyboardFor(input);
   else if (!kioskKeyboard.hidden) hideKeyboard();
 });

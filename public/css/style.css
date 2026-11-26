@@ -481,8 +481,11 @@ body, html {
   background: var(--surface-input);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
-  padding: 0 12px;
-  height: 42px;
+  padding: 0 4px 0 14px;
+  /* A touch target, not a desktop field: 56 px tall, and a tap anywhere on it
+     (the magnifier, the padding) opens the keyboard - see app.js section 12. */
+  height: 56px;
+  cursor: text;
   box-shadow: 0 1px 3px rgba(70, 58, 46, 0.08);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -507,8 +510,8 @@ body, html {
 }
 
 .search-icon .icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
 }
 
 .ctrl-btn .icon {
@@ -520,13 +523,16 @@ body, html {
   flex: 1;
   background: transparent;
   border: none;
+  align-self: stretch;          /* the whole height of the box is the field */
+  min-width: 0;
   color: var(--text-dark);
-  font-size: 16.5px;
+  font-size: 18px;
   font-weight: 500;
   outline: none;
 }
 
 .search-input-wrapper input::placeholder {
+  font-size: 16px;              /* the whole hint fits; what is typed is 18 px */
   color: var(--text-muted);
 }
 
@@ -536,7 +542,14 @@ body, html {
   color: var(--text-muted);
   font-size: 20px;
   cursor: pointer;
+  flex: none;
+  width: 48px;                  /* a finger-sized target for the x */
+  height: 48px;
+  border-radius: 8px;
 }
+.clear-btn:active { background: var(--surface-hover); }
+/* Nothing to clear: the x steps aside and the hint gets its room. */
+.search-input-wrapper input:placeholder-shown + .clear-btn { display: none; }
 
 .search-box {
   position: relative;
