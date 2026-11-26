@@ -900,9 +900,7 @@ function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
   const matches = PLACES.filter(loc => {
     if (!inCategory(loc, selectedCategory)) return false;
     if (!q) return true;
-    return loc.name.toLowerCase().includes(q) ||
-           loc.acronym.toLowerCase().includes(q) ||
-           loc.building.toLowerCase().includes(q);
+    return scoreMatch(loc, q) !== null;     // the same matching as the suggestions
   });
 
   // Pins are drawn for the floor on screen only - a second-floor room plotted
@@ -1253,35 +1251,133 @@ function revealAt(target, inCentre, inZoom) {
 
 const MAX_SUGGESTIONS = 8;
 
-// Rank so that the thing you typed the start of comes first.
-function scoreMatch(loc, q) {
-  const name = loc.name.toLowerCase();
-  const acr = loc.acronym.toLowerCase();
-  const bld = loc.building.toLowerCase();
+// Text as search compares it: lower case, dashes and dots as spaces, single
+// spaces ("AS-101" -> "as 101"), and a compact form with only letters and
+// digits ("as101") so room codes match however they are typed.
+const normText = s => String(s || '').toLowerCase().replace(/[-_./,()']+/g, ' ').replace(/\s+/g, ' ').trim();
+const compactText = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
 
-  if (acr && acr === q) return 0;
-  if (name === q) return 1;
-  if (acr && acr.startsWith(q)) return 2;
-  if (name.startsWith(q)) return 3;
+// The everyday words and building short forms of search-words.js, normalised
+// once. A query that IS one of the words (or the start of one, from 3 letters)
+// points at a category, a name or a building.
+const SEARCH_ALIASES = (function () {
+  const list = [];
+  const add = (word, target) => list.push({ n: normText(word), c: compactText(word), target });
+  if (typeof SEARCH_WORDS !== 'undefined') {
+    for (const e of SEARCH_WORDS) for (const w of e.words) add(w, e.category ? { category: e.category } : { name: normText(e.name) });
+  }
+  if (typeof SEARCH_BUILDING_NAMES !== 'undefined') {
+    for (const b of Object.keys(SEARCH_BUILDING_NAMES)) for (const w of SEARCH_BUILDING_NAMES[b]) add(w, { building: b });
+  }
+  return list;
+})();
+
+// Up to `max` letters wrong, missing, extra or swapped? (Damerau-Levenshtein,
+// cut short once it cannot come in under max.)
+function closeSpelling(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return false;
+  let prev2 = null, prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    let rowMin = i;
+    for (let j = 1; j <= b.length; j++) {
+      let v = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (prev2 && i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, prev2[j - 2] + 1);
+      cur.push(v);
+      rowMin = Math.min(rowMin, v);
+    }
+    if (rowMin > max) return false;
+    prev2 = prev; prev = cur;
+  }
+  return prev[b.length] <= max;
+}
+const typoAllowance = w => (w.length >= 8 ? 2 : w.length >= 5 ? 1 : 0);
+
+// Every word typed (5+ letters may be a letter off) finds a word of the name,
+// or the start of one: "registar" -> Registrar, "comp lab" -> Computer Laboratory.
+function typoMatch(nameWords, qWords) {
+  return qWords.every(t => nameWords.some(w =>
+    w === t || (t.length >= 3 && w.startsWith(t)) ||
+    (typoAllowance(t) > 0 && closeSpelling(t, w, typoAllowance(t)))));
+}
+
+// Does this everyday word / short form point at loc? Its rank if so, else null.
+function aliasScore(loc, name, a, exact) {
+  const t = a.target;
+  if (t.category) return loc.categories && loc.categories.indexOf(t.category) !== -1 ? (exact ? -1 : 4.5) : null;
+  if (t.name) return (' ' + name + ' ').includes(' ' + t.name + ' ') ? (exact ? -1 : 4.5) : null;
+  if (buildingsOf(loc).indexOf(t.building) === -1) return null;
+  return normText(t.building) === name ? (exact ? -2 : 4.4)        // the building itself first
+                                       : (exact ? -0.5 : 6.5);     // then the places in it
+}
+
+// The everyday words a misspelt query is close to ("restrom" -> "restroom"),
+// worked out once per query rather than once per place.
+let typoAliasCache = { q: null, list: [] };
+function aliasesNear(q) {
+  if (typoAliasCache.q !== q) {
+    const max = typoAllowance(q);
+    typoAliasCache = { q, list: max ? SEARCH_ALIASES.filter(a => closeSpelling(q, a.n, max)) : [] };
+  }
+  return typoAliasCache.list;
+}
+
+// Rank: lower is better, null = no match. Roughly: an everyday word or short
+// form typed in full, then the acronym or name typed in full or begun, then a
+// word of the name begun, then a match inside a word or in the building, then
+// a near spelling.
+function scoreMatch(loc, query) {
+  const q = normText(query);
+  if (!q) return null;
+  const qc = compactText(query);
+  const name = normText(loc.name);
+  const acr = normText(loc.acronym);
+  const bld = normText(loc.building);
+  let best = null;
+  const take = s => { if (s !== null && (best === null || s < best)) best = s; };
+
+  for (const a of SEARCH_ALIASES) {
+    const exact = a.n === q || (qc.length >= 2 && a.c === qc);
+    if (exact || (q.length >= 3 && a.n.startsWith(q))) take(aliasScore(loc, name, a, exact));
+    // and of those, the ones whose own name has the word come first:
+    // "library" -> the Library before the rest of its category
+    if (exact && best !== null && (' ' + name).includes(' ' + q)) take(name === q ? -2.5 : -1.5);
+  }
+
+  if (acr && acr === q) take(0);
+  if (name === q) take(1);
+  // room codes typed without the dash or with a space: "as101", "as 101"
+  if (/\d/.test(qc) && qc.length >= 3) {
+    if (compactText(loc.name) === qc || compactText(loc.acronym) === qc) take(1.5);
+    else if (compactText(loc.name).startsWith(qc)) take(3.5);
+  }
+  if (acr && acr.startsWith(q)) take(2);
+  if (name.startsWith(q)) take(3);
   // start of any word in the name, e.g. "reg" matching "Office of the Registrar"
-  if (new RegExp('\\b' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(name)) return 4;
-  if (name.includes(q)) return 5;
-  if (bld.startsWith(q)) return 6;
-  if (bld.includes(q)) return 7;
-  if (acr && acr.includes(q)) return 8;
-  return -1;
+  if ((' ' + name).includes(' ' + q)) take(4);
+  // inside a word only from 3 letters on: "id" must not find guIDance and presIDent
+  if (q.length >= 3 && name.includes(q)) take(5);
+  if (bld.startsWith(q)) take(6);
+  if (q.length >= 3 && bld.includes(q)) take(7);
+  if (q.length >= 3 && acr && acr.includes(q)) take(8);
+  if (best === null && q.length >= 4) {
+    const qWords = q.split(' ');
+    if (typoMatch(name.split(' '), qWords)) take(9);
+    else for (const a of aliasesNear(q)) { const s = aliasScore(loc, name, a, false); if (s !== null) take(9.5); }
+  }
+  return best;
 }
 
 function searchLocations(query, category = 'ALL', limit = Infinity) {
-  const q = query.trim().toLowerCase();
-  if (!q) return [];
+  if (!normText(query)) return [];
   const scored = [];
   for (const loc of PLACES) {
     if (!inCategory(loc, category)) continue;
-    const s = scoreMatch(loc, q);
-    if (s >= 0) scored.push({ loc, s });
+    const s = scoreMatch(loc, query);
+    if (s !== null) scored.push({ loc, s });
   }
-  scored.sort((a, b) => a.s - b.s || a.loc.name.localeCompare(b.loc.name));
+  scored.sort((a, b) => a.s - b.s || a.loc.name.localeCompare(b.loc.name) ||
+                        buildingText(a.loc).localeCompare(buildingText(b.loc)));
   return scored.slice(0, limit).map(r => r.loc);
 }
 
@@ -1320,11 +1416,16 @@ function renderSuggestions(query) {
   }
 
   showingHistory = false;
+  // Rows with the same name (the comfort rooms, the faculty rooms) also say
+  // which floor, so they can be told apart.
+  const nameCount = {};
+  suggestions.forEach(loc => { nameCount[loc.name] = (nameCount[loc.name] || 0) + 1; });
   suggestionList.innerHTML = suggestions.map((loc, i) => {
     const color = locationColor(loc);
-    const sub = loc.acronym && !loc.name.includes(loc.acronym)
+    let sub = loc.acronym && !loc.name.includes(loc.acronym)
       ? highlight(loc.acronym, q) + ' · ' + escapeHtml(buildingText(loc))
       : escapeHtml(buildingText(loc));
+    if (nameCount[loc.name] > 1 && loc.floor) sub += ' · ' + escapeHtml(loc.floor);
     return '<li class="suggestion" role="option" id="sug-' + i + '" data-index="' + i + '">' +
              '<span class="suggestion-swatch" style="background:' + color + '"></span>' +
              '<span class="suggestion-text">' +
