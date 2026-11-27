@@ -1323,6 +1323,30 @@ function aliasScore(loc, name, a, exact) {
 
 // The everyday words a misspelt query is close to ("restrom" -> "restroom"),
 // worked out once per query rather than once per place.
+// "EB 101" -> { buildings: ['Engineering Building'], num: '101' }: a building
+// short form (search-words.js) followed by a room number, or null. Worked out
+// once per query.
+let roomQueryCache = { q: null, value: null };
+function roomQuery(query) {
+  if (roomQueryCache.q === query) return roomQueryCache.value;
+  const buildingsFor = pre => SEARCH_ALIASES.filter(a => a.target.building && a.c === pre).map(a => a.target.building);
+  let value = null;
+  // typed with a space before the number ("ITB1 101", "EB 2"): split there
+  const spaced = normText(query).match(/^(.+) (\d{1,4}[a-z]?)$/);
+  if (spaced && buildingsFor(compactText(spaced[1])).length) {
+    value = { buildings: buildingsFor(compactText(spaced[1])), num: spaced[2] };
+  } else {
+    // run together ("eb101"): the shortest short form that leaves a number
+    const qc = compactText(query);
+    for (let i = 1; i < qc.length && !value; i++) {
+      const pre = qc.slice(0, i), num = qc.slice(i);
+      if (/^[a-z]/.test(pre) && /^\d{1,4}[a-z]?$/.test(num) && buildingsFor(pre).length) value = { buildings: buildingsFor(pre), num };
+    }
+  }
+  roomQueryCache = { q: query, value };
+  return value;
+}
+
 let typoAliasCache = { q: null, list: [] };
 function aliasesNear(q) {
   if (typoAliasCache.q !== q) {
@@ -1356,10 +1380,29 @@ function scoreMatch(loc, query) {
 
   if (acr && acr === q) take(0);
   if (name === q) take(1);
-  // room codes typed without the dash or with a space: "as101", "as 101"
+  // room codes typed without the dash or with a space: "as101", "as 101", and
+  // the code without the words before it: "e101" finds "Room E-101"
   if (/\d/.test(qc) && qc.length >= 3) {
     if (compactText(loc.name) === qc || compactText(loc.acronym) === qc) take(1.5);
     else if (compactText(loc.name).startsWith(qc)) take(3.5);
+    const words = name.split(' ');
+    for (let i = 1; i < words.length; i++) {
+      const tail = compactText(words.slice(i).join(''));
+      if (tail === qc) take(1.5);
+      else if (/^[a-z]/.test(tail) && tail.startsWith(qc)) take(3.5);
+    }
+  }
+  // a building's short form and a room number: "EB 101", "EB-101", "eb101"
+  // find Room E-101 in the Engineering Building, "IAS 101" finds AS-101
+  // (a number still being typed - "EB 2" - lists the E-2.. rooms)
+  const room = roomQuery(query);
+  if (room && room.buildings.some(b => buildingsOf(loc).indexOf(b) !== -1)) {
+    for (const w of name.split(' ')) {
+      const digits = (compactText(w).match(/^[a-z]*(\d+[a-z]?)$/) || [])[1];
+      if (!digits) continue;
+      if (digits === room.num) take(-1.5);
+      else if (digits.startsWith(room.num)) take(-1);
+    }
   }
   if (acr && acr.startsWith(q)) take(2);
   if (name.startsWith(q)) take(3);
