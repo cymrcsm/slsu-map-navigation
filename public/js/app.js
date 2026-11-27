@@ -577,7 +577,6 @@ const backToTutorialBtn = document.getElementById('back-to-tutorial-btn');
 
 // Which category button is pressed. 'ALL' means no filter.
 let activeCategory = 'ALL';
-const recenterRoomBtn = document.getElementById('recenter-room-btn');
 const getDirectionsBtn = document.getElementById('get-directions-btn');
 // "Take this on my phone" only appears once a route is on screen.
 const sendToPhoneBtn = document.getElementById('send-to-phone-btn');
@@ -2029,14 +2028,6 @@ function addEtaBubble(runs, destLevel, minutes, metres) {
 
 backToTutorialBtn.addEventListener('click', showTutorialView);
 backFromCategoryBtn.addEventListener('click', () => selectCategory('ALL'));
-
-recenterRoomBtn.addEventListener('click', () => {
-  if (activeSelectedLocation) {
-    // "Focus on Map" goes a step tighter than the automatic selection zoom.
-    const z = Math.min(MAX_ZOOM, readableZoom(activeSelectedLocation) + 1);
-    flyToView(toLeafletCoords(activeSelectedLocation.coords), z, { animate: true });
-  }
-});
 
 if (basemapBtn) {
   basemapBtn.addEventListener('click', () => {

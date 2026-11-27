@@ -1023,10 +1023,6 @@ body, html {
 }
 .action-btn[hidden] { display: none; }
 
-/* The compass takes the SLSU navy against the light button. */
-#get-directions-btn .icon {
-  color: var(--primary-color);
-}
 
 .action-btn:active {
   transform: scale(0.98);
@@ -1040,14 +1036,21 @@ body, html {
   border: none;
   box-shadow: 0 4px 12px rgba(116, 65, 15, 0.32);
 }
-/* Ask for Directions alone sits level with Focus on Map and Edit details -
-   scoped by id so the shared class above is untouched. */
+/* Ask for Directions is the one thing a place's card is for: the route's own
+   blue, full width, taller and bolder than the other actions (expert review).
+   Scoped by id so the shared class above is untouched. */
 #get-directions-btn {
-  background: var(--surface-card);
-  color: var(--text-dark);
-  border: 1px solid var(--border-subtle);
-  box-shadow: none;
+  min-height: 60px;
+  background: var(--route-line);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-size: 19px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(26, 115, 232, 0.35);
 }
+#get-directions-btn .icon { width: 24px; height: 24px; }
+#get-directions-btn:active { background: #1557B0; box-shadow: none; }
 .secondary-btn {
   background: var(--surface-card);
   color: var(--text-dark);
