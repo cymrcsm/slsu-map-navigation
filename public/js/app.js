@@ -1010,7 +1010,7 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc), reveal = false) {
 
   // Coming from a category listing, "back" should return to that listing.
   backToTutorialBtn.textContent = activeCategory === 'ALL'
-    ? '← Back to Start'
+    ? '← Back'
     : '← Back to ' + filterName(activeCategory);
 
   // Show the floor this room is on, otherwise its pin is filtered out and the
@@ -2095,7 +2095,7 @@ function releaseFilterForSearch() {
   showOpenBuilding();
   paintCategoryButtons();
   clearBuildingPin();
-  backToTutorialBtn.textContent = '← Back to Start';
+  backToTutorialBtn.textContent = '← Back';
   if (!categoryView.classList.contains('hidden')) showPanel(tutorialView);
 }
 
@@ -2165,9 +2165,11 @@ function zoomInGap(by) {
 }
 document.getElementById('zoom-in').addEventListener('click', () => { panelsAsideForButton(); zoomInGap(map.options.zoomDelta); });
 document.getElementById('zoom-out').addEventListener('click', () => { panelsAsideForButton(); zoomInGap(-map.options.zoomDelta); });
+// Home: back to the start - the whole campus, and the left panel's start view
+// (search, building, place and route let go, the search panel unfolded).
 document.getElementById('recenter-map-btn').addEventListener('click', () => {
-  autoCenterCampus(true);
-  showTutorialView();
+  if (typeof foldSearch === 'function') foldSearch(false);
+  selectCategory('ALL');        // start view + the whole campus (autoCenterCampus)
 });
 
 // ==========================================
