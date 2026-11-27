@@ -1682,6 +1682,8 @@ body, html {
 /* An admin tool (the coordinates of a tap, placement prompts): shown only while
    the admin panel is unlocked (app.js adds .admin-on), never to visitors. */
 .kiosk-app:not(.admin-on) #coord-inspector { display: none; }
+/* A place's map coordinates mean nothing to a visitor: admin only too. */
+.kiosk-app:not(.admin-on) .detail-coords-row { display: none; }
 #coord-inspector {
   position: absolute;
   bottom: 22px;
