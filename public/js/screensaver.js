@@ -14,7 +14,7 @@
 // between, and no timers at all while someone is using the kiosk other than
 // the one idle timeout. The look (style.css SCREENSAVER): the photo across the
 // top fading into navy, the place's name large over it, "01 / 05" and a dash
-// per photo, and a white "Touch anywhere" button.
+// per photo, and a white "Touch to find a room or office" button.
 //
 // Loaded after app.js and uses its functions (selectCategory, lockAdmin, ...).
 
