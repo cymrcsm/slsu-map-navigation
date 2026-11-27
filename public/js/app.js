@@ -749,30 +749,18 @@ function buildBuildingList() {
     head.type = 'button';
     head.className = 'cat-btn bldg-btn';
     head.setAttribute('aria-expanded', 'false');
-    const chevron = document.createElement('span');
-    chevron.className = 'bldg-chevron';
-    chevron.setAttribute('aria-hidden', 'true');
-    chevron.textContent = '›';
     const label = document.createElement('span');
     label.className = 'cat-label';
     label.textContent = buildingLabel(building);
     const count = document.createElement('span');
     count.className = 'cat-count';
     count.textContent = buildingCounts[building]['*'];
-    head.append(chevron, label, count);
+    head.append(label, count);
     head.addEventListener('click', () => toggleBuilding(building));
 
-    const subs = document.createElement('div');
-    subs.className = 'bldg-subs';
-    subs.hidden = true;
-    subs.appendChild(filterButton(filterId(building, '*'), 'All places here', null, 'sub-btn'));
-    Object.keys(buildingCounts[building])
-      .filter(id => id !== '*')
-      .sort((a, b) => getCategoryName(a).localeCompare(getCategoryName(b)))
-      .forEach(id => subs.appendChild(
-        filterButton(filterId(building, id), getCategoryName(id), getCategoryColor(id), 'sub-btn')));
-
-    group.append(head, subs);
+    // No category level under a building (expert review): opening it lists all
+    // of its places on the left, grouped by floor.
+    group.append(head);
     categoryListEl.appendChild(group);
   });
   showOpenBuilding();
@@ -804,7 +792,8 @@ function showOpenBuilding() {
   categoryListEl.querySelectorAll('.bldg-group').forEach(group => {
     const open = group.dataset.building === openBuilding;
     group.classList.toggle('open', open);
-    group.querySelector('.bldg-subs').hidden = !open;
+    const subs = group.querySelector('.bldg-subs');
+    if (subs) subs.hidden = !open;
     group.querySelector('.bldg-btn').setAttribute('aria-expanded', open ? 'true' : 'false');
   });
 }
@@ -1103,27 +1092,48 @@ function fillCategoryView(shown) {
     li.textContent = 'Nothing is filed under this category yet.';
     categoryResults.appendChild(li);
   } else {
-    shown.slice().sort((a, b) => a.name.localeCompare(b.name)).forEach(loc => {
+    // In a building: floor by floor (a heading for each), the kind of place
+    // shown by its symbol. A category: A-Z, with the building named.
+    const rows = shown.slice().sort((a, b) =>
+      (inBuilding ? levelOfFloor(a.floor) - levelOfFloor(b.floor) : 0) || a.name.localeCompare(b.name));
+    let floorShown = null;
+    rows.forEach(loc => {
+      if (inBuilding && loc.floor !== floorShown) {
+        floorShown = loc.floor;
+        const head = document.createElement('li');
+        head.className = 'result-floor';
+        head.textContent = loc.floor || 'Ground Floor';
+        categoryResults.appendChild(head);
+      }
       const li = document.createElement('li');
       li.className = 'result-item';
       li.tabIndex = 0;
 
-      const swatch = document.createElement('span');
-      swatch.className = 'result-swatch';
-      swatch.style.background = locationColor(loc);
+      let mark;
+      if (inBuilding) {
+        mark = document.createElement('span');
+        mark.className = 'result-icon';
+        mark.innerHTML = quickIcon(pinIconFor(loc), primaryCategory(loc));
+      } else {
+        mark = document.createElement('span');
+        mark.className = 'result-swatch';
+        mark.style.background = locationColor(loc);
+      }
 
       const text = document.createElement('span');
       text.className = 'result-text';
       const name = document.createElement('strong');
       name.textContent = loc.name;
       const sub = document.createElement('small');
-      const where = inBuilding ? loc.floor : buildingText(loc);
+      const where = inBuilding
+        ? (loc.categories && loc.categories.length ? getCategoryName(primaryCategory(loc)) : '')
+        : buildingText(loc);
       sub.textContent = loc.acronym && !loc.name.includes(loc.acronym)
-        ? loc.acronym + ' · ' + where
+        ? loc.acronym + (where ? ' · ' + where : '')
         : where;
       text.append(name, sub);
 
-      li.append(swatch, text);
+      li.append(mark, text);
       li.addEventListener('click', () => showLocationDetails(loc, undefined, true));
       li.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showLocationDetails(loc, undefined, true); }
