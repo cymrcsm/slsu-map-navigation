@@ -3630,3 +3630,145 @@ showLocationDetails = function () {
   if (kioskAppEl.classList.contains('left-folded')) foldSearch(false);
   return showLocationDetailsFoldBase.apply(this, arguments);
 };
+
+// ==========================================
+// HELP FOR FIRST-TIME VISITORS (expert review)
+// ==========================================
+// Not a page to pass through - research on onboarding finds tutorials barely
+// help and are mostly skipped (NN/g) - but help where it is needed:
+//   - examples of what can be typed, to tap, on the start view;
+//   - "Ask for Directions" pulses once the first time a place is opened;
+//   - "Show me how" (start view) and the ? on the map: three steps over the
+//     real screen, each part lit while the rest is dimmed, Skip any time.
+
+// ---- search examples ----
+const SEARCH_TIPS = ['CR', 'Registrar', 'EB 101'];
+(function buildSearchTips() {
+  const box = document.getElementById('search-tips');
+  if (!box) return;
+  SEARCH_TIPS.forEach(tip => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'tip-chip';
+    chip.textContent = tip;
+    chip.addEventListener('click', () => {
+      // after this tap's own "click elsewhere closes the list" has run
+      setTimeout(() => {
+        searchInput.value = tip;
+        searchInput.dispatchEvent(new Event('input'));
+        if (typeof KioskLog !== 'undefined') KioskLog.event('ui', { what: 'search-tip', tip: tip });
+      }, 0);
+    });
+    box.appendChild(chip);
+  });
+})();
+
+// ---- one pulse on "Ask for Directions", once per visitor ----
+let directionsHinted = false;
+function resetOneTimeHints() { directionsHinted = false; }
+const showLocationDetailsHintBase = showLocationDetails;
+showLocationDetails = function () {
+  const out = showLocationDetailsHintBase.apply(this, arguments);
+  if (!directionsHinted) {
+    directionsHinted = true;
+    getDirectionsBtn.classList.remove('hint-pulse');
+    void getDirectionsBtn.offsetWidth;            // restart the animation
+    getDirectionsBtn.classList.add('hint-pulse');
+  }
+  return out;
+};
+getDirectionsBtn.addEventListener('animationend', () => getDirectionsBtn.classList.remove('hint-pulse'));
+
+// ---- "Show me how" ----
+const GUIDE_STEPS = [
+  { title: 'Search for a place',
+    text: 'Type a room, an office or a code - "Registrar", "EB 101", or just "CR". Tap a result to see it on the map.',
+    target: () => document.querySelector('.search-input-wrapper') },
+  { title: 'Or pick a building',
+    text: 'Every building is listed here. Tap one to see its rooms on the left, floor by floor.',
+    target: () => document.querySelector('.panel-right') },
+  { title: 'Get directions from here',
+    text: 'This dot is you, at this kiosk. Open any place and tap "Ask for Directions" for the walking route - then take it on your phone with the QR code.',
+    target: () => { const l = document.querySelector('.kiosk-label'); return l && l.closest('.leaflet-marker-icon'); },
+    before: () => {
+      // the "you are here" dot has to be on screen, between the panels
+      const el = GUIDE_STEPS[2].target();
+      const r = el && el.getBoundingClientRect();
+      const ins = mapInsets();
+      if (!r || r.left < ins.left || r.right > window.innerWidth - ins.right || r.top < 80 || r.bottom > window.innerHeight - 40) {
+        autoCenterCampus(false);
+      }
+    } }
+];
+const guideOverlay = document.getElementById('guide-overlay');
+const guideHole = document.getElementById('guide-hole');
+const guideCard = document.getElementById('guide-card');
+let guideStep = -1;
+
+function openGuide(from) {
+  closeSuggestions();
+  searchInput.blur();
+  hideKeyboard();
+  if (typeof closeMapKey === 'function') closeMapKey();
+  if (kioskAppEl.classList.contains('left-folded')) foldSearch(false);
+  if (kioskAppEl.classList.contains('right-folded')) foldBuildings(false);
+  if (typeof KioskLog !== 'undefined') KioskLog.event('ui', { what: 'guide-open', from: from });
+  guideOverlay.hidden = false;
+  showGuideStep(0);
+}
+
+function closeGuide(how) {
+  if (guideOverlay.hidden) return;
+  if (how && typeof KioskLog !== 'undefined') KioskLog.event('ui', { what: 'guide-' + how, step: guideStep + 1 });
+  guideOverlay.hidden = true;
+  guideStep = -1;
+}
+
+function showGuideStep(i) {
+  guideStep = i;
+  const step = GUIDE_STEPS[i];
+  if (step.before) step.before();
+  document.getElementById('guide-count').textContent = (i + 1) + ' of ' + GUIDE_STEPS.length;
+  document.getElementById('guide-title').textContent = step.title;
+  document.getElementById('guide-text').textContent = step.text;
+  document.getElementById('guide-next').textContent = i === GUIDE_STEPS.length - 1 ? 'Done' : 'Next';
+  // measured on the next frame, after any map move above has been laid out
+  requestAnimationFrame(() => placeGuide(step.target()));
+}
+
+function placeGuide(el) {
+  const pad = 10, gap = 18, W = window.innerWidth, H = window.innerHeight;
+  const r = el && el.getBoundingClientRect();
+  if (!r || !r.width) {
+    guideHole.hidden = true;
+    guideCard.style.left = (W - guideCard.offsetWidth) / 2 + 'px';
+    guideCard.style.top = (H - guideCard.offsetHeight) / 2 + 'px';
+    return;
+  }
+  guideHole.hidden = false;
+  // a small target (the you-are-here dot) still gets a hole a finger can see
+  const MIN = 90;
+  const w = Math.max(r.width + 2 * pad, MIN), h = Math.max(r.height + 2 * pad, MIN);
+  const hole = { left: r.left + r.width / 2 - w / 2, top: r.top + r.height / 2 - h / 2, width: w, height: h };
+  Object.assign(guideHole.style, {
+    left: hole.left + 'px', top: hole.top + 'px', width: hole.width + 'px', height: hole.height + 'px'
+  });
+  guideHole.classList.remove('lit');
+  void guideHole.offsetWidth;
+  guideHole.classList.add('lit');
+  // the card beside the lit part, on the side with more room
+  const cw = guideCard.offsetWidth, ch = guideCard.offsetHeight;
+  let left = (hole.left + hole.width / 2 < W / 2) ? hole.left + hole.width + gap : hole.left - gap - cw;
+  left = Math.max(16, Math.min(W - cw - 16, left));
+  let top = Math.max(16, Math.min(H - ch - 16, hole.top + Math.min(hole.height, 200) / 2 - 40));
+  guideCard.style.left = left + 'px';
+  guideCard.style.top = top + 'px';
+}
+
+document.getElementById('guide-next').addEventListener('click', () => {
+  if (guideStep >= GUIDE_STEPS.length - 1) closeGuide('done');
+  else showGuideStep(guideStep + 1);
+});
+document.getElementById('guide-skip').addEventListener('click', () => closeGuide('skip'));
+document.getElementById('guide-open-btn').addEventListener('click', () => openGuide('start'));
+document.getElementById('help-btn').addEventListener('click', () => openGuide('map'));
