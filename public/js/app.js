@@ -921,7 +921,7 @@ function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
   onThisFloor.map(loc => markerFor.get(loc.id)).filter(Boolean).sort(byLat)
     .forEach(m => markerLayer.addLayer(m.setDim(false)));
   syncMarkerVisibility(searchQuery);
-  updateFilterChip(selectedCategory, q, matches.length);
+  updateFilterChip(selectedCategory, q, matches);
   return matches;
 }
 
@@ -929,10 +929,22 @@ function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
 // places", "Search: cr · 43 places") and an x that shows every place again
 // without moving the map. Hidden when nothing is chosen. Elements are looked
 // up here: renderMarkers runs once while the page is still loading.
-function updateFilterChip(selectedCategory, q, count) {
+// When some of them are on other floors it says how many are where ("1 on this
+// floor, 11 on 2F"), or the 11 not on screen look missing.
+const FLOOR_SHORT = ['GF', '2F', '3F'];
+function updateFilterChip(selectedCategory, q, matches) {
   const chip = document.getElementById('filter-chip');
   if (!chip) return;
-  const places = count === 1 ? '1 place' : count + ' places';
+  const count = matches.length;
+  let places = count === 1 ? '1 place' : count + ' places';
+  const perLevel = {};
+  matches.forEach(l => { const v = levelOfFloor(l.floor); perLevel[v] = (perLevel[v] || 0) + 1; });
+  const here = perLevel[activeLevel] || 0;
+  if (here !== count) {
+    const elsewhere = Object.keys(perLevel).map(Number).filter(v => v !== activeLevel).sort()
+      .map(v => perLevel[v] + ' on ' + (FLOOR_SHORT[v] || LEVELS[v]));
+    places += ' · ' + here + ' on this floor, ' + elsewhere.join(', ');
+  }
   let text = '';
   if (q) text = 'Search: “' + markerQuery.trim() + '” · ' + places;
   else if (selectedCategory !== 'ALL') text = 'Showing: ' + filterName(selectedCategory) + ' · ' + places;
