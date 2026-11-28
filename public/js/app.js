@@ -1650,7 +1650,7 @@ function highlightSuggestion(index) {
 function chooseSuggestion(index) {
   const loc = suggestions[index];
   if (!loc) return;
-  if (loc.isBuilding) { openBuildingFromSearch(loc.building); return; }
+  if (loc.isBuilding) { rememberSearch(loc); openBuildingFromSearch(loc.building); return; }
   rememberSearch(loc);
   searchInput.value = loc.name;
   closeSuggestions();
@@ -1730,7 +1730,14 @@ function clearSearchHistory() {
 }
 
 function renderHistory() {
-  const locs = searchHistory.map(id => PLACES.find(l => l.id === id)).filter(Boolean);
+  // a building searched is kept as 'building:<name>', a place by its id
+  const locs = searchHistory.map(id => {
+    if (String(id).startsWith('building:')) {
+      const b = id.slice('building:'.length);
+      return buildingCounts[b] ? { isBuilding: true, building: b, id: id, name: buildingLabel(b) } : null;
+    }
+    return PLACES.find(l => l.id === id);
+  }).filter(Boolean);
   if (!locs.length) { closeSuggestions(); return; }
   suggestions = locs;
   activeSuggestion = -1;
@@ -1741,7 +1748,7 @@ function renderHistory() {
         HISTORY_ICON +
         '<span class="suggestion-text">' +
           '<strong>' + escapeHtml(loc.name) + '</strong>' +
-          '<small>' + escapeHtml(buildingText(loc)) + '</small>' +
+          '<small>' + (loc.isBuilding ? 'Building' : escapeHtml(buildingText(loc))) + '</small>' +
         '</span>' +
         '<button type="button" class="history-remove" data-id="' + escapeHtml(loc.id) + '"' +
           ' aria-label="Remove ' + escapeHtml(loc.name) + ' from recent searches">' + REMOVE_ICON + '</button>' +
