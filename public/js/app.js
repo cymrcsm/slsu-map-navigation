@@ -368,8 +368,6 @@ function fitView(bounds, options = {}) {
 // OpenStreetMap requires visible credit wherever its tiles are shown.
 L.control.attribution({ position: 'bottomleft', prefix: false }).addTo(map);
 
-const basemapBtn = document.getElementById('basemap-btn');
-
 // Tiles are cached under public/tiles by fetch-tiles.js, covering the campus
 // boundary padded to match setMaxBounds() below, at z15-19. Nothing here
 // reaches the network, so the street map works with the kiosk offline.
@@ -507,16 +505,11 @@ function applyFloorOpacity() {
 }
 
 let basemapVisible = false;
-let basemapUsable = true;
 
 function applyBasemap(on) {
   basemapVisible = on;
   if (on) { basemap.addTo(map); } else if (map.hasLayer(basemap)) { map.removeLayer(basemap); }
   applyFloorOpacity();
-  if (basemapBtn) {
-    basemapBtn.classList.toggle('active-basemap', on);
-    basemapBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-  }
 }
 
 // Tile floors go on in applyFloorOpacity(), the active one only; the SVG
@@ -2208,13 +2201,6 @@ document.getElementById('building-directions-btn').addEventListener('click', e =
   drawRoute(target, true, 'after-panels');
   if (typeof KioskLog !== 'undefined') KioskLog.event('ui', { what: 'building-directions', id: target.id });
 });
-
-if (basemapBtn) {
-  basemapBtn.addEventListener('click', () => {
-    if (!basemapUsable) return;
-    applyBasemap(!basemapVisible);
-  });
-}
 
 getDirectionsBtn.addEventListener('click', () => {
   if (!activeSelectedLocation) return;

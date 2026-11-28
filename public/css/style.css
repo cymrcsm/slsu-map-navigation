@@ -1317,8 +1317,9 @@ body, html {
   background-color: var(--bg-color) !important;
 }
 
-/* One row along the top of the map, centred between the panels: street map,
-   floors, zoom, recentre. */
+/* One row along the top of the map, centred between the panels: zoom, home
+   (whole campus) and help. The floors stand on the right edge (below). The
+   street map is always on; it has no switch (removed 2026-11-28). */
 .map-controls {
   position: absolute;
   top: var(--panel-gap);
@@ -1373,21 +1374,10 @@ body, html {
   justify-content: center;
   transition: background 0.15s ease, color 0.15s ease;
 }
-/* The floor on screen is highlighted in the street-map button's navy
-   (#basemap-btn.active-basemap); the other floors stay plain. */
+/* The floor on screen is highlighted in navy; the other floors stay plain. */
 .floor-btn.active {
   background: var(--primary-color);
   color: var(--map-paper);
-}
-
-#basemap-btn.active-basemap {
-  background: var(--primary-color);
-  color: var(--map-paper);
-}
-
-#basemap-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
 }
 
 /* Home (back to the whole campus): the same white button with a navy symbol

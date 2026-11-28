@@ -190,12 +190,6 @@
       <div id="map"></div>
 
       <div class="map-controls">
-        <div class="ctrl-group">
-          <button id="basemap-btn" class="ctrl-btn" title="Toggle street map" aria-label="Toggle street map" aria-pressed="true">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.25" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="4.1" ry="9.25" stroke="currentColor" stroke-width="1.5"/><path d="M3.1 8.9h17.8M3.1 15.1h17.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </button>
-        </div>
-
         <div class="ctrl-group floor-group">
           <button class="ctrl-btn floor-btn active" data-floor="1">GF</button>
           <button class="ctrl-btn floor-btn" data-floor="2">2F</button>
@@ -211,15 +205,15 @@
           </button>
         </div>
 
-        <div class="ctrl-group">
-          <button id="help-btn" class="ctrl-btn help-btn" title="How to use the kiosk" aria-label="How to use the kiosk">?</button>
-        </div>
-
         <div class="ctrl-group center-group">
           <button id="recenter-map-btn" class="ctrl-btn" title="Back to the whole campus" aria-label="Back to the whole campus">
             <!-- home: back to the whole-campus view (app.js autoCenterCampus) -->
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 10.75 12 3.25l9 7.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.25 9v10.25c0 .97.78 1.75 1.75 1.75h3.25v-5a1.75 1.75 0 0 1 3.5 0v5H17c.97 0 1.75-.78 1.75-1.75V9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
+        </div>
+
+        <div class="ctrl-group">
+          <button id="help-btn" class="ctrl-btn help-btn" title="How to use the kiosk" aria-label="How to use the kiosk">?</button>
         </div>
       </div>
 
@@ -282,7 +276,6 @@
     </aside>
 
   </div>
-
 
   <!-- Administrator panel. The maintenance controls are not on the kiosk
        surface at all; the only way here is tapping the logo, and the server
