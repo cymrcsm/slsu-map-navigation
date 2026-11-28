@@ -291,6 +291,8 @@ body, html {
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
 }
 .cat-btn:active { transform: scale(0.99); }
+/* a finger-sized row: kiosk guidance is 44-48 px; building rows are the most tapped */
+.cat-btn { min-height: 48px; }
 
 .cat-btn.active {
   border-width: 2px;
@@ -344,8 +346,8 @@ body, html {
   top: 12px;
   right: 12px;
   z-index: 2;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   border: 1px solid var(--border-subtle);
@@ -368,11 +370,11 @@ body, html {
   color: var(--on-brand);
   font-size: 15px;
 }
-.panel-right .panel-fold { top: calc((var(--panel-band-h) - 40px) / 2); }
+.panel-right .panel-fold { top: calc((var(--panel-band-h) - 48px) / 2); }
 .kiosk-app.right-folded { --panel-right-w: 64px; }
 .kiosk-app.right-folded .panel-right .category-list { display: none; }
 .kiosk-app.right-folded .panel-right .panel-right-label { font-size: 0; padding: 0; }
-.kiosk-app.right-folded .panel-right .panel-fold { right: 11px; }
+.kiosk-app.right-folded .panel-right .panel-fold { right: 7px; }
 
 /* The left panel folds the same way (app.js foldSearch): its button sits at
    the end of the navy band, and folded, only the band's button and a vertical
@@ -745,10 +747,10 @@ body, html {
   color: var(--text-muted);
 }
 .tip-chip {
-  height: 40px;
+  height: 48px;
   padding: 0 16px;
   border: 1px solid var(--border-subtle);
-  border-radius: 20px;
+  border-radius: 24px;
   background: var(--surface-card);
   color: var(--primary-strong);
   font-size: 15.5px;
@@ -771,10 +773,10 @@ body, html {
 .guide-head .guide-label { margin-bottom: 0; }
 .guide-open-btn {
   flex: none;
-  height: 38px;
-  padding: 0 14px;
+  height: 46px;
+  padding: 0 16px;
   border: 1px solid var(--primary-strong);
-  border-radius: 19px;
+  border-radius: 23px;
   background: transparent;
   color: var(--primary-strong);
   font-size: 14.5px;
