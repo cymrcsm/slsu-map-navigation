@@ -110,8 +110,19 @@ const MapMarks = (function () {
   // Leaflet's canvas renderer still does the projecting, culling and hit
   // testing; only the shape it paints and the box it occupies change.
   const PlaceMarker = L.CircleMarker.extend({
+    // A faded marker: a place outside the building or search being shown. It
+    // stays a small pale dot at every zoom (never a pin), so the chosen places
+    // stand out while the rest of the campus is still there to see and tap.
+    setDim: function (dim) {
+      if (!!this.options.dim === !!dim) return this;
+      this.options.dim = !!dim;
+      this.setStyle({ opacity: dim ? 0.6 : 1, fillOpacity: dim ? 0.55 : 1 });
+      this.setRadius(dim ? DOT_R * 0.8 : DOT_R);
+      return this;
+    },
+
     _isPin: function () {
-      return !!this._map && this._map.getZoom() >= this.options.pinZoom;
+      return !this.options.dim && !!this._map && this._map.getZoom() >= this.options.pinZoom;
     },
 
     _updateBounds: function () {

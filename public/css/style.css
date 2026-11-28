@@ -2280,3 +2280,42 @@ body, html {
   .ss-inside { font-size: 18px; }
   .ss-cta { font-size: 18px; padding: 14px 24px 14px 16px; }
 }
+
+/* What the bold pins are, over the map under its controls (app.js
+   updateFilterChip): a building or search is chosen and the other places are
+   faded. Centred in the gap between the panels; gone while a route has the
+   screen to itself. */
+.filter-chip {
+  position: absolute;
+  top: calc(var(--panel-gap) + 66px);
+  left: calc((var(--panel-left-w) + 2 * var(--panel-gap) + 100vw - var(--panel-right-w) - 2 * var(--panel-gap)) / 2);
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - var(--panel-left-w) - var(--panel-right-w) - 6 * var(--panel-gap));
+  padding: 6px 6px 6px 18px;
+  border-radius: 26px;
+  background: var(--primary-strong);
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(18, 41, 77, 0.3);
+}
+.filter-chip[hidden],
+.kiosk-app.route-focus .filter-chip { display: none; }
+.filter-chip > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.filter-chip-clear {
+  flex: none;
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 20px;
+  background: #FFFFFF;
+  color: var(--primary-strong);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.filter-chip-clear:active { background: var(--surface-hover); }

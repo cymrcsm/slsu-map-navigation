@@ -156,6 +156,7 @@ function applyServerKioskPosition(saved) {
 
 function rebuildAllMarkers() {
   markerLayer.clearLayers();
+  dimLayer.clearLayers();
   markerFor.clear();
   PLACES.forEach(createMarker);
 }
@@ -593,6 +594,8 @@ const detailCoords = document.getElementById('detail-coords');
 let activeSelectedLocation = null;
 let activeRouteLayers = [];
 const markerLayer = L.layerGroup().addTo(map);
+// The places left out of a building or search, faded (section 8, renderMarkers)
+const dimLayer = L.layerGroup();
 
 // ==========================================
 // 6. KIOSK POSITIONING (PERSISTENT STATE)
@@ -898,16 +901,51 @@ function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
   const onThisFloor = matches.filter(loc => levelOfFloor(loc.floor) === activeLevel);
   visibleIds = new Set(onThisFloor.map(l => l.id));
 
+  // A building or a search chosen: its places stand out and every other place
+  // on this floor stays on the map, faded (user testing: with the rest hidden,
+  // people who went on looking around the map found it empty). The chip over
+  // the map says what is shown and lets it go (updateFilterChip).
+  const filtering = selectedCategory !== 'ALL' || !!q;
+  const chosen = new Set(onThisFloor.map(l => l.id));
+  const others = filtering
+    ? PLACES.filter(loc => !chosen.has(loc.id) && levelOfFloor(loc.floor) === activeLevel)
+    : [];
+  visibleIds = new Set([...chosen, ...others.map(l => l.id)]);
+
   // Northernmost first, so where pins overlap the one lower on screen is
   // painted over the one above it - the order the page elements used to stack.
+  const byLat = (a, b) => b.getLatLng().lat - a.getLatLng().lat;
   markerLayer.clearLayers();
-  onThisFloor
-    .map(loc => markerFor.get(loc.id))
-    .filter(Boolean)
-    .sort((a, b) => b.getLatLng().lat - a.getLatLng().lat)
-    .forEach(m => markerLayer.addLayer(m));
+  dimLayer.clearLayers();
+  others.map(loc => markerFor.get(loc.id)).filter(Boolean).sort(byLat)
+    .forEach(m => dimLayer.addLayer(m.setDim(true)));
+  onThisFloor.map(loc => markerFor.get(loc.id)).filter(Boolean).sort(byLat)
+    .forEach(m => markerLayer.addLayer(m.setDim(false)));
   syncMarkerVisibility(searchQuery);
+  updateFilterChip(selectedCategory, q, matches.length);
   return matches;
+}
+
+// The chip over the map: what the bold pins are ("Showing: Library · 12
+// places", "Search: cr · 43 places") and an x that shows every place again
+// without moving the map. Hidden when nothing is chosen. Elements are looked
+// up here: renderMarkers runs once while the page is still loading.
+function updateFilterChip(selectedCategory, q, count) {
+  const chip = document.getElementById('filter-chip');
+  if (!chip) return;
+  const places = count === 1 ? '1 place' : count + ' places';
+  let text = '';
+  if (q) text = 'Search: “' + markerQuery.trim() + '” · ' + places;
+  else if (selectedCategory !== 'ALL') text = 'Showing: ' + filterName(selectedCategory) + ' · ' + places;
+  chip.hidden = !text;
+  document.getElementById('filter-chip-text').textContent = text;
+}
+function showAllPlaces() {
+  searchInput.value = '';
+  closeSuggestions();
+  releaseFilterForSearch();          // the building let go, the map left where it is
+  renderMarkers('ALL', '');
+  if (typeof KioskLog !== 'undefined') KioskLog.event('ui', { what: 'show-all' });
 }
 
 // Zoomed out to the whole campus the markers are left off: a few hundred dots
@@ -918,6 +956,13 @@ function renderMarkers(selectedCategory = 'ALL', searchQuery = '') {
 function syncMarkerVisibility(searchQuery) {
   const q = searchQuery !== undefined ? searchQuery : markerQuery;
   const want = map.getZoom() >= MARKER_ZOOM || activeCategory !== 'ALL' || !!q.trim();
+  // the faded rest follow the usual rule: only from MARKER_ZOOM in, so the whole
+  // campus is not a haze of dots
+  const wantDim = map.getZoom() >= MARKER_ZOOM && dimLayer.getLayers().length > 0;
+  if (wantDim && !map.hasLayer(dimLayer)) {
+    dimLayer.addTo(map);
+    if (map.hasLayer(markerLayer)) { map.removeLayer(markerLayer); markerLayer.addTo(map); }  // bold on top
+  } else if (!wantDim && map.hasLayer(dimLayer)) map.removeLayer(dimLayer);
   if (want && !map.hasLayer(markerLayer)) markerLayer.addTo(map);
   else if (!want && map.hasLayer(markerLayer)) map.removeLayer(markerLayer);
 }
@@ -933,9 +978,12 @@ function markerAt(layerPoint) {
   let best = null, bestD = Infinity;
   visibleIds.forEach(id => {
     const m = markerFor.get(id);
-    if (!m || !markerLayer.hasLayer(m) || !m._point) return;
-    if (pinZoom() && !m._containsPoint(layerPoint)) return;
-    const d = m._aim().distanceTo(layerPoint);
+    if (!m || !m._point) return;
+    const dim = !!m.options.dim;
+    if (dim ? !(map.hasLayer(dimLayer) && dimLayer.hasLayer(m)) : !markerLayer.hasLayer(m)) return;
+    if (!dim && pinZoom() && !m._containsPoint(layerPoint)) return;
+    let d = m._aim().distanceTo(layerPoint);
+    if (dim) { if (d > 16) return; d += 10; }      // a chosen pin wins over a faded dot
     if (d < bestD) { bestD = d; best = id; }
   });
   return best;
@@ -2201,6 +2249,7 @@ document.getElementById('zoom-in').addEventListener('click', () => { panelsAside
 document.getElementById('zoom-out').addEventListener('click', () => { panelsAsideForButton(); zoomInGap(-map.options.zoomDelta); });
 // Home: back to the start - the whole campus, and the left panel's start view
 // (search, building, place and route let go, the search panel unfolded).
+document.getElementById('filter-chip-clear').addEventListener('click', showAllPlaces);
 document.getElementById('recenter-map-btn').addEventListener('click', () => {
   if (typeof foldSearch === 'function') foldSearch(false);
   selectCategory('ALL');        // start view + the whole campus (autoCenterCampus)
