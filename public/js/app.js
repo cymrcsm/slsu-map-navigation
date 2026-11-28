@@ -1269,8 +1269,40 @@ function buildingPoint(building, fallbackBounds) {
 // marks its destination with the same pin).
 const FIND_PIN_SVG = MapMarks.FIND_PIN_SVG;
 
+// A building chosen while the map is zoomed in near it is not taken out to the
+// campus and back - that trip is for showing where something far off is:
+//   already all on screen (between the panels) -> the map stays put, the pin drops;
+//   partly on screen or just past the edge     -> one short move, zooming out only
+//                                                 as far as needed to fit it, never in;
+//   far off, or the map out at the campus      -> the usual reveal.
 function revealBuilding(building, bounds, fitOpts) {
-  revealAt(buildingPoint(building, bounds), bounds.getCenter(), fitZoom(bounds, fitOpts));
+  const pinAt = buildingPoint(building, bounds);
+  const whole = L.latLngBounds([bounds.getSouthWest(), bounds.getNorthEast(), pinAt]);
+  const zoomedIn = map.getZoom() > overviewZoom() + 0.5;
+  if (zoomedIn && boundsInGap(whole)) {
+    map.stop();
+    ++viewMove;                        // cancels any camera move still running
+    dropFindPin(pinAt);
+    return;
+  }
+  if (zoomedIn && screensAway(whole.getCenter()) <= NEAR_SCREENS) {
+    dropFindPin(pinAt);
+    fitView(whole, Object.assign({}, fitOpts, { maxZoom: Math.min(map.getZoom(), fitOpts.maxZoom || map.getZoom()) }));
+    return;
+  }
+  revealAt(pinAt, bounds.getCenter(), fitZoom(bounds, fitOpts));
+}
+
+// Is all of `bounds` on screen in the gap between the panels, clear of the map
+// controls along the top?
+function boundsInGap(bounds) {
+  const ins = mapInsets();
+  const size = map.getSize();
+  const a = map.latLngToContainerPoint(bounds.getNorthWest());
+  const b = map.latLngToContainerPoint(bounds.getSouthEast());
+  const m = 24;
+  return Math.min(a.x, b.x) >= ins.left + m && Math.max(a.x, b.x) <= size.x - ins.right - m &&
+         Math.min(a.y, b.y) >= 90 && Math.max(a.y, b.y) <= size.y - m;
 }
 
 // The way the map finds something chosen from a list - a building, a search
