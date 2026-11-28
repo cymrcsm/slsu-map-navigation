@@ -61,6 +61,8 @@
     if (mode === 'local' && !local) mode = 'web';
 
     stepsEl.hidden = mode !== 'local';
+    // the moving dot needs location, and on the kiosk's own copy HTTPS too
+    document.getElementById('qr-location').hidden = mode === 'local' && local.startsWith('http://');
     capEl.hidden = mode === 'local';
     if (mode === 'web') {
       drawQr(web);
