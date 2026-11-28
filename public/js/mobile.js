@@ -240,6 +240,8 @@ function applyFloorVisibility() {
 
 // --- destination --------------------------------------------------------
 function resolveDestination(id) {
+  // a building as a whole (the kiosk's "Ask for Directions to this building")
+  if (/^bldg:/.test(id) && typeof buildingDestination === 'function') return buildingDestination(id.slice(5));
   const base = LOCATIONS.find(l => l.id === id);
   return base ? Object.assign({}, base) : null;
 }

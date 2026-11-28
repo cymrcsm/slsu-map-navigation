@@ -53,3 +53,36 @@ const BUILDING_LABELS = [
   { text: "Archives Center", at: [205.6, 457.3] },
   { text: "NSTP CWTS Building", at: [43.6, 221.6] }
 ];
+
+// A building as a destination ("Ask for Directions to this building", kiosk
+// and phone alike): its name on the map stands for it. The walk ends at the
+// point of a ground-floor walkway line nearest the name - routes keep to the
+// drawn lines, and a name in the middle of a roof can be metres from one.
+// Its id is "bldg:<building>", which the phone's ?d= / /go/ link carries.
+function buildingDestination(building) {
+  const want = String(building || '').trim().toLowerCase();
+  if (!want) return null;
+  const labels = BUILDING_LABELS.filter(l => !l.gate);
+  const lab = labels.find(l => l.text.trim().toLowerCase() === want) ||
+              labels.find(l => want.startsWith(l.text.trim().toLowerCase()));
+  if (!lab) return null;
+  let at = lab.at;
+  if (typeof WALK_PATHS !== 'undefined') {
+    const N = WALK_PATHS.nodes;
+    let best = Infinity;
+    WALK_PATHS.edges.forEach(([a, b]) => {
+      const A = N[a], B = N[b];
+      if (A[2] !== 0 || B[2] !== 0) return;               // ground floor only
+      const dx = B[0] - A[0], dy = B[1] - A[1], len2 = dx * dx + dy * dy || 1;
+      const t = Math.max(0, Math.min(1, ((lab.at[0] - A[0]) * dx + (lab.at[1] - A[1]) * dy) / len2));
+      const q = [A[0] + t * dx, A[1] + t * dy];
+      const d = Math.hypot(q[0] - lab.at[0], q[1] - lab.at[1]);
+      if (d < best) { best = d; at = q; }
+    });
+  }
+  return {
+    id: 'bldg:' + building, name: building, acronym: '', building: building,
+    floor: 'Ground Floor', coords: [Math.round(at[0] * 10) / 10, Math.round(at[1] * 10) / 10],
+    categories: [], description: 'The building as a whole.'
+  };
+}

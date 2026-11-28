@@ -43,7 +43,9 @@ const MapMarks = (function () {
     'lodging':                             // a bed (dormitories, guest rooms)
       'M2.5 5h2.2v7.2h16.8V20h-2.2v-2.6H4.7V20H2.5Z M9.6 9.6a2.1 2.1 0 1 1-4.2 0a2.1 2.1 0 1 1 4.2 0Z M10.8 8h7.2a3.5 3.5 0 0 1 3.5 3.5v.2H10.8Z',
     'classrooms':                          // a graduation cap
-      'M12 3.5 1 9l11 5.5L21 10v6h2V9Z M5.6 13v3.9C7.3 18.6 9.6 19.5 12 19.5s4.7-.9 6.4-2.6V13L12 16.2Z'
+      'M12 3.5 1 9l11 5.5L21 10v6h2V9Z M5.6 13v3.9C7.3 18.6 9.6 19.5 12 19.5s4.7-.9 6.4-2.6V13L12 16.2Z',
+    'entrance':                            // a door with its knob (building main entrances)
+      'M7 2.5h10A1.5 1.5 0 0 1 18.5 4v16.5h-13V4A1.5 1.5 0 0 1 7 2.5Z M14.6 11a1.3 1.3 0 1 0 0 2.6a1.3 1.3 0 1 0 0-2.6Z M3 20h18v2H3Z'
   };
   const iconPaths = {};
   function iconPath(cat) {

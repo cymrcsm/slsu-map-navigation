@@ -22,7 +22,12 @@ function getCategoryName(categoryId) {
 }
 
 const primaryCategory = loc => (loc.categories && loc.categories[0]) || null;
-const locationColor = loc => getCategoryColor(primaryCategory(loc));
+// A building's entrance: a place whose name says so ("Administration Building -
+// Main Entrance"). It wears a door, in navy when it has no category, and is
+// where "Ask for Directions to this building" leads (buildingTarget).
+const ENTRANCE_COLOR = '#12294D';
+const isEntrance = loc => /entrance/i.test(loc.name || '');
+const locationColor = loc => (isEntrance(loc) && !primaryCategory(loc)) ? ENTRANCE_COLOR : getCategoryColor(primaryCategory(loc));
 // The data files every place outside a real building under "SLSU Main
 // Campus"; the kiosk calls that group Campus Grounds (section 7).
 const CAMPUS_GROUNDS = 'SLSU Main Campus';
@@ -846,13 +851,14 @@ const markerFor = new Map();   // location id -> PlaceMarker
 // one. "Parking & Transit Waiting Areas" holds the waiting areas too, and a P
 // on a bench would send someone looking for a car park, so those get a bench.
 function pinIconFor(loc) {
+  if (isEntrance(loc)) return 'entrance';
   const cat = primaryCategory(loc);
   if (cat === 'parking-waiting' && !/parking/i.test(loc.name)) return 'waiting';
   return cat;
 }
 
 function createMarker(loc) {
-  const color = getCategoryColor(primaryCategory(loc));
+  const color = locationColor(loc);
   // A tap on a marker is the marker's, not also the map's (the map's own
   // click handlers would otherwise run under it): bubblingMouseEvents is off.
   const marker = MapMarks.placeMarker(toLeafletCoords(loc.coords), color, markerRenderer, PIN_ZOOM,
@@ -1028,7 +1034,7 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc), reveal = false) {
   if (!cats.length) {
     const chip = document.createElement('span');
     chip.className = 'cat-chip';
-    chip.textContent = 'Uncategorised';
+    chip.textContent = String(loc.id).startsWith('bldg:') ? 'Building' : 'Uncategorised';
     chip.style.background = UNCATEGORISED_COLOR + '1A';
     chip.style.color = UNCATEGORISED_COLOR;
     detailBadge.appendChild(chip);
@@ -1065,6 +1071,8 @@ function showLocationDetails(loc, flyZoom = readableZoom(loc), reveal = false) {
   if (typeof setActiveLevel === 'function') setActiveLevel(levelOfFloor(loc.floor), false);
 
   showPanel(detailView);
+  // 'none': a route is about to be drawn and frames the walk itself
+  if (reveal === 'none') return;
   const at = toLeafletCoords(loc.coords);
   // Already zoomed in near the place - a room picked from the list of the
   // building being looked at, or a search for the room next door: no trip out
@@ -1131,6 +1139,11 @@ function fillCategoryView(shown) {
   categoryViewTitle.textContent = filterName(activeCategory);
   categoryViewKind.textContent = inBuilding ? 'Building' : 'Category';
   categoryViewCount.textContent = shown.length === 1 ? '1 place' : shown.length + ' places';
+  // a building with an entrance pin (or a place of its own name) can be walked to as a whole
+  const bBtn = document.getElementById('building-directions-btn');
+  const f = parseFilter(activeCategory);
+  bBtn.targetPlace = (f && f.building !== CAMPUS_GROUNDS) ? buildingTarget(f.building) : null;
+  bBtn.hidden = !bBtn.targetPlace;
 
   categoryResults.innerHTML = '';
   if (!shown.length) {
@@ -1498,9 +1511,45 @@ function highlight(text, q) {
          escapeHtml(text.slice(i + q.length));
 }
 
+// Buildings are searched too: by name ("administration", "student center") or
+// short form (search-words.js: "admin", "HTM", "EB"). At most two, on top of
+// the suggestions; a building row opens the building the way its row in the
+// list on the right does. Not for a room code ("EB 101" wants the room).
+function buildingMatches(query) {
+  const q = normText(query), qc = compactText(query);
+  if (!q || roomQuery(query)) return [];
+  const out = [];
+  buildingsInOrder().forEach(b => {
+    if (b === CAMPUS_GROUNDS) return;
+    const label = normText(buildingLabel(b));
+    let best = null;
+    const take = v => { if (best === null || v < best) best = v; };
+    if (label === q) take(0);
+    else if (q.length >= 3 && label.startsWith(q)) take(1);
+    else if (q.length >= 3 && (' ' + label).includes(' ' + q)) take(2);
+    for (const a of SEARCH_ALIASES) {
+      if (a.target.building !== b) continue;
+      if (a.n === q || (qc.length >= 2 && a.c === qc)) take(0.5);
+      else if (q.length >= 3 && a.n.startsWith(q)) take(1.5);
+    }
+    if (best !== null) out.push({ b, best });
+  });
+  out.sort((x, y) => x.best - y.best || buildingLabel(x.b).localeCompare(buildingLabel(y.b)));
+  return out.slice(0, 2).map(x => x.b);
+}
+
+const BUILDING_ROW_ICON = '<span class="suggestion-bldg-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none">' +
+  '<path d="M4 21V5.5A1.5 1.5 0 0 1 5.5 4h8A1.5 1.5 0 0 1 15 5.5V21M15 9.5h3.5A1.5 1.5 0 0 1 20 11v10M2.5 21h19M7.5 8h4M7.5 11.5h4M7.5 15h4" ' +
+  'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+
 function renderSuggestions(query) {
   const q = query.trim().toLowerCase();
-  suggestions = q ? searchLocations(query, activeCategory, MAX_SUGGESTIONS) : [];
+  const bRows = q ? buildingMatches(query) : [];
+  let places = q ? searchLocations(query, activeCategory, MAX_SUGGESTIONS) : [];
+  // a building with a place of its own name is listed once, as the building
+  places = places.filter(l => !bRows.some(b => normText(l.name) === normText(b)));
+  suggestions = bRows.map(b => ({ isBuilding: true, building: b, id: 'building:' + b, name: buildingLabel(b) }))
+    .concat(places).slice(0, MAX_SUGGESTIONS);
   activeSuggestion = -1;
 
   if (!suggestions.length) {
@@ -1521,6 +1570,16 @@ function renderSuggestions(query) {
   const nameCount = {};
   suggestions.forEach(loc => { nameCount[loc.name] = (nameCount[loc.name] || 0) + 1; });
   suggestionList.innerHTML = suggestions.map((loc, i) => {
+    if (loc.isBuilding) {
+      const n = (buildingCounts[loc.building] || {})['*'] || 0;
+      return '<li class="suggestion suggestion-bldg" role="option" id="sug-' + i + '" data-index="' + i + '">' +
+               BUILDING_ROW_ICON +
+               '<span class="suggestion-text">' +
+                 '<strong>' + highlight(loc.name, q) + '</strong>' +
+                 '<small>Building · ' + n + (n === 1 ? ' place' : ' places') + '</small>' +
+               '</span>' +
+             '</li>';
+    }
     const color = locationColor(loc);
     let sub = loc.acronym && !loc.name.includes(loc.acronym)
       ? highlight(loc.acronym, q) + ' · ' + escapeHtml(buildingText(loc))
@@ -1559,11 +1618,34 @@ function highlightSuggestion(index) {
 function chooseSuggestion(index) {
   const loc = suggestions[index];
   if (!loc) return;
+  if (loc.isBuilding) { openBuildingFromSearch(loc.building); return; }
   rememberSearch(loc);
   searchInput.value = loc.name;
   closeSuggestions();
   selectBuildingOf(loc);
   showLocationDetails(loc, undefined, true);
+}
+
+// A building chosen in the search: opened as if tapped in the list on the right
+// (the map finds it, its places listed on the left floor by floor).
+function openBuildingFromSearch(b) {
+  searchInput.value = '';
+  closeSuggestions();
+  searchInput.blur();
+  hideKeyboard();
+  if (openBuilding !== b) toggleBuilding(b);
+  else if (activeCategory !== filterId(b, '*')) selectCategory(filterId(b, '*'));
+  else showPanel(categoryView);
+}
+
+// Where "Ask for Directions to this building" leads: its entrance pin (a place
+// in it whose name says "Entrance"), else a place named after the building
+// itself, else the building's name on the map (building-labels.js
+// buildingDestination); none of these - no button.
+function buildingTarget(b) {
+  const inB = PLACES.filter(l => buildingsOf(l).indexOf(b) !== -1);
+  return inB.find(isEntrance) || inB.find(l => normText(l.name) === normText(b)) ||
+         (typeof buildingDestination === 'function' ? buildingDestination(b) : null);
 }
 
 // A place found by search shows its building chosen in the right panel, just
@@ -2076,6 +2158,17 @@ function addEtaBubble(runs, destLevel, minutes, metres) {
 
 backToTutorialBtn.addEventListener('click', showTutorialView);
 backFromCategoryBtn.addEventListener('click', () => selectCategory('ALL'));
+
+// Straight to the route to the building's entrance, its card underneath for
+// when the route's x brings the panels back.
+document.getElementById('building-directions-btn').addEventListener('click', e => {
+  const target = e.currentTarget.targetPlace;
+  if (!target) return;
+  showLocationDetails(target, undefined, 'none');
+  routeFocus = true;
+  drawRoute(target, true, 'after-panels');
+  if (typeof KioskLog !== 'undefined') KioskLog.event('ui', { what: 'building-directions', id: target.id });
+});
 
 if (basemapBtn) {
   basemapBtn.addEventListener('click', () => {
@@ -3565,7 +3658,8 @@ const QUICK_FIND = [
 ];
 
 function quickIcon(cat, colourCat) {
-  return '<span class="quick-icon" style="background:' + getCategoryColor(colourCat || cat) + '">' +
+  const bg = (cat === 'entrance' && !colourCat) ? ENTRANCE_COLOR : getCategoryColor(colourCat || cat);
+  return '<span class="quick-icon" style="background:' + bg + '">' +
          MapMarks.iconSvg(cat) + '</span>';
 }
 
@@ -3604,7 +3698,8 @@ const MAP_KEY = [
   ['libraries', 'Libraries'],
   ['lodging', 'Dormitories & lodging'],
   ['parking-waiting', 'Parking'],
-  ['waiting', 'Waiting areas', 'parking-waiting']
+  ['waiting', 'Waiting areas', 'parking-waiting'],
+  ['entrance', 'Building entrances']
 ];
 const mapKeyBtn = document.getElementById('map-key-btn');
 const mapKeyCard = document.getElementById('map-key-card');

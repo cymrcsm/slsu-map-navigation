@@ -2319,3 +2319,33 @@ body, html {
   cursor: pointer;
 }
 .filter-chip-clear:active { background: var(--surface-hover); }
+
+/* A building in the search suggestions (app.js buildingMatches): a building
+   symbol instead of the colour dot, on a light navy ground, above the places. */
+.suggestion-bldg { align-items: center; background: var(--brand-wash); margin-bottom: 2px; }
+.suggestion-bldg-icon {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--primary-strong);
+  color: #FFFFFF;
+}
+.suggestion-bldg-icon svg { width: 20px; height: 20px; }
+
+/* "Ask for Directions to this building", in a building's list: the same blue
+   as Ask for Directions on a place's card. */
+.building-directions-btn {
+  min-height: 54px;
+  margin: 4px 0 14px;
+  background: var(--route-line);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-size: 17.5px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(26, 115, 232, 0.3);
+}
+.building-directions-btn:active { background: #1557B0; box-shadow: none; }
