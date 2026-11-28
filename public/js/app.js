@@ -3488,15 +3488,19 @@ lockAdmin = function () {
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 // ==========================================
-// PANELS STEP ASIDE WHILE THE MAP MOVES
+// PANELS STEP ASIDE WHILE THE MAP MOVES - switched off
 // ==========================================
-// While a finger drags or pinches the map, the mouse wheel turns, or the zoom
-// buttons are pressed, both side panels slide out of the way so the whole
-// screen is map; they come back once the map has been still for a moment.
+// While a finger dragged or pinched the map, the mouse wheel turned, or the zoom
+// buttons were pressed, both side panels used to slide out of the way and come
+// back once the map had been still for a moment. Off since the expert review
+// (PANELS_STEP_ASIDE): panels that move by themselves surprised first-time
+// visitors and could not be tapped for a moment after; both panels now fold
+// to a tab instead, by choice. The route view still clears them (routeFocus).
 // Moves the app makes by itself (flying to a chosen place, framing a route)
 // leave the panels where they are - the panel is showing what was chosen.
 // The map behind does not change size (the panels float over it, style.css
 // .panel), so nothing is laid out again: the panels move as pictures.
+const PANELS_STEP_ASIDE = false;
 const PANELS_BACK_MS = 700;
 const kioskAppEl = document.querySelector('.kiosk-app');
 const mapPointers = new Set();
@@ -3511,6 +3515,7 @@ function setPanelsAside(aside) {
   clearTimeout(panelsBackTimer);
   // Not while the on-screen keyboard is up: its field is in the left panel.
   if (aside && !kioskKeyboard.hidden) return;
+  if (aside && !PANELS_STEP_ASIDE) return;
   kioskAppEl.classList.toggle('panels-aside', aside);
 }
 
