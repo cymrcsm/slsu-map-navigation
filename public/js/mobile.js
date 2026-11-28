@@ -256,13 +256,14 @@ if (!dest) {
 
 // The kiosk's usage log (db/usage-log.js): a phone that opened this page from
 // the kiosk's own Wi-Fi tells the kiosk the hand-off arrived. Anonymous - the
-// destination only. The public copy on GitHub Pages cannot reach the kiosk and
+// destination, and the random code of the QR it came from (handoff.js), which
+// matches it to that QR being shown. The public copy on GitHub Pages cannot reach the kiosk and
 // sends nothing.
 if (ON_KIOSK) {
   fetch('api/log', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ source: 'phone', events: [{ ts: new Date().toISOString(), type: 'phone-open', data: { id: dest.id } }] })
+    body: JSON.stringify({ source: 'phone', events: [{ ts: new Date().toISOString(), type: 'phone-open', data: { id: dest.id, h: params.get('h') || '' } }] })
   }).catch(() => {});
 }
 

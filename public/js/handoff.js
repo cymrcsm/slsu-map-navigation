@@ -32,10 +32,16 @@
     const b = clean(cfg.webUrl);
     return b ? b + '/?d=' + encodeURIComponent(loc.id) + '&from=' + encodeURIComponent(from()) : '';
   }
+  // A random code for each time the dialog opens, carried by the offline QR's
+  // link and sent back by the phone that opens it (mobile.js phone-open), so the
+  // usage log can tell how many offline codes shown were scanned. Anonymous:
+  // it says nothing about the phone or the person.
+  let handoffCode = '';
   function localUrlFor(loc) {
     let b = clean(cfg.localUrl);
     if (!b && /^https?:$/.test(location.protocol)) b = location.origin;
-    return b ? b + '/go/' + encodeURIComponent(loc.id) + '?from=' + encodeURIComponent(from()) : '';
+    return b ? b + '/go/' + encodeURIComponent(loc.id) + '?from=' + encodeURIComponent(from()) +
+               (handoffCode ? '&h=' + handoffCode : '') : '';
   }
 
   function drawQr(url) {
@@ -91,17 +97,18 @@
   function open() {
     if (typeof activeSelectedLocation === 'undefined' || !activeSelectedLocation) return;
     destEl.textContent = activeSelectedLocation.name;
+    handoffCode = Math.random().toString(36).slice(2, 8);
     mode = cfg.webUrl ? 'web' : 'local';
     render();
     overlay.classList.remove('hidden');
-    if (typeof KioskLog !== 'undefined') KioskLog.event('qr-open', { id: activeSelectedLocation.id, qr: mode });
+    if (typeof KioskLog !== 'undefined') KioskLog.event('qr-open', { id: activeSelectedLocation.id, qr: mode, h: handoffCode });
   }
   function close() { overlay.classList.add('hidden'); }
 
   swapEl.addEventListener('click', () => {
     mode = mode === 'web' ? 'local' : 'web';
     render();
-    if (typeof KioskLog !== 'undefined') KioskLog.event('qr-swap', { qr: mode });
+    if (typeof KioskLog !== 'undefined') KioskLog.event('qr-swap', { qr: mode, h: handoffCode });
   });
   btn.addEventListener('click', open);
   // The close button is the only way out. Someone lining their phone camera up

@@ -179,6 +179,15 @@ function formatKioskTime(iso) {
          d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 }
 
+// "QR: 12 of 40 sessions (30%) opened it; offline code scanned 5 of 9 times."
+function qrLine(s) {
+  const q = s.qr;
+  if (!q) return '';
+  const pct = (a, b) => (b ? Math.round(100 * a / b) + '%' : '-');
+  return ' Phone QR: opened in ' + q.sessions + ' of ' + s.sessions + ' sessions (' + pct(q.sessions, s.sessions) + '); ' +
+         'offline code scanned ' + q.offlineScanned + ' of ' + q.offlineShown + ' times shown.';
+}
+
 async function refreshUsageSummary() {
   if (!sessionAdminCode) return;
   usageSummaryEl.textContent = 'Loading…';
@@ -187,7 +196,7 @@ async function refreshUsageSummary() {
     usageSummaryEl.textContent = !s.enabled
       ? 'Logging is turned off on this kiosk (KIOSK_LOGGING=off).'
       : s.events + ' records, ' + s.sessions + ' visitor sessions, since ' + formatKioskTime(s.first) +
-        '. Kiosk clock now: ' + formatKioskTime(s.now) + '.';
+        '. Kiosk clock now: ' + formatKioskTime(s.now) + '.' + qrLine(s);
   } catch (err) {
     usageSummaryEl.textContent = err.message;
   }

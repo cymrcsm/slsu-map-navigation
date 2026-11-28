@@ -111,7 +111,27 @@ async function exportCsv() {
 async function summary() {
   const [count] = await all('SELECT COUNT(*) AS n, MIN(server_ts) AS first, MAX(server_ts) AS last FROM events');
   const [sessions] = await all("SELECT COUNT(DISTINCT session) AS n FROM events WHERE session IS NOT NULL");
-  return { enabled: ENABLED, events: count.n, sessions: sessions.n, first: count.first, last: count.last, now: new Date().toISOString() };
+  return { enabled: ENABLED, events: count.n, sessions: sessions.n, first: count.first, last: count.last,
+           now: new Date().toISOString(), qr: await qrSummary() };
+}
+
+// The phone hand-off, per visitor: how many sessions opened the QR dialog, and
+// of the offline codes shown (the kiosk Wi-Fi one), how many a phone opened -
+// matched by the random code the QR link carries (handoff.js, mobile.js).
+// Scans of the online code reach GitHub Pages, not the kiosk: not countable.
+async function qrSummary() {
+  const rows = await all("SELECT session, type, data FROM events WHERE type IN ('qr-open', 'qr-swap', 'phone-open')");
+  const parse = d => { try { return JSON.parse(d || '{}') || {}; } catch (e) { return {}; } };
+  const sessions = new Set(), offlineShown = new Set(), scanned = new Set();
+  let opens = 0, phoneOpens = 0;
+  rows.forEach(r => {
+    const d = parse(r.data);
+    if (r.type === 'qr-open') { opens++; if (r.session) sessions.add(r.session); }
+    if ((r.type === 'qr-open' || r.type === 'qr-swap') && d.qr === 'local' && d.h) offlineShown.add(d.h);
+    if (r.type === 'phone-open') { phoneOpens++; if (d.h) scanned.add(d.h); }
+  });
+  const matched = [...scanned].filter(h => offlineShown.has(h)).length;
+  return { sessions: sessions.size, opens, offlineShown: offlineShown.size, phoneOpens, offlineScanned: matched };
 }
 
 module.exports = { record, startServerHeartbeat, exportCsv, summary, ENABLED };
