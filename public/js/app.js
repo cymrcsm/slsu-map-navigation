@@ -1592,7 +1592,9 @@ function renderSuggestions(query) {
   if (!suggestions.length) {
     if (q) {
       showingHistory = false;
-      suggestionList.innerHTML = '<li class="suggestion-empty">No match for “' + escapeHtml(query.trim()) + '”</li>';
+      // not a dead end: what else can be typed, and the list on the right
+      suggestionList.innerHTML = '<li class="suggestion-empty">No match for “' + escapeHtml(query.trim()) + '”' +
+        '<small>Try a building name, a room code like EB 101, or pick a building on the right.</small></li>';
       suggestionList.classList.remove('hidden');
       searchInput.setAttribute('aria-expanded', 'true');
     } else {
